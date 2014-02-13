@@ -2,7 +2,7 @@ Modal and Component-Based System Specifications
 ===
 **By Mikael H. Møller at Department of Computer Science, Aalborg University.**
 
-This repository contains my thises, and the presentation used in the Ph.d. lecture (including sources).
+This repository contains my thesis, and the presentation used in the Ph.d. lecture (including sources).
 
 
 - Handed in:  September 9th, 2013.
