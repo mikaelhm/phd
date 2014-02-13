@@ -1,0 +1,131 @@
+%!TEX root = main.tex
+%\section{Decidability Issues}
+
+As stated in the introduction, Petri nets are a useful model since (1) they 
+model infinite state systems and (2) several relevant properties of transition
+systems are decidable. The following proposition whose proof is an % slight
+adaption of the one in~\cite{haddad-et-al-2013} establishes that 
+one can decide both consuming properties. 
+
+Before establishing the proof of Proposition~\ref{prop:decide:consuming},
+we recall some results about Petri nets that we apply here.
+Let $E \subseteq \N^k$, $E$ is a \emph{linear set}
+if there exists a finite set of vectors of $\N^k$ $\{v_0,\ldots,v_n\}$
+such that $E=\{v_0 + \sum_{1 \leq i \leq n} \lambda_i v_i\mid \forall i\ \lambda_i \in \N\}$.
+A \emph{semi-linear set}~\cite{gs66} is a finite union of linear sets; a representation of it is given
+by the family of finite sets of vectors defining the corresponding linear sets.
+Semi-linear sets are \emph{effectively} closed w.r.t. union, intersection and complementation.
+This means that one can compute a representation of the union, intersection and complementation
+starting from a representation of the original semi-linear sets. 
+$E$ is an \emph{upward closed set} if $\forall v \in E.\ v'\geq v \Rightarrow v' \in E$.
+An upward closed set has a finite set of minimal vectors denoted $\min(E)$. 
+An upward closed set is a semi-linear set which has a representation that can be derived
+from the equation $E=\min(E)+\N^k$ if $\min(E)$ is computable.
+
+Given a Petri net $\mathcal N$  and a marking $m$, the \emph{reachability}
+problem consists in deciding whether $m$ is reachable from $m_0$
+in $\mathcal N$. This problem is decidable~\cite{ReachaPbMayer}
+but none of the associated algorithms are primitive recursive. 
+Furthermore this procedure can be adapted to semi-linear sets
+when markings are identified to vectors of $\N^{|P|}$.
+% Based on reachability analysis, the authors of~\cite{dj89} design an algorithm  
+% that decides whether a marking $m$ is a \emph{home state}, i.e. $m$ is reachable
+% from any reachable
+% marking. A more general problem
+% is in fact decidable: given a subset of places $P'$ and a (sub)marking $m$ on
+% this subset, is it possible from any reachable marking to reach
+% a marking that coincides on $P'$ with $m$?
+
+In~\cite{rackoff78}, the \emph{coverability} is shown 
+to be EXPSPACE-complete. The coverability problem
+consists in determining, given a net and a target marking, whether one can reach a marking
+greater or equal than the target.  
+In~\cite{VJ84} given a Petri net, several procedures have been designed to compute the minimal
+set of markings of several interesting upward closed sets. In particular,
+given an upward closed set $\transition{Target}$, by a backward analysis one can compute
+the (representation of) upward closed set from which $\transition{Target}$ is reachable.
+Using the results of~\cite{rackoff78}, this algorithm performs in EXPSPACE.
+
+While in Petri nets, strong fairness is undecidable~\cite{carst87}, 
+observationally weak fairness is decidable and more generally, 
+the existence of an infinite sequence fulfilling a formula of the
+following fragment of LTL is decidable~\cite{Jancar90}. The literals are (1) comparisons
+between places markings and values, (2) transition firings and (3)  their negations. Formulas
+are inductively defined as literals, conjunction or disjunction of formulas and $GF \varphi$
+where $GF$ is the infinitely often operator and $\varphi$ is a formula. 
+
+
+\begin{proposition}
+\label{prop:decide:consuming}
+Let $\pnN$ be a \MAIOPN and let $B \subseteq \chan$ be a subset of its channels. 
+The satisfaction by $\pnN$ of
+the message consuming and the necessarily message consuming properties w.r.t.\ $B$
+are decidable.
+\end{proposition}
+\begin{proof}
+	{\bf Consuming property.} 
+
+\noindent
+Let $a \in B$ and $E_a$ be the upward closed set of markings defined by:
+\[
+	E_a=\{m\mid \exists t \in \Tmust \mbox{ with }\lambda(t)=\inact{a} \mbox{ and } m\geq W^-(t)\}\; ,
+\]   
+$E_a$ is the set of markings from which (in all refinements) one can immediately consume some message~$a$.
+Let $F_a$ be the upward closed set of markings defined by:\\ 
+\[
+	F_a=\{m\mid \exists m'\in E_a\ \exists \sigma \in (\Tmust)^*.\ \lambda(\sigma) \in (\Sigmat\setminus \inset)^* \wedge m \xrightarrow{\sigma} m'\}\;,
+\]
+$F_a$ is the set of markings from which one can later (in all refinements without the help of the environment)
+consume some message $a$. One computes $F_a$ by backward analysis. Let $G$ be defined 
+by: 
+\[
+	G=\{m \mid \exists a \in B. \ m(a)>0 \wedge m \notin F_a\}.
+\]
+$G$ is a semi-linear set corresponding to the markings
+from which some message $a\in B$ will never be consumed. 
+Then  $\mathcal N$ is not $B$-consuming
+iff $G$ is reachable.
+
+
+\smallskip\noindent
+{\bf Necessarily consuming property.}
+
+\noindent First one checks whether $\mathcal N$ is $B$-consuming,
+a necessary condition for being necessarily $B$-consuming. 
+If $\mathcal N$ is $B$-consuming, then one checks whether
+for some $a \in B$, there exists a reachable marking $m$ fulfilling $m(a)>0$ from which an infinite
+weakly fair run is fireable without occurrence of transitions labelled by $\inact{a}$. To perform
+this test, one builds a net $\mathcal N'$ as follows.
+\begin{itemize}
+%
+	\item $P'=P\uplus \{run\}$
+%
+	\item $T'=T\uplus \{stop\}$ 
+%
+	\item $\forall p \in P\ \forall t \in T\ W'^-(p,t)=W^-(p,t), W'^+(p,t)=W^+(p,t)$, $m'^0(p)=m^0(p)$
+%
+	\item $W'^-(run,stop)=1,$ $W'^+(run,stop)=0$, $m'^0(run)=1$
+%
+	\item $W'^-(a,stop)=W'^+(a,stop)=1$
+%
+	\item $\forall p \in P\setminus \{a\}\  W'^-(p,stop)=W'^+(p,stop)=0$
+%
+	\item $\forall t \in T\ \mbox{ such that }\lambda(t)=\inact{a}\ W'^-(run,t)=W'^+(run,t)=1$
+%
+	\item $\forall t \in T\ \mbox{ such that }\lambda(t)\neq\inact{a}\ W'^-(run,t)=W'^+(run,t)=0$
+%
+\end{itemize}
+$\mathcal N'$ behaves as $\mathcal N$ as long as $stop$ is not fired.
+Transition $stop$ can be fired only if $m(a)>0$.
+When $stop$ is fired only transitions not labelled by $\inact{a}$ are fireable.
+Then one checks whether there exists an infinite observationally weakly fair run 
+that fulfils formula $GF run=0 \wedge GF \neg \mbox{fireable}(\inact{a})$
+in $\mathcal N'$. Since $\mbox{fireable}(\inact{a})$ is expressible
+by a boolean combination of comparisons of place markings with constants,
+the formula belongs to the logic of~\cite{Jancar90}.
+The first term witnesses the firing of $stop$
+and the second term ensures that the sequence is also weakly
+fair in $\mathcal N$. Then $\mathcal N$ is necessarily $B$-consuming 
+iff there is no such run. 
+
+\end{proof}

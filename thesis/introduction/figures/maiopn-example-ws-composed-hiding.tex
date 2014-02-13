@@ -1,0 +1,49 @@
+%!TEX root = ../../thesis.tex
+
+\begin{tikzpicture}[node distance=0.5cm and 1cm]
+    \node[mustt,label={[name=reql]above:$\transition{Request?}$}] (req) {};
+    \node[place, right=of req,label=above:$p_0$] (p) {};
+    \node[mayt,label=left:$\tau$,below=of p] (check) {};
+
+    \node[mustt,label=above:$\transition{\tau}$,right=of p] (noval) {};
+    \node[place, below=of noval,label=below:$p_1$] (p1) {};
+
+    \node[place, right=of noval,label=above:$p_2$] (p2) {};
+    \node[mayt,label=right:$\tau$,below=of p2] (validated) {};
+
+    \node[mustt,label={[name=resl]above:$\transition{Response!}$},right=of p2] (res) {};
+    % \node[mayt,label=below:$\transition{Denied!}$,below right=of p] (denied) {};
+    
+    \draw[arc] (req) -- (p) {};
+    \draw[arc] (p) -- (check) {};
+    \draw[arc] (check) -- (p1) {};
+    \draw[arc] (p1) -- (validated) {};
+    \draw[arc] (validated) -- (p2) {};
+    \draw[arc] (p2) -- (res) {};
+    \draw[arc] (p) -- (noval) {};
+    \draw[arc] (noval) -- (p2) {};
+
+    \node[place, below=1cm of check,label=left:$p_3$] (checkChan) {};
+    \node[place, below=1cm of validated,label=right:$p_4$] (valChan) {};
+
+
+    \node[mustt,label={[name=reqVl]left:$\tau$}, below=1cm of checkChan] (reqV) {};
+    
+    \node[place, right=of reqV,label=above:$p_5$] (pval) {};
+    \node[mustt,label={[name=valTl]right:$\tau$},below=1cm of valChan] (valT) {};
+    \node[mustt,label={[name=deniedl]right:$\transition{Denied!}$},below=of valT] (denied) {};
+    
+    \draw[arc] (reqV) -- (pval) {};
+    \draw[arc] (pval) -- (valT) {};
+    \draw[arc] (pval) -- (denied) {};
+
+    \draw[arc] (check) -- (checkChan) {};
+    \draw[arc] (checkChan) -- (reqV) {};
+    \draw[arc] (valT) -- (valChan) {};
+    \draw[arc] (valChan) -- (validated) {};
+
+
+    \begin{pgfonlayer}{background}
+        \node [compBackground,inner sep=6mm,fit=(reql) (check) (validated) (resl) (reqVl) (valTl) (deniedl)] {};
+    \end{pgfonlayer}
+\end{tikzpicture}

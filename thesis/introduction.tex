@@ -1,0 +1,20 @@
+%!TEX root = thesis.TEX
+
+\ifnum\lalala=1
+    \renewcommand{\ref}[1]{{\bf\pageref{intro:first}$<$\pageref{#1}$<$\pageref{intro:last}}}
+    \renewcommand{\eqref}[1]{{\bf\pageref{intro:first}$<$\pageref{#1}$<$\pageref{intro:last}}}
+\fi
+
+\label{intro:first}
+\part{Introduction}
+\thispagestyle{empty}
+
+\input{introduction/motivation}
+\input{introduction/model_checking}
+\input{introduction/modal_transition_systems}
+\input{introduction/mts_contribution}
+\input{introduction/components}
+\input{introduction/comp_contribution}
+\input{introduction/thesis_overview}
+
+\label{intro:last}

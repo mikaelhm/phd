@@ -1,0 +1,75 @@
+\section{Introduction}
+The  specification  formalisms   of  Modal  Transition  Systems  (MTS)
+\cite{DBLP:conf/lics/LarsenT88,AHLNW:EATCS:08} grew out of a series of
+attempts   to  achieve  a   flexible  and   easy-to-use  compositional
+development methodology  for reactive systems.  In  fact the formalism
+of   MTS   may   be   seen   as   a   fragment   of  a 
+temporal   logic~\cite{DBLP:journals/tcs/BoudolL92},   
+while   having   a   behavioural
+semantics  allowing  for an easy  composition with  respect  to  process
+constructs.
+
+In short, MTS are labelled  transition systems equipped with two types
+of  transitions: \emph{must}  transitions which are mandatory  for any
+implementation, and  \emph{may} transitions  which are optional  for an
+implementation.   Refinement  of an   MTS  now  essentially  consists of
+iteratively resolving the unsettled  status of may transitions: either
+by removing them or by turning them into must transitions.
+
+It is  well admitted (see e.g. \cite{RBBCP:ACSD:09}) that MTS  and their
+extensions              like              disjunctive              MTS
+(DMTS)~\cite{DBLP:conf/lics/LarsenX90}, %,fossacs-techrep},
+1-selecting MTS  (1MTS)~\cite{FS:JLAP:08} and transition  systems with
+obligations   (OTS)~\cite{benes_et_al:OASIcs:2011:3070}   provide  strong
+support  for a specification  formalism allowing  for step-wise refinement
+process.   Moreover,  the MTS  formalisms  have  applications in  other
+contexts,   which   include   verification  of   product   lines
+\cite{DBLP:conf/fmoods/GrulerLS08,LarsenNW07},
+interface theories~\cite{UC:FSE:04,RBBCP:ACSD:09}
+and
+modal abstractions in 
+program analysis~\cite{GHJ:CONCUR:01,HJS:ESOP:01,NNN:SAS:08}.
+%                       and
+%conter-example-guided-abstraction-refinement  techique  for transition
+%systems.
+
+Unfortunately, all  of these formalisms lack the  capability to express
+some intuitive specification  requirements like exclusive, conditional
+and  persistent choices.  In this  paper we  extend considerably the
+expressiveness of MTS and its variants so that it can model
+arbitrary Boolean conditions on transitions and also allows to instantiate persistent
+transitions. Our model, called \emph{parametric modal transition systems} (PMTS),
+is equipped with a finite set of parameters that
+are fixed prior to the instantiation of the transitions in the specification.
+The generalized notion of modal refinement is designed to handle the parametric
+extension and it specializes to
+the well-studied modal refinements on all the subclasses of our model
+like
+MTS, disjunctive MTS and MTS with obligations.
+
+To the best of our knowledge, this is the first sound attempt to introduce
+persistence into a specification formalism based on modal transition systems.
+The most related work is by Fecher and Schmidt 
+on 1-selecting MTS~\cite{FS:JLAP:08} where the authors
+allow to model exclusive-or and briefly mention the desire %outline a possibility 
+to extend the formalism with persistence. However, 
+as in detail explained in the apendix of
+% %Appendix~\ref{ap:mts}, 
+\cite{pmts-techrep},
+their definition does not capture the %intended 
+notion of persistence.
+Our formalism is in several aspects semantically more general and handles persistence
+in a complete and uniform manner.
+
+The main technical contribution, apart from the formalism itself, 
+is a comprehensive complexity   characterization   of modal refinement 
+checking on all of the practically relevant subclasses of PMTS. 
+We show that the complexity ranges from P-completeness to 
+$\PiP_4$-completeness, depending on the requested generality of the PMTS specifications 
+on the left-hand and right-hand sides.
+
+%*** someone please complete this -- is it the work of Harald Fecher?**
+%For  related  work  we  mention  \cite{}  that  attempt  to  introduce
+%persistence, but lack ... with  technical problems and do not allow as
+%general expressiveness as our PMTS. 
+

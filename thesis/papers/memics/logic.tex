@@ -1,0 +1,183 @@
+\section{Characterizing Logic}
+In this section we define a new logic for reasoning about BMTS specifications. The logic is based on Hennessy Milner Logic (HML) with recursion \cite{DBLP:conf/caap/Larsen88}. Originally \cite{DBLP:journals/jacm/HennessyM85} HML was defined on LTS and has been proven to characterize bisimulation. 
+
+The syntax is identical to HML with recursion, we actually only extend the semantics to capture the modalities of BMTS. We follow the approach used in~\cite{DBLP:journals/iandc/SteffenI94}, for more see~\cite{AILS:reactive:07}. 
+The main idea is to present a way to construct the characteristic formula for a BMTS, and then prove that the satisfaction of the logic coincide with modal refinement checking.
+
+We build the characteristic formula as a mutually recursive equation system with an equation for each state of the BMTS.
+
+Let $\mathcal{X} = \{X_1,\ldots,X_n\}$ be a set of variables, then the set $\mathcal{M_X}$ of formulas over a set of actions $\Sigma$ is given by the following abstract syntax.
+\[
+ F,G =:: 	X \mid
+			\true \mid 
+			\false \mid 
+			F \wedge G \mid 
+			F \vee G \mid 
+			\ldia{a} F \mid
+			\lbox{a} F\; ,
+\]
+where $a \in \Sigma$ and $X \in \mathcal{X}$.
+
+A mutually recursive equation system is a set of equations like 
+\begin{align*}
+	X_1=F_{X_1} \\
+	X_2=F_{X_2} \\
+	\vdots \\
+ 	X_n=F_{X_n}\;,
+\end{align*}	
+where $X_1, \ldots, X_n$ are unique variables and $F_{X_1},\ldots, F_{X_n}$ are logic formulas that each may contain several of the variables. The equation system is formally given by a declaration, a function $D: \mathcal{X} \goes{} \mathcal{M_X}$, assigning a formula to each variable in $\mathcal{X}$.
+
+Given a BMTS $(S,T,\UPhi,s_0)$ over a set of actions $\Sigma$ we define the
+denotational semantics as a function $\Osat{F}: (2^S)^n \rightarrow 2^S$  
+inductively for $F \in \mathcal{M_X}$ by
+	\begin{align*}
+		\Osat{X_i}(S_1,\ldots,S_n) &= S_i\\
+		\Osat{\true}(S_1,\ldots,S_n) &= S\\		
+		\Osat{\false}(S_1,\ldots,S_n) &= \emptyset \\
+		\Osat{F \wedge G}(S_1,\ldots,S_n) &= \Osat{F}(S_1,\ldots,S_n) \cap \Osat{G}(S_1,\ldots,S_n) \\
+		\Osat{F \vee G}(S_1,\ldots,S_n) &= \Osat{F}(S_1,\ldots,S_n) \cup \Osat{G}(S_1,\ldots,S_n) \\
+		\Osat{\ldia{a} F}(S_1,\ldots,S_n) &= \diad{a}\Osat{F}(S_1,\ldots,S_n) \\
+		\Osat{\lbox{a} F}(S_1,\ldots,S_n) &= \boxd{a}\Osat{F}(S_1,\ldots,S_n)\;,
+	\end{align*}
+where \diad{a} and \boxd{a} are defined as follows
+\begin{align*}
+	\diad{a}S' &= \{s \in S \mid \forall M \in \val(s) ,\; \exists (a,s'') \in M : s'' \in S'\}\\
+	\boxd{a}S' &= \{s \in S \mid \forall M \in \val(s) ,\; \forall (a,s') \in M : s' \in S'\}.
+\end{align*}
+
+The modal logic presented here is basically HML with recursion, with $\boxd{a}$ and $\diad{a}$ defined to match must and may modalities in BMTSs.
+
+We define $\diad{a}$ so it corresponds to a must transition, recall that must means that there has to be an $a$ transition no matter how one satisfies the obligation formula. Note that it is enough to quantify over $\forall M \in \val(s)$, as $\UPhi(s)$ is satisfiable, so there exists at least one $M \in \val(s)$.
+
+We define $\boxd{a}$ so it corresponds to may transitions, i.e. a transition that can be there in any of the possible configurations of a state. Also note that the definition of $\boxd{a}$ and $\diad{a}$ are closely related to the two requirements in modal refinement in Definition~\ref{def:bool-mr}.
+
+The return value of $\Osat{F}(S_1,\ldots,S_n)$ is the set of states satisfying $F$ assuming that $S_i$ is the set of states satisfying $X_i$ for $1 \leq i \leq n$.  
+
+As we are dealing with a mutually recursive equation system declared by a function $D$, the solution of such can be a maximal fix-point. Let $\setsat{D}$ be the \emph{semantic function} $\setsat{D} : \mathcal{D} \rightarrow \mathcal{D}$ defined by
+	\[
+		\setsat{D}(S_1,\ldots,S_n) = (\Osat{F_{X_1}}(S_1,\ldots,S_n),\ldots,\Osat{F_{X_n}}(S_1,\ldots,S_n)),
+	\]
+	where $S_i \subseteq S$ for $1 \leq i \leq n$.
+
+As $\setsat{D}$ is monotonic, Tarski's fixed-point theorem gives us that there exists a unique maximal fix-point. 
+We define the satisfaction relation for every $i$ as
+
+\[
+	s \models_{max} D(X_i) \iff s \in S_i, \text{ where } (S_1,\ldots,S_n) = \bigcap \{O \mid O \supseteq \setsat{D}(O)\}\;.
+\]
+
+We only consider the maximal fix-points, so from now on we will omit the $max$ subscript. We shall sometimes abuse the notation a bit, by applying the satisfaction relation directly on a BTMS and a declaration, like $ \mathcal S \models D_\mathcal T$. This just means that $s_0 \models \DecT(X_{t_0})$, where $s_0$ and $t_0$ are the initial states of $\mathcal S$ and $\mathcal T$.
+
+Now given a BTMS $\mathcal{T}$ we will define a declaration $\DecT$ such that for all other BMTSs $\mathcal{S}$ we know that $\mathcal{S}$ is in modal refinement of $\mathcal{T}$ if and only if $\mathcal{S}$ satisfies $\DecT$.
+
+\begin{theorem}\label{thm:charataristic}
+	Given two BMTSs $\mathcal{T}=(S_1,T_1,\UPhi_1,t_0)$, $\mathcal{S} = (S_2,T_2,\UPhi_2,s_0)$. Let $\DecT$ be constructed as follows for each state $t \in S_1$ 
+	\[\label{eqn:logic-construction}
+		\DecT(X_t) = 	%	\bigvee_{\mu \subseteq P} 
+				 	\bigvee_{ N \in \val(t)}
+					\left [ 
+						\left ( 
+							\bigwedge_{(a,t') \in N}\ldia{a}X_{t'}
+						\right ) 
+						\wedge 
+						\bigwedge_{a \in \Sigma}\lbox{a}
+							\left( 
+								\bigvee_{(a,t') \in N}(X_{t'}) 
+							\right)
+					\right ],
+	\]
+	then 
+	\[
+		\mathcal{S} \models \DecT \iff S \mr T\,.
+	\]
+\end{theorem}
+We note that \eqref{eqn:logic-construction} generalizes the characteristic formula construction in \cite{DBLP:journals/iandc/SteffenI94} and \linebreak \cite{AILS:reactive:07} with the disjunction in front. 
+
+Before we prove Theorem~\ref{thm:charataristic}, let us again have a look at the example from last section.
+\begin{example}
+ The logical characterization of $\mathcal{S}_1$ looks like this,
+	\begin{align*}
+		D_{\mathcal{S}_1}(X_{s_1}) =& ( \ldia{\Coin} X_{s_2} ) \wedge ( \lbox{\Coin} X_{s_2} \wedge \lbox{\Choc} \false \wedge \lbox{\Coffee} \false \wedge \lbox{\Tea} \false ) \\
+	    D_{\mathcal{S}_1}(X_{s_2}) =
+	    & \Bigg{(} ( \ldia{\Choc} X_{s_1} \wedge \ldia{\Coffee} X_{s_1} \wedge \ldia{\Tea} X_{s_1}  ) \wedge \\ &\quad( \lbox{\Coin} \false \wedge \lbox{\Choc} X_{s_1} \wedge \lbox{\Coffee} X_{s_1} \wedge \lbox{\Tea} X_{s_1}  )
+	\Bigg{)} \vee\\
+		& \Bigg{(} ( \ldia{\Choc} X_{s_1} \wedge \ldia{\Coffee} X_{s_1}  ) \wedge \\ &\quad( \lbox{\Coin} \false \wedge \lbox{\Choc} X_{s_1} \wedge \lbox{\Coffee} X_{s_1} \wedge \lbox{\Tea} \false  )
+	\Bigg{)} \vee\\
+		& \Bigg{(}( \ldia{\Choc} X_{s_1} \wedge \ldia{\Tea} X_{s_1}  ) \wedge\\ &\quad  ( \lbox{\Coin} \false \wedge \lbox{\Choc} X_{s_1} \wedge \lbox{\Coffee} \false \wedge \lbox{\Tea} X_{s_1}  )
+	\Bigg{)} \vee\\
+		 & \Bigg{(}( \ldia{\Coffee} X_{s_1} \wedge \ldia{\Tea} X_{s_1}  ) \wedge \\ &\quad( \lbox{\Coin} \false \wedge \lbox{\Choc} \false \wedge \lbox{\Coffee} X_{s_1} \wedge \lbox{\Tea} X_{s_1}  )
+		\Bigg{)}\; .
+	\end{align*}
+\end{example}
+
+
+We will prove Theorem~\ref{thm:charataristic} by the following two lemmas.
+
+
+\begin{lemma}\label{lem:sat-impl-mr}
+		Let $\DecT(X_t)$ be defined as in \eqref{eqn:logic-construction}, then for each state $t \in S_1$ we have
+
+	\[
+		s \mr t \text{ implies } s \models \DecT(X_t)\, ,
+	\]
+	for all $s \in S_2$.
+\end{lemma}
+\begin{proof}
+ 	Assume that $s \mr t$. We will show that $s \in \satset{\DecT(X_t)}$, the set of all states that satisfy $\DecT(X_t)$. Further let $\mrset{t}= \{s \mid s \mr t\}$ be the set of all states in modal refinement of $t$.
+
+As the satisfaction relation is defined as a maximal fix-point, we need to show that  
+	\[
+		s \in \bigcup_{ N \in \val(t)}
+		\left [ 
+			\left ( 
+				\bigcap_{(a,t') \in N}\diad{a}\mrset{t'}
+			\right ) 
+			\cap 
+			\bigcap_{a \in \Sigma}\boxd{a}
+				\left( 
+					\bigcup_{(a,t') \in M}\mrset{t'}
+				\right)
+		\right ].
+	\]
+	Assume $M \in \val(s)$. By definition of modal refinement we know that there exists $N \in \val(t)$, such that the two requirements for modal refinement are fulfilled. Let us now use this $N$, and prove the two following cases:
+\begin{enumerate}
+	\item $s \in 
+		\left ( 
+			\bigcap_{(a,t') \in N}\diad{a}\mrset{t'}
+		\right ) 
+	$
+	\item $s \in
+	\bigcap_{a \in \Sigma}\boxd{a}
+		\left ( 
+			\bigcup_{(a,t') \in O}\mrset{t'}
+		\right ) $
+		\end{enumerate}
+		
+	Proof of 1. Assume $(a,t') \in N$. By modal refinement we know that for all $(a,t') \in N$ there exists $(a,s') \in M$ such that $s' \mr t'$. Thus we have that
+		$s \in 
+			\left ( 
+				\bigcap_{(a,t') \in N}\diad{a}\mrset{t'}
+			\right ) 
+		$.
+		
+		
+	Proof of 2. Assume $(a,s') \in M$. By modal refinement we get that there exists $(a,t') \in N$ st. $s' \in \mrset{t'}$. This gives us $s \in
+		\bigcap_{a \in \Sigma}\boxd{a}
+			\left ( 
+				\bigcup_{(a,t') \in N}\mrset{t'}
+			\right )$. 
+\end{proof}
+
+\begin{lemma}\label{lem:mr-impl-sat}
+	Let $\DecT(X_t)$ be defined as in \eqref{eqn:logic-construction}, then for each state $t \in S_1$ we have
+	
+\[
+	s \models \DecT(X_t) \text{ implies }  s \mr t,
+\]
+for all $s \in S_2$.
+\end{lemma}
+This lemma can be proved in the same manner as Lemma~\ref{lem:sat-impl-mr}.
+%, the full proof can be found in Appendix~\ref{app-logic}.
+By these two lemmas we have proved Theorem~\ref{thm:charataristic}.
+
+Unfortunately the size of the formula is exponential in the given BMTS. In the worst case there can be exponentially many $N \in \val(s)$, so it is exponential in the number of outgoing transitions. We could however not expect it to be smaller, as modal refinement checking of BMTS was shown to be $\Pi^P_2$-complete in \cite{BKLMS:ATVA:11}.

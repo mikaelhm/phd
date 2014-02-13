@@ -1,0 +1,114 @@
+%!TEX root = ./main.tex
+
+\subsection{Semantics: Modal Asynchronous I/O-Transition Systems}
+\label{sec:semantics-tgc}
+
+We extend the transition system semantics of modal Petri nets defined in Sect.~\ref{subsec:basics-modal} to \MAIOPNs.
+For this purpose we introduce \emph{modal asynchronous I/O-transition system} (\MAIOTS) $\S = (\chan, \Sigma,Q,q^0,\may{},\must{},\val)$
+which are modal transition systems such that $\chan$ is a finite set of channels, $\ioalpha{}$ is an I/O-alphabet over $\chan$,
+and $\val: Q  \goes{} \N^{\chan}$  is a channel valuation function which determines for each state $q \in Q$ how many messages are actually pending
+on each channel $a \in C$. Instead of $\val(q)(a)$ we write $\val(q,a)$. We require that initially all channels are empty, i.e.\ $\val(q^0,a) = 0$ for all $a \in \chan$, that for each $a \in \chan$  putting $\outact{a}$ and consuming $\inact{a}$ messages from $a$ has the expected behaviour, and that the open input/output actions have no effect on a channel, i.e.\
+\begin{itemize}
+            \item[~] $q \goes{\outact{a}} q' \implies \val(q') = \val(q)[a\mathrm{++}]$\footnote{$\val(q)[a\mathrm{++}]$ ($\val(q)[a\mathrm{--}]$ resp.) denotes the update of $\val$ which increments (decrements)
+the value of $a$ and leaves the values of all other channels unchanged.},
+            \item[~] $q \goes{\inact{a}} q' \implies \val(q,a) > 0 
+            \text{ and } \val(q') = \val(q)[a\mathrm{--}]$, and
+            \item[~] for all $x \in (\inset \cup \outset), q \goes{x} q' \implies \val(q') = \val(q)$.
+\end{itemize}
+
+
+
+The semantics $\maiots(\pnN)$ of a modal asynchronous I/O--Petri net $\pnN$ is given by the transition system semantics of modal Petri nets such that the reachable
+markings are the states. Additionally we define the associated channel valuation function $\val: Q  \goes{} \N^{\chan}$ such that
+the valuation of a channel $a$ in a current state $m$ is given by the number of tokens on $a$
+under the marking $m$, i.e.\ $\val(m,a) = m(a)$.
+For instance, the semantics of the \textsf{CompressorInterface} in Sect.~\ref{sec:example} and of the \textsf{Controller} leads to
+ infinite state transition systems;
+the transition systems associated with the two compressor components
+have two reachable states and the transitions between them correspond directly to their Petri net representations 
+in Fig.~\ref{fig:ex-gifCompressor} and  Fig.~\ref{fig:ex-txtCompressor}.
+%For instance, the transition systems associated with the \MAIOPNs $\pnN_1$ and $\pnN_2$ in Fig.~\ref{fig:ex-aiopn1} and~\ref{fig:ex-aiopn2}
+% have two reachable states and the transitions between them correspond directly to their Petri net representations. 
+%The situation is different for the \MAIOPN $\pnN_3$ in Fig.~\ref{fig:ex-aiopn}. It has infinitly many reachable markings
+%and hence its associated \MAIOTS has infinitely many reachable states. 
+%Fig.~\ref{fig:ex-associatedMAIOTS} shows an excerpt of it. 
+%The states indicate the number of tokens in each place in the order $p_0, p_1, msg, p_2, p_3$. The initial state is underlined.
+%
+%
+%\begin{figure}
+%    \centering
+%    \input{papers/tgc/figures/state-space-example.tex}
+%    \caption{Part of the associated \MAIOTS for $\pnN_3$ in Fig.~\ref{fig:ex-aiopn}.}
+%\label{fig:ex-associatedMAIOTS}
+%\end{figure}
+
+The \emph{asynchronous composition} $\S \compos \T$ of two \MAIOTSs $\S$ and $\T$ works as for asynchronous I/O--transition systems in~\cite{haddad-et-al-2013} taking additionally care that\linebreak must-transitions of $\S$ and $\T$ induce must-transitions of  $\S \compos \T$.
+The composition introduces new channels $\chan_{\S\T} = \Sigma_\S \cap \Sigma_\T$ for shared input/output labels.
+Every transition with a shared output label $a$ becomes a transition with the communication label $\outact{a}$,
+and similarly transitions with input labels $a$ become transitions with label $\inact{a}$.
+The state space of the composition is (the reachable part of) the Cartesian product of the underlying state spaces of $\S$ and $\T$ together with the set $\N^{\chan_{\S\T}}$ of valuations for the new channels such that transitions labelled by  $\outact{a}$ and $\inact{a}$ have the expected effect on the new channels; for details see~\cite{haddad-et-al-2013}.
+The asynchronous composition of two \MAIOTSs is commutative and also associative under appropriate syntactic restrictions on the underlying alphabets.
+
+We also introduce a \emph{hiding operator} on \MAIOTSs that hides communication channels
+and moves all corresponding communication labels to $\tau$.
+Let $\S = \maiotstup{\S}$ be a \MAIOTS with I/O-alphabet \ioalpha{\S}, and let $H \subseteq \chan_\S$ be a subset of its channels. The \emph{channel hiding of $H$ in $\S$} is the \MAIOTS $\S \setminus H = (\chan, \Sigma,Q_\S,q^0_\S,\may{},\must{},\val)$, such that 
+$\chan = \chan_\S \setminus H$, $\Sigma = \inset_\S \uplus \outset_\S \uplus \com$ with $\com = \{\inact{a},\outact{a} \mid a \in \chan\}$,
+ $\val(q,a) = \val_\S(q,a)$  for all $q \in Q, a \in \chan$, and the may-transition relation is given by:
+\begin{align*}
+    \may{} \; = &\{(q,a,q') \mid a \in (\Sigmat \setminus \{\inact{a},\outact{a} \mid a \in H\}) \text{ and } q \may{a}_\S q' \} \\
+              &\cup \{ (q,\tau ,q') \mid \exists a \in H \text{ such that either } q \may{\outact{a}}_\S q'  \text{ or }   q \may{\inact{a}}_\S q' \},
+\end{align*}
+    \begin{itemize}
+        \item[~] $\may{} \; = \{(q,a,q') \mid a \in (\Sigmat \setminus \{\inact{a},\outact{a} \mid a \in H\}) \text{ and } q \may{a}_\S q' \} \; \cup $\\
+              $~~\qquad \{ (q,\tau ,q') \mid \exists a \in H \text{ such that either } q \may{\outact{a}}_\S q'  \text{ or }   q \may{\inact{a}}_\S q' \}$,
+    \end{itemize}
+The must-transition relation $\must{}$ is defined analogously.
+
+For the results developed in the next sections it is important that our transition system semantics is compositional and
+compatible with hiding as stated in the next theorem. 
+
+\begin{theorem}\label{thm:comp-hide-semantics}
+  Let $\pnN$ and $\M$ be two composable \MAIOPNs  and let $H \subseteq \chan_\pnN$
+be a subset of the channels of $\pnN$. The following holds:
+ \begin{enumerate}
+\item\label{item:comp-semantics} 
+$\maiots(\pnN \compospn \M) = \maiots(\pnN) \compos \maiots(\M)$ (up to isomorphic state spaces),
+\item\label{item:hide-semantics}
+$\maiots(\pnN \setminus_{pn} H) = \maiots(\pnN) \setminus H$.
+ \end{enumerate}
+\end{theorem}
+\begin{proof}
+	The proof of part \ref{thm:comp-hide-semantics}.\ref{item:comp-semantics} is ommited as it is almost identical to the proof in \cite{TechReportVersion}.
+
+\paragraph{Proof of \ref{thm:comp-hide-semantics}.\ref{item:hide-semantics}}
+Let $\maiots(\pnN \hidepn H) = A = \maiotstup{A}$ and $\maiots(\pnN) \hide H = B = \maiotstup{B}$. 
+The following equalities follow directly from 
+the definiton of channel hidding on \MAIOPNs, channel hidding on \MAIOTSs and the semantics of a \MAIOPN: 
+% Def.~\ref{def:hiding-pn}, Def.~\ref{def:assoc-maiots} and Def.~\ref{def:hiding-ts}; 
+$\chan_A = \chan_B$, $\Sigma_A = \Sigma_B$, $Q_A = Q_B$, $q^0_A = q^0_B$, and $\val_A = \val_B$. 
+It remains to prove that the two transition relations coincide.
+
+From 
+the semantics of a \MAIOPN
+% Def.~\ref{def:assoc-maiots} 
+it follows that 
+\[
+    \may{}_A = \{(m,a,m') \mid a \in (\Sigma_A)_\tau \;.\; m \may{a}_{(\pnN \hidepn H)} m'\}\;,
+\]
+where $\may{}_{(\pnN \hidepn H)}$ is the may-transition relation of $\pnN \hidepn H$.
+
+From the
+definition of channel hiding on \MAIOPNs
+%Def.~\ref{def:hiding-pn} 
+we see that communication labels on hidden channels are renamed to $\tau$. Thus, 
+\begin{align*}
+    \may{}_B = &\{(m,\tau,m') \mid \exists a \in H \;.\; m \may{\inact{a}}_{\pnN} m' ~\vee~m \may{\outact{a}}_{\pnN} m' \}\\
+    &\cup  \{(m,a,m') \mid a \in (\Sigmat \setminus \{\inact{a},\outact{a} \mid a \in H\}) \;.\; m \may{a}_{\pnN} m'\} \;,
+\end{align*}
+
+where $\Sigma$ is the I/O-alphabet of $\pnN$ and $\may{}_{\pnN}$ is the may-transition relation of $\pnN$.
+It then follows from 
+the definition of channel hidding on \MAIOTS
+%Def.~\ref{def:hiding-ts} 
+that $\may{}_A =~\may{}_B$. Similarly one can prove that $\must{}_A =~\must{}_B$.
+\end{proof}

@@ -1,0 +1,114 @@
+In this section, we give an overview of the complexity of our problem both 
+in general and in an important special case. We start with establishing 
+the hardness results. The matching upper bounds and the outline of their 
+proofs follow. 
+%The subsequent sections are devoted to the actual proofs of the 
+%upper bounds and the corresponding algorithms.
+When referring to the size of MTSDs and the dual-price scheme, we
+implicitly assume binary encoding of numbers.
+We start by observing that the implementation problem is NP-hard even if no hardware is involved.
+
+\begin{proposition}
+The implementation problem is NP-hard even for the hardware
+requirement function $\Psi$ that is constantly true for all actions.
+\end{proposition}
+\begin{proof}
+We shall reduce the satisfiability problem of Boolean formulae (SAT) 
+to our problem. Let $\varphi$ be a Boolean formula over the 
+variables $x_1,\ldots,x_n$. We define a MTSD $\Spec$ over the set
+of actions $\Sigma=\{x_1,\ldots,x_n,*\}$ such that the running cost is 
+$r(x_j)= 1$ for all $1\leq j\leq n$ and $r(*)=2$ and the duration of all actions is $1$.  
+The specification $\Spec$ has 
+one state $s$ and a self-loop under all elements of $\Sigma$ with
+the obligation function $\Phi(s)=\varphi\vee (*,s)$. The reason for adding
+the action $*$ is to make sure that in case $\varphi$ is not satisfiable
+then we can still have a deadlock-free, but more running-cost-expensive implementation. 
+Now we set the hardware to $H=\emptyset$ and the hardware requirement
+function $\Psi(a)$ constantly true for all $a \in \Sigma$. 
+It is easy to observe that the formula $\varphi$ is satisfiable iff $\Spec$ 
+has an implementation $\Impl$ with $\rc(\Impl)\leq 1$ (and $\ic(\Impl)=0$).
+% \qed
+\end{proof}
+
+Note that in the proof we required $\Phi$ to be a general Boolean formula. 
+If, for instance, we considered $\Phi$ in \emph{positive form}
+(i.e.~only containing $\wedge$ and $\vee$ operators and not $\neg$), 
+the hardness would not hold.
+Thus on the one hand, one source of hardness is the complexity of $\Phi$. 
+On the other hand, even if $\Phi$ corresponds to the simplest case of an 
+implementation ($\Phi$ is a conjunction of atomic propositions), the problem 
+remains hard due to the hardware.
+
+\begin{proposition} \label{prop:hardware:hard}
+The implementation problem is NP-hard even for specifications that are 
+already implementations.
+\end{proposition}
+\begin{proof}
+We reduce the NP-complete problem of vertex cover to our problem. 
+Let $(V,E)$ where $E \subseteq V\times V$ 
+be a graph and $k\in\mathbb N$ be an integer. We ask
+whether there is a subset of vertices $V_k \subseteq V$ 
+of cardinality $k$ such that for every $(v_1,v_2) \in E$
+at least $v_1 \in V_k$ or $v_2 \in V_k$. Let us construct 
+an MTSD specification $\Spec$ with hardware $H=V$ and the investment function
+$i(v) = 1$ for all $v \in H$, such that
+$\Spec$ has only one state $s$ and a self-loop under a single action $a$ 
+that is required ($\Phi(s)=(a,s)$)
+and where the hardware requirement function is 
+$\Psi(a)=\bigwedge_{(u,v)\in E}(u\vee v)$.
+There is now a vertex cover in $(V,E)$ of size $k$ iff 
+$\Spec$ has an implementation $\Impl$ with $\ic(\Impl)\leq k$.
+Setting e.g.~$D(s,a,s) = 1$ and the running cost $r(a)=0$
+establishes NP-hardness of the 
+implementation problem where we ask for the existence of an implementation
+of $\Spec$ with maximum running cost $0$ and maximum investment cost $k$.
+
+Alternatively, we may introduce a self-loop with 
+a new action name $a_{(u,v)}$ 
+for every edge $(u,v)$
+in the graph such that $\Psi(a_{(u,v)})= u \vee v$, 
+showing NP-hardness even for the
+case where the hardware requirement function is a simple disjunction
+of hardware components.
+% \qed
+\end{proof}
+
+%Note that hardware requirement function $\Psi$ from the proof was in conjunctive normal form. However, if one only allowed $\Psi$ in disjunctive normal form (DNF), the stated hardness would not hold.
+
+In the subsequent sections, we 
+obtain the following matching upper bound which yields the following theorem.
+
+\begin{theorem}\label{thm:NP}
+The implementation problem is NP-complete.
+\end{theorem}
+
+By analysing the proof of Proposition~\ref{prop:hardware:hard},
+it is clear that we have to restrict the hardware requirement function
+before we can obtain a more efficient algorithm for the implementation problem.
+We do so by assuming a constant number of hardware components
+(not part of the input).
+%We do so by saying that an action $a$ is a \emph{hardware-requiring} action
+%if $\Psi(a)$ is different from true.
+%In order to achieve a better complexity bound, we will assume that
+%the number of hardware-requiring actions is constant (not part of the input). 
+If we at the same time require the obligation function in 
+positive form, we obtain a simpler problem as stated in the following theorem.
+
+\begin{theorem}\label{thm:MPG}
+The implementation problem with  
+positive obligation function and 
+a constant number of hardware components
+is polynomially equivalent to mean payoff games and 
+thus it is in $\text{NP} \cap \text{coNP}$ and 
+solvable in pseudo-polynomial time.
+\end{theorem}
+
+%This special case is useful, as $\Psi$ in DNF specifies the possible 
+%minimal configurations one by one, which we find rather natural. 
+%Moreover, transitions are usually prohibited by absence of the transition, not by negations in the formula. Thus, this case also encompasses e.g.~the disjunctive MTS or transition systems with obligations.
+% Nevertheless, in the obligation function $\Phi$, sometimes implication and exclusive-or may be of use. Therefore, one would like to deal with them if they occur from time to time. In Section~\ref{opt} we show that one can do that using an algorithm where all negations involved in $\Phi$ only cause a \emph{local} blow-up.
+%%negations are of little use in hardware requirements as hardware does not have to be used just because it is available. 
+
+The subsequent sections are devoted to proving Theorems~\ref{thm:NP} and~\ref{thm:MPG}. The algorithm to solve the implementation problem first reduces the dual-priced MTSD into a mean payoff game extended with time durations and then solves this game. This new extension of mean payoff games and an algorithm to solve them is presented in Section~\ref{mpgd}. The translation follows in Section~\ref{translation}. Since this translation is exponential in general, Section~\ref{opt} then shows how to translate in polynomial time with only local exponential blow-ups where negations occur. Section~\ref{alg} then concludes and establishes the complexity bounds.
+%results stated in the theorems.
+

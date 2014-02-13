@@ -1,0 +1,44 @@
+%!TEX root = /Users/mikaelhm/projects/PNInterfaceTheory/main.tex
+\begin{tikzpicture}
+
+
+\node[place,tokens=2] at (-1,-1) (p0) {};
+
+
+\node[transition,rotate=0,label={above:$\outact{a}$}] at (0,0) (toa) {};
+\node[place,tokens=0] at (0,-1) (p1) {};
+\node[transition,rotate=0,label={below:$\inact{b}$}] at (0,-2) (tib) {};
+
+
+\node[place,tokens=0,label=above:$a$] at (2,0) (pa) {};
+\node[place,tokens=0,label=above:$b$] at (2,-2) (pb) {};
+
+\node[transition,rotate=0,label={above:$\inact{a}$}] at (4,0) (tia) {};
+\node[place,tokens=0] at (4,-1) (p3) {};
+\node[transition,rotate=0,label={below:$\outact{b}$}] at (4,-2) (tob) {};
+\node[place,tokens=1] at (5,-1) (p4) {};
+
+
+\draw[arc] (p0) to[bend left] (toa) {};
+\draw[arc] (toa) to[] (p1) {};
+\draw[arc] (p1) to[] node[right,midway] {2} (tib) {};
+\draw[arc] (tib) to[bend left] node[auto,midway] {2} (p0) {};
+
+\draw[arc] (toa) to[] (pa) {};
+\draw[arc] (pa) to[] (tia) {};
+\draw[arc] (tob) to[] (pb) {};
+\draw[arc] (pb) to[] (tib) {};
+
+
+\draw[arc] (tob) to[] (p3) {};
+\draw[arc] (p3) to[] (tia) {};
+\draw[arc] (tia) to[bend left] (p4) {};
+\draw[arc] (p4) to[bend left] (tob) {};
+% \draw[arc] (p0) to[] (tia) {};
+
+\begin{pgfonlayer}{background}
+\node [compBackground,inner sep=6mm,fit=(p0)(toa)(tib)] {};
+\node [compBackground,inner sep=6mm,fit=(tia)(tob)(p4)] {};
+\end{pgfonlayer}
+
+\end{tikzpicture}

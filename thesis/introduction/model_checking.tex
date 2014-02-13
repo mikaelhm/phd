@@ -1,0 +1,22 @@
+%!TEX root = ../thesis.tex
+\section{Model Checking}
+
+The contribution of this thesis lies within \emph{model checking}, which is a formal method. 
+Given a formal specification of a system and precise requirements, model checking is a mathematically-based technique that verifies whether the system fulfils its requirements. 
+The general aspects of this approach were introduced independently by Emmerson and Clarke \cite{EC1980,CE1982} and Queille and Sifakis \cite{QS1982}. Clark, Emmerson and Sifakis have all made a substantial contribution to model checking and were honoured with the Turing Award in 2007. 
+The model checking technique can be seen as a three phase method. 
+First, a model of the system must be defined in a mathematical formalism. 
+Second, the system requirements and properties must be expressed in a formal manner. 
+Given such formal model and requirement, a model checking algorithm can check whether the property holds for the system model. 
+The algorithm gives its answer on the basis of a complete search of the model in which the algorithm checks whether the requirements are met throughout the model.
+If there is a part of the system where a requirement does not hold, model checking will be able to provide information about this.
+
+Model checking does not examine an actual system, but a model of a system. This simplifies the complex task of checking whether a property is satisfied by a system. Therefore, the model must be as close to the system as possible. 
+If the system model lack a vital detail, the results of the model checking might be useless. In order to specify a model that captures all the core concepts of a system, the modelling formalism must be expressive enough. For instance, consider an emergency system that brakes trains that are too close to each other on the same track. 
+Using model checking, it is possible to verify that both trains must be stopped within 1 minute if they get too close. Additionally, model checking can make sure that two trains will never get closer than 2 km. To do this, however, the modelling formalism must be able to model timing constraints and quantities such as distance. Furthermore, some system models can be infinite which can make the model checking problematic or even undecidable, for an overview of this see~\cite{DBLP:books/ws/phaunRS01/BurkartE01,Moller:1996:IR:646731.703702}.
+
+Since model checking mathematically proves that a system model has certain properties, developers can trust this method. For example, it is common to aim for a system that has no deadlocks. A deadlock in a system is a situation where the system cannot progress in any way. 
+Using model checking, the developer can confirm that there are no deadlocks in the system analysed. Hence, developers can use model checking to prove the absence of error in the system model. However, this does not guarantee that the actual implementation of the system will be error free, as it only reason about a model of the system. On the other hand, it can still be better than well-known techniques such as testing and simulation, where developers monitor a large number of executions of a systems. 
+These executions can reveal problems, but there is no way to make sure that these executions will reveal all errors. On the other hand, to prove absence of errors using model checking, the developers must know the possible errors and be able to express them. 
+
+% \todo{I think I need to cite some real life case studies using model checking.}

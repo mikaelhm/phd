@@ -1,0 +1,98 @@
+%!TEX root = ../../thesis.tex
+In this section, we formally introduce a dual-price scheme on top of 
+MTSD in order to model the \emph{investment cost} (cost of hardware necessary to 
+perform the implemented actions) and the \emph{running cost} (weighted 
+long-run average of running costs of actions).
+We therefore consider only deadlock-free implementations 
+(every state has at least one outgoing transition) so that the long-run
+average reward is well defined.  
+%Further, a~\emph{hardware investment cost} is given
+%by the set of actions that an~implementation is capable of taking and
+%a~requirement function describing possible hardware options to realize an
+%action.
+
+\begin{definition}[Dual-Price Scheme] 
+A \emph{dual-price scheme} over an alphabet $\Sigma$ is 
+a tuple $\mathcal P=(r,H,\Psi,\hc)$ where 
+\begin{itemize}
+ \item $r:\Sigma\to\mathbb Z$ is a \emph{running cost} function of actions per
+ time unit,
+ \item $H$ is a finite set of available \emph{hardware},
+ \item $\Psi:\Sigma\to\B(H)$ is a \emph{hardware requirement} function, and
+ \item $\hc:H\to\mathbb N_0$ is a hardware \emph{investment cost} function.
+\end{itemize}
+\end{definition}
+
+Hence every action is assigned its unit cost and every action
+can have different hardware requirements (specified as a Boolean
+combination of hardware components) on which it can be executed.
+This allows for much more variability than a possible alternative of a simple investment cost $\Sigma\to \mathbb N_0$. Further, observe that the running cost may be negative, meaning that execution of such an action actually gains 
+rather than spends resources. 
+%This is then suitable for modelling e.g.~vending machines.
+ 
+Let $\Impl$ be an implementation with an initial state $s_0$.
+A set $G\subseteq H$ of hardware is \emph{sufficient} for an implementation
+$\Impl$, written $G\models \Impl$, if $G\models\Psi(a)$ for every action $a$ reachable
+from $s_0$.  The \emph{investment cost} of %the implementation 
+$\Impl$ is then defined as
+\[\ic(\Impl)=\min_{G\models \Impl}\sum_{g\in G}\hc(g) \ . \]
+Further, 
+a~\emph{run} of $\Impl$ is an~infinite sequence $s_0 a_0 t_0 s_1 a_1 t_1 \cdots$ with
+$(s_i, a_i, s_{i+1}) \in T$ and $t_i\in D(s_i, a_i, s_{i+1})$.
+Hence, in such a run, a concrete time duration in each uncontrollable interval
+is selected. We denote the set of all runs of $\Impl$ by $\mathcal
+R(\Impl)$.  The \emph{running cost} of an implementation $\Impl$ is the worst-case
+long-run average 
+\[
+	\rc(\Impl) = \sup_{s_0a_0t_0s_1a_1t_1 \cdots \in \mathcal R(\Impl)} 
+		\limsup_{n \to \infty} 
+		\frac{\sum_{i = 0}^{n} r(a_i)
+			\cdot t_i}%D(s_i,a_i,s_{i+1})}%
+		{\sum_{i = 0}^{n} t_i}%D(s_i,a_i,s_{i+1})	
+\ .
+\]
+
+%
+%An \emph{overall cost} of an implementation $I$ is simply
+%\[\cost(I)=\ic(I)+\mathit{time}\cdot\rc(I)\]
+%The \emph{minimal cost} of a specification is thus defined as
+%$\cost(S)=\displaystyle\min_{I\mr S}\cost(I)$ and we are interested in finding
+%the \emph{cheapest implementation} $I$ of $S$, i.e. 
+%$\displaystyle\arg\min_{I\mr S}\cost(I)$.
+
+Our \emph{cheapest-implementation problem} 
+is now defined as follows: given an MTSD specification $\Spec$ %and its initial state
+together with a dual-price scheme over the same alphabet, and given an upper-bound $\mathit{max}_{\ic}$ 
+for the
+investment cost, find an implementation $\Impl$ of $\Spec$ (i.e.~$\Impl\mr\Spec$) such that
+$\ic(\Impl) \leq \mathit{max}_{\ic}$ 
+and for every implementation $\Impl'$ of $\Spec$ with
+$\ic(\Impl') \leq \mathit{max}_{\ic}$, we have $\rc(\Impl) \leq \rc(\Impl')$.
+
+%\todo{Jan: should we comment why 2 problems?}
+
+Further, we introduce the respective decision problem, 
+the \emph{implementation problem}, as follows: given an MTSD specification $\Spec$ %and its initial vertex 
+together with a dual-price scheme, and given an upper-bound $\mathit{max}_{\ic}$ 
+for the investment cost and an upper bound $\mathit{max}_{\rc}$ on the running cost, decide whether there is an implementation $\Impl$ of $\Spec$ such that both
+$\ic(\Impl) \leq \mathit{max}_{\ic}$ 
+and $\rc(\Impl) \leq \mathit{max}_{\rc}$.
+
+\begin{example}\label{ex:prices}
+Figure~\ref{fig:cost} depicts a dual-price scheme over the same alphabet \linebreak
+$\Sigma=\{\Wait,\DriveBus,\SmallClean, \BigClean, \SkipClean\}$ as of our
+motivating specification $\Spec$. The running cost of the implementation $\Impl_2$ is
+$(1\cdot8+10\cdot 10+6\cdot6+1\cdot8+10\cdot 10+30\cdot
+7)/(1+10+6+1+10+30)\approx7.97$ as the maximum value is achieved when \DriveBus
+(with running cost 10) takes 10 minutes. On the one hand, this is optimal for
+$\Spec$ and a maximum investment cost at least 100. On the other hand, if the maximum
+investment cost is 99 or less then the optimal implementation is depicted in
+$\Impl_1$ and its cost is $(5\cdot8+10\cdot10+6\cdot5)/(5+10+6)\approx8.10$.
+\end{example}
+
+\begin{remark}
+Note that the definition of the dual-price scheme only relies on having durations on the labelled transition systems. Hence, one could easily apply this in various other settings like in the special case of traditional MTS (with may and must transitions instead of the obligation function) or in the more general case of parametric MTS (see~\cite{BKLMS:ATVA:11}) when equipped with durations as described above.
+\end{remark}
+
+
+

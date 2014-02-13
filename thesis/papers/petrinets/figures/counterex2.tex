@@ -1,0 +1,19 @@
+%!TEX root = /Users/mikaelhm/projects/PNInterfaceTheory/main.tex
+\begin{tikzpicture}
+% \node[place,tokens=0] at (-2,0) (p0) {};
+\node[transition,rotate=0,label={above:$\outact{a}$}] at (0,0) (toa) {};
+\node[place,tokens=0,label=above:$a$] at (2,0) (pa) {};
+\node[transition,rotate=0,label={above:$\inact{a}
+$}] at (4,0) (tia) {};
+
+\node[place,white] at (2,-1.4) (pb) {};
+
+
+% \draw[arc] (p0) to (toa) {};
+\draw[arc] (toa) to[] (pa) {};
+\draw[arc] (pa) to[] (tia) {};
+\begin{pgfonlayer}{background}
+\node [compBackground,inner sep=6mm,fit=(toa)] {};
+\node [compBackground,inner sep=6mm,fit=(tia)] {};
+\end{pgfonlayer}
+\end{tikzpicture}

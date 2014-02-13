@@ -1,0 +1,42 @@
+%!TEX root = ../../thesis.tex
+\begin{tikzpicture}[node distance=2cm and 0.956cm]
+    \node[state,align=center] (u0) {$q_1,r_0$\\$\channel{0}$};
+    \node[state,align=center,initial,initial where=above,right=of u0] (u1) {$q_0,r_0$\\$\channel{0}$};
+    \node[state,align=center,right=of u1] (u2) {$q_1,r_0$\\$\channel{1}$};
+    \node[state,align=center,right=of u2] (u3) {$q_0,r_0$\\$\channel{1}$};
+    \node[state,align=center,right=of u3] (u4) {$q_1,r_0$\\$\channel{2}$};
+
+    \node[state,align=center,below=of u0] (d0) {$q_1,r_1$\\$\channel{0}$};
+    \node[state,align=center,right=of d0] (d1) {$q_0,r_1$\\$\channel{0}$};
+    \node[state,align=center,right=of d1] (d2) {$q_1,r_1$\\$\channel{1}$};
+	\node[state,align=center,right=of d2] (d3) {$q_0,r_1$\\$\channel{1}$};
+    \node[state,align=center,right=of d3] (d4) {$q_1,r_1$\\$\channel{2}$};
+
+    \node[right=of u4] (u5) {};
+	\node[right=of d4] (d5) {};
+
+    \path (u0) edge[->] node[above,midway] {\transition{pre?}} (u1) {};
+    \path (u1) edge[->] node[above,midway] {\transition{\outact{msg}}} (u2) {};
+	\path (u2) edge[->] node[above,midway] {\transition{pre?}} (u3) {};
+	\path (u3) edge[->] node[above,midway] {\transition{\outact{msg}}} (u4) {};
+
+	\path (d0) edge[->] node[above,midway] {\transition{pre?}} (d1) {};
+    \path (d1) edge[->] node[above,midway] {\transition{\outact{msg}}} (d2) {};
+	\path (d2) edge[->] node[above,midway] {\transition{pre?}} (d3) {};
+	\path (d3) edge[->] node[above,midway] {\transition{\outact{msg}}} (d4) {};
+
+	\path (d0) edge[->] node[left,pos=0.75] {\transition{post!}} (u0) {};
+	\path (d1) edge[->] node[left,pos=0.75] {\transition{post!}} (u1) {};
+	\path (d2) edge[->] node[left,pos=0.75] {\transition{post!}} (u2) {};
+	\path (d3) edge[->] node[left,pos=0.75] {\transition{post!}} (u3) {};
+	\path (d4) edge[->] node[left,pos=0.75] {\transition{post!}} (u4) {};
+
+	\path (u2) edge[->] node[left,pos=0.65,xshift=-2.95] {\transition{\inact{msg}}} (d0) {};
+	\path (u3) edge[->] node[left,pos=0.65,xshift=-2.95] {\transition{\inact{msg}}} (d1) {};
+	\path (u4) edge[->] node[left,pos=0.65,xshift=-2.95] {\transition{\inact{msg}}} (d2) {};
+    
+    \path (u4) edge[->,dashed] (u5) {};
+    \path (d4) edge[->,dashed] (d5) {};
+    % \path (u5) edge[->,dashed] (d3) {};
+
+\end{tikzpicture}

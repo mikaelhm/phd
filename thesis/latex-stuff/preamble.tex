@@ -1,0 +1,204 @@
+%!TEX root = ../thesis.tex
+
+\usepackage[table]{xcolor}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Colors
+% \definecolor{darkblue}{RGB}{64,71,107}
+% \definecolor{lightblue}{RGB}{148,165,247}
+\definecolor{myblue}{rgb}{0.549,0.618,0.922}
+\colorlet{lightlightblue}{myblue!25!white}
+\colorlet{lightblue}{myblue!50!white}
+\colorlet{darkblue}{myblue!50!black}
+\colorlet{darkdarkblue}{myblue!25!black}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% så den brede margin er ind mod hæftningen 
+%(latex vil normalt have den brede margin yderst, 
+% så man kan skrive noter)
+\let\tmp\oddsidemargin
+\let\oddsidemargin\evensidemargin
+\let\evensidemargin\tmp
+\reversemarginpar
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% page geometry
+\addtolength{\oddsidemargin}{-10pt}
+\addtolength{\evensidemargin}{10pt}
+\addtolength{\topmargin}{20pt}
+%\addtolength{\textwidth}{80pt}
+%\addtolength{\textheight}{102pt}
+%\addtolength{\marginparsep}{-5pt}
+%\addtolength{\marginparwidth}{-10pt}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Fix bad line breaking (LOOK UP!)
+%\sloppy
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{url} 
+\usepackage{import} %something about realitve including of sub files
+\usepackage{tocvsec2}
+
+\usepackage{enumitem}
+\usepackage{bbding} % special enum item item-style
+\usepackage{subfig}
+\usepackage{nicefrac}
+\usepackage{xspace}
+\usepackage{tabularx}
+\usepackage{multirow}
+\usepackage{hhline}
+\usepackage[symbol]{footmisc}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% For nice framed boxes
+\usepackage{kvoptions}
+\usepackage{etoolbox}
+\usepackage{calc}
+\usepackage[framemethod=TikZ]{mdframed}  
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{lipsum}% generates filler text
+
+% for math stuff
+\RequirePackage{amsmath,amssymb,stmaryrd,amsbsy,xspace,amsthm,amsfonts}
+\RequirePackage{bbm}
+\RequirePackage{verbatim}
+\RequirePackage{nicefrac}
+
+% for algorithms
+\usepackage[vlined,ruled]{algorithm2e}
+
+
+
+% \usepackage{todonotes}
+
+\usepackage[style=alphabetic,natbib=true,firstinits=true,maxnames=10,backend=biber,url=false,isbn=false]{biblatex}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% pretty and clickable referencess citaions
+\usepackage[colorlinks=false,final=true,hypertexnames=false]{hyperref}
+\hypersetup{ 
+  linkcolor=darkdarkblue, 
+  pdfborder={0 0 0},%
+    citecolor=darkblue,%
+    urlcolor= myblue
+}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% theorem environments
+\mdfdefinestyle{bgstyle}{
+	hidealllines=true,
+  	skipabove=\topskip,  	
+  	skipbelow=\topskip,
+  	outermargin=15pt,
+  	innermargin=15pt,
+  	innerrightmargin=15pt,
+  	innerleftmargin=15pt,
+  	splittopskip=2\topsep,
+  	splitbottomskip=\topsep,
+	% splittopskip=\topskip,%
+	backgroundcolor=lightlightblue}
+
+
+
+\newtheoremstyle{myplain} %
+	{3pt} % Space above
+	{3pt} % Space below
+	{\itshape} % Body font
+	{} % Ident amount
+	{\bfseries} % Theorem head font
+	{\\} %  Punctuation after theorem head
+	{0pt} % Space after theorem head [def: .5em]
+	{} % Theorem head spec
+\newtheoremstyle{mydefinition} %
+	{3pt} % Space above
+	{3pt} % Space below
+	{\normalfont} % Body font
+	{} % Ident amount
+	{\bfseries} % Theorem head font
+	{\\} %  Punctuation after theorem head
+	{0pt} % Space after theorem head [def: .5em]
+	{} % Theorem head spec
+
+\theoremstyle{plain}% default
+	\newtheorem{thm}{Theorem}%[chapter]
+	\newtheorem{mdlemma}[thm]{Lemma}
+	\newtheorem{mdproposition}[thm]{Proposition}
+	\newtheorem{mdcorollary}[thm]{Corollary}
+	\newtheorem{mddefinition}[thm]{Definition}
+  \newtheorem{result}{Result}
+\theoremstyle{remark}
+  
+	\newtheorem{remark}{Remark}	
+	\newtheorem{example}{Example}
+
+\newenvironment{definition}%
+  {\begin{mdframed}[style=bgstyle]\begin{mddefinition}}%
+  {\end{mddefinition}\end{mdframed}}
+\newenvironment{lemma}%
+  {\begin{mdframed}[style=bgstyle,skipbelow=0pt]\begin{mdlemma}}%
+  {\end{mdlemma}\end{mdframed}}
+\newenvironment{proposition}%
+  {\begin{mdframed}[style=bgstyle,skipbelow=0pt]\begin{mdproposition}}%
+  {\end{mdproposition}\end{mdframed}}
+\newenvironment{theorem}%
+  {\begin{mdframed}[style=bgstyle,skipbelow=0pt]\begin{thm}}%
+  {\end{thm}\end{mdframed}}
+\newenvironment{corollary}%
+  {\begin{mdframed}[style=bgstyle,skipbelow=0pt]\begin{mdcorollary}}%
+  {\end{mdcorollary}\end{mdframed}}
+% \newenvironment{result}%
+  % {\begin{mdframed}[style=bgstyle,skipbelow=0pt]\begin{mdresult}}%
+  % {\end{mdresult}\end{mdframed}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Set font and style on figure captions
+\setkomafont{caption}{\footnotesize}
+\setkomafont{captionlabel}{\footnotesize\bfseries}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Fix . after numbering but addding . to header 
+\KOMAoptions{numbers=noendperiod}  % Remove . form numering e.g. Figure 2.1.:
+\renewcommand*{\chaptermarkformat}{\thechapter.\enskip}
+\renewcommand*{\sectionmarkformat}{\thesection.\enskip}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Load file with seperate tikz settings
+\input{latex-stuff/tikz}
+
+\usepackage{latex-stuff/lgchapmod} % Nice headings with big numbers
+
+% No page number on Part pages
+    \makeatletter
+    \renewcommand\part{%
+      \if@openright
+        \cleardoublepage
+      \else
+        \clearpage
+      \fi
+      \thispagestyle{empty}%
+      \if@twocolumn
+        \onecolumn
+        \@tempswatrue
+      \else
+        \@tempswafalse
+      \fi
+      \null\vfil
+      \secdef\@part\@spart}
+    \makeatother
+
+
+%%%%%%%%%%%XXXX Not sure what this does %%%%%%%%%%%%%%%
+% ask linej
+\def\lalala{0} 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 

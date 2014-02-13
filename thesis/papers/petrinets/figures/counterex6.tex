@@ -1,0 +1,74 @@
+%!TEX root = /Users/mikaelhm/projects/PNInterfaceTheory/main.tex
+\begin{tikzpicture}[scale=0.675, every node/.style={transform shape}]
+
+
+\node[place,tokens=1] at (-1,-1) (p0) {};
+
+
+\node[transition,rotate=0,label={above:$\outact{a}$}] at (0,0) (toa) {};
+\node[place,tokens=0] at (0,-1) (p1) {};
+\node[transition,rotate=0,label={below:$\inact{b}$}] at (0,-2) (tib) {};
+
+
+\node[place,tokens=0,label=above:$a$] at (2,0) (pa) {};
+\node[place,tokens=0,label=above:$b$] at (2,-2) (pb) {};
+
+\node[transition,rotate=0,label={above:$\inact{a}$}] at (4,0) (tia) {};
+\node[place,tokens=0] at (4,-1) (p3) {};
+\node[transition,rotate=0,label={below:$\outact{b}$}] at (4,-2) (tob) {};
+\node[place,tokens=1] at (5,-1) (p4) {};
+
+
+\draw[arc] (p0) to[bend left] (toa) {};
+\draw[arc] (toa) to[] (p1) {};
+\draw[arc] (p1) to[]  (tib) {};
+\draw[arc] (tib) to[bend left] (p0) {};
+
+\draw[arc] (toa) to[] (pa) {};
+\draw[arc] (pa) to[] (tia) {};
+\draw[arc] (tob) to[] (pb) {};
+\draw[arc] (pb) to[] (tib) {};
+
+
+\draw[arc] (tob) to[] (p3) {};
+\draw[arc] (p3) to[] (tia) {};
+\draw[arc] (tia) to[bend left] (p4) {};
+\draw[arc] (p4) to[bend left] (tob) {};
+% \draw[arc] (p0) to[] (tia) {};
+
+
+
+\node[place,tokens=1] at (-1,-5) (p10) {};
+
+
+\node[transition,rotate=0,label={above:$\outact{c}$}] at (0,-4) (toc) {};
+\node[place,tokens=0] at (0,-5) (p11) {};
+\node[transition,rotate=0,label={below:$\inact{d}$}] at (0,-6) (tid) {};
+
+
+\node[place,tokens=0,label=above:$c$] at (2,-4) (pc) {};
+\node[place,tokens=0,label=above:$d$] at (2,-6) (pd) {};
+
+\node[transition,rotate=0,label={above:$\inact{d}$}] at (4,-4) (tic) {};
+\node[place,tokens=0] at (4,-5) (p13) {};
+\node[transition,rotate=0,label={below:$\outact{b}$}] at (4,-6) (tod) {};
+\node[place,tokens=1] at (5,-5) (p14) {};
+
+
+\draw[arc] (p10) to[bend left] (toc) {};
+\draw[arc] (toc) to[] (p11) {};
+\draw[arc] (p11) to[] (tid) {};
+\draw[arc] (tid) to[bend left] (p10) {};
+
+\draw[arc] (toc) to[] (pc) {};
+\draw[arc] (pc) to[] (tic) {};
+\draw[arc] (tod) to[] (pd) {};
+\draw[arc] (pd) to[] (tid) {};
+
+
+\draw[arc] (tod) to[] (p13) {};
+\draw[arc] (p13) to[] (tic) {};
+\draw[arc] (tic) to[bend left] (p14) {};
+\draw[arc] (p14) to[bend left] (tod) {};
+
+\end{tikzpicture}

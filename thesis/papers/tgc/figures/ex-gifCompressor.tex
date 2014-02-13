@@ -1,0 +1,20 @@
+%!TEX root = ../../../thesis.tex
+\begin{tikzpicture}
+\node[place,tokens=1] at (1.5,4.2) (p7) {};
+
+\node[mustt,rotate=0,label={left:$\trans{{gif?}}$}] at (0,3) (gifin) {};
+\node[place,tokens=0] at (1,3) (p8) {};
+
+\node[mayt,rotate=0,label={right:$\trans{{fail!}}$}] at (1.8,3) (failout) {};
+\node[mustt,rotate=0,label={right:$\trans{{jpg!}}$}] at (3,3) (jpgout) {};
+
+
+\draw[arc] (p7) to[bend right] (gifin) {};
+\draw[arc] (gifin) to[] (p8) {};
+\draw[arc] (p8) to[bend right=45] (jpgout) {};
+\draw[arc] (p8) to[] (failout) {};
+\draw[arc] (jpgout) to[bend right] (p7) {};
+\draw[arc] (failout) to[bend right=15] (p7) {};
+
+
+\end{tikzpicture}

@@ -1,0 +1,43 @@
+%!TEX root = ../../thesis.tex
+
+\begin{tikzpicture}
+	\node[place,tokens=1,label={[name=p0l]above:$p_0$}] at (-2,0) (p0) {};
+    \node[transition,rotate=90,label={[name=tmsg_outl,yshift=0,xshift=18]0:${\outact{msg}}$}] at (-1,-1.5) (tmsg_out) {};
+    \node[place,tokens=0,label=below:$p_1$] at (-2,-3) (p1) {};
+    \node[transition,rotate=90,label={[name=ta_inl,yshift=0,xshift=0]90:${in?}$}] at (-3,-1.5) (ta_in) {};
+
+	\node[transition,rotate=90,label={[name=tmsg_inl,yshift=0,xshift=-18]0:${\inact{msg}}$}] at (5,-1.5) (tmsg_in) {};
+    \node[place,label=above:$p_2$,tokens=1] at (5,0) (p2) {};
+    \node[place,label=below:$p_3$,tokens=0] at (5,-3) (p3) {};
+      \node[transition,rotate=90,label={[yshift=0,xshift=0]-90:${out!}$},anchor=center] at (7,-3) (tb_out) {};
+      \node[place,label=left:$p_4$,tokens=0] at (7,-1.5) (p4) {};
+      \node[transition,rotate=90,label={[yshift=0,xshift=0]180:${\tau}$}] at (9,-3) (tau_0) {};
+      \node[transition,rotate=90,label={[yshift=0,xshift=0]0:${\tau}$}] at (9,0) (tau_2) {};
+      \node[place,label=left:$p_5$,tokens=0] at (9,-1.5) (p5) {};
+      \node[transition,rotate=90,label={[yshift=0,xshift=0]0:${\tau}$}] at (7,0) (tau_1) {};
+
+      \node[place,label=below:${msg}$] at (2,-1.5) (pa) {};
+
+      \draw[arc] (p0) to[bend left] (tmsg_out) {};
+      \draw[arc] (tmsg_out) to[bend left] (p1) {};
+      \draw[arc] (p1) to[bend left] (ta_in) {};
+      \draw[arc] (ta_in) to[bend left] (p0) {};
+
+      \draw[arc] (tmsg_out) -- (pa) {};
+      \draw[arc] (pa) -- (tmsg_in) {};
+
+      \draw[arc] (p2) to[] (tmsg_in) {};
+      \draw[arc] (tmsg_in) to[] (p3) {};
+      \draw[arc] (p3) to[] (tb_out) {};
+      \draw[arc] (tb_out) to[] (p4) {};
+      \draw[arc] (p4) to[] (tau_0) {};
+      \draw[arc] (tau_0) to[] (p5) {};
+      \draw[arc] (p5) to (tau_2) {};
+      \draw[arc] (tau_2) to (p4) {};
+      \draw[arc] (tau_1) to (p2) {};
+      \draw[arc] (p4) to (tau_1) {};
+\begin{pgfonlayer}{background}
+\node [compBackground,inner sep=8mm,fit=(p0) (tmsg_outl) (p1) (ta_inl)] {};
+\node [compBackground,inner sep=8mm,fit=(p2) (tb_out) (p3) (tmsg_inl) (tau_0)] {};
+\end{pgfonlayer}
+\end{tikzpicture}

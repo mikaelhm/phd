@@ -1,0 +1,108 @@
+\section{Boolean Modal Transition Systems}
+We will now formally introduce the syntax and semantics of the computational model Boolean MTS (BMTS).
+
+A \emph{Boolean formula} over a set $X$ of atomic propositions is given by
+the following abstract syntax 
+\[ 
+\varphi ::= \true \mid x \mid \neg \varphi \mid \varphi \wedge \psi 
+\mid \varphi \vee \psi \]
+where $x$ ranges over $X$. 
+The set of all Boolean formulas over the set $X$
+is denoted by $\B(X)$. 
+The satisfaction relation is defined as usual. We say that a formula is \emph{satisfiable} if there is at least one 
+
+\begin{definition}
+A~\emph{Boolean MTS} (BMTS) over an action alphabet $\USigma$ is 
+a~tuple $(S,T,\UPhi,s_0)$ where
+\begin{itemize}
+	\item $S$ is a~set of \emph{states},
+	\item $T \subseteq S \times \USigma \times S$ is a~\emph{transition relation},
+	\item $\UPhi : S \to \mathcal B(\USigma \times S)$ is a satisfiable \emph{obligation function} over the atomic propositions containing outgoing transitions, and
+	\item $s_0 \in S$ is the initial state. 
+\end{itemize}
+We implicitly assume that whenever $(a,t)$ occurs in $\UPhi(s)$ then $(s,a,t) \in T$.
+By $T(s) = \{(a,t) \mid (s,a,t) \in T\}$ we denote the set of all outgoing transitions of $s$. 
+\end{definition}
+
+Note that this definition is almost identical to the definition of OTS. In OTS the obligation function is restricted to only return positive Boolean formulas. If we restrict the obligation function to return formulas in conjunctive normal form, then the definition would be equivalent to the one of Disjunctive MTS, furthermore if only conjunctions of outgoing transitions were allowed we have the definition of regular MTS. The BMTS formalism is also known as parameter-free PMTS as defined in \cite{BKLMS:ATVA:11}.
+
+An \emph{implementation} of a BMTS specification is a BTMS were the obligation function for each state is a conjunction of all outgoing transitions, i.e. all transitions are must transitions.
+
+The obligation formulas might be satisfied by several different sets of outgoing transitions, thus we define $\val(s) = \{ M \mid M \subseteq \Sigma \times S : M \models \UPhi(s)\}$. Intuitively $\val(s)$ is the set of all possible sets of outgoing transitions from $s$. 
+
+Clearly with these BMTSs, we can express many different kinds of modalities on transitions. We will still use the notion may and must, even though it is not as clear anymore. 
+
+A must transition is a transition that is required in any implementation. Thus a transition $(s,a,s')$ is a must transition if $(a,s') \in M$ for all $M \in \val(s)$. We draw must transitions as full lined arrows.
+
+A may transition is a transition that can be in an implementation. Thus a transition $(s,a,s')$ is a may transition if $(a,s') \in M$ for some $M \in \val(s)$. We draw may transitions as dashed lined arrows.
+
+% \begin{figure}[ht]
+% 	\centering
+% 	\input{papers/memics/figures/vending_machine_spec1}
+% 	\caption{BMTS specification $\mathcal{S}_1$.}\label{fig:bmts_vends1}
+% \end{figure}
+
+% \begin{figure}[ht]
+% 	\centering
+% 	\input{papers/memics/figures/vending_machine_spec2}
+% 	\caption{BMTS specification $\mathcal{S}_2$.}\label{fig:bmts_vends2}
+% \end{figure}
+
+% \begin{figure}[ht]
+% 	\centering
+% 	\input{papers/memics/figures/vending_machine_impl1}
+% 	\caption{BMTS implementation $\mathcal{I}_1$.}\label{fig:bmts_vendi1}
+% \end{figure}
+
+% \begin{figure}[ht]
+% 	\centering
+% 	\input{papers/memics/figures/vending_machine_impl2}
+% 	\caption{BMTS implementation $\mathcal{I}_2$.}\label{fig:bmts_vendi2}
+% \end{figure}
+
+Before we define the refinement relation, let us have a look at a small example. 
+
+\begin{example}
+Assume a specification of a simple vending machine. The vending machine must be able to receive a $\Coin$. After receiving a $\Coin$, the vending machine may deliver one out of three products, either $\Choc, \Coffee$ or $\Tea$. Finally the vending machine must offer at least two of the products.
+
+A specification of such vending machine is given as $\mathcal{S}_1$ in Figure~\ref{fig:bmts_vends1}. The system starts in state $s_0$, where it must receive a $\Coin$, \emph{must} as the only way to satisfy $\UPhi(s_0)$ is having the $\Coin$ transition. 
+After receiving a $\Coin$, the vending machine may deliver one of three products, and return to $s_0$.
+
+The requirement that the vending machine must offer at least two products is expressed in the obligation function $\UPhi(s_1)$, which is a disjunction over possible outgoing transitions with two products. Having all three products is also fine, as this also satisfies the formula. Note that this requirement is something that one cannot express in a regular MTS.
+
+If we had to refine the requirement, so that the vending machine must always offer $\Choc$, we can do this by modifying $\UPhi(s_1)$, as done in $\mathcal{S}_2$ in Figure~\ref{fig:bmts_vends2}. We say that $\mathcal{S}_2$ is a modal refinement of $\mathcal{S}_1$, as it does not violate any requirement of $\mathcal{S}_1$.
+
+A BMTS specification yields a set of implementations, two implementations of $\mathcal{S}_1$ are shown in Figure~\ref{fig:bmts_vendi1} and Figure~\ref{fig:bmts_vendi2}.
+\end{example}
+
+We will now formally define the notion of modal refinement between BMTSs. The definition is a modified version of the one presented for PMTS in \cite{BKLMS:ATVA:11}.
+
+\begin{figure}[h!]
+	\centering
+	\subfloat[BMTS specification $\mathcal{S}_1$.\label{fig:bmts_vends1}]{\input{papers/memics/figures/vending_machine_spec1}}\qquad
+	\subfloat[BMTS specification $\mathcal{S}_2$.\label{fig:bmts_vends2}]{\input{papers/memics/figures/vending_machine_spec2}}\qquad
+	\subfloat[BMTS implementation $\mathcal{I}_1$.\label{fig:bmts_vendi1}]{\input{papers/memics/figures/vending_machine_impl1}}\qquad
+	\subfloat[BMTS implementation $\mathcal{I}_2$.\label{fig:bmts_vendi2}]{\input{papers/memics/figures/vending_machine_impl2}}
+	\caption{BMTS example of a simple vending machine.}
+\end{figure}
+
+
+\begin{definition}[Modal Refinement]\label{def:bool-mr}
+Let $(S_1,T_1,\UPhi_1,s_0)$ and $(S_2,T_2,\UPhi_2,t_0)$ be two BMTSs. 
+A binary relation
+$R \subseteq S_1 \times S_2$ is a~\emph{modal refinement} if $\forall (s,t) \in R$ it holds that
+\begin{align*}  
+ \forall M \in \val(s) : \exists N \in \val(t) : 
+        & \ \forall (a,s') \in M : \exists (a,t') \in N : (s',t') \in R \ \ \wedge \\
+                &\ \forall (a,t') \in N : \exists (a,s') \in M : (s',t') \in R\ .
+\end{align*}
+We say that $s$ modally refines $t$, denoted by $s \mr t$, if there
+exists a~modal refinement $R$ such that $(s,t) \in R$.
+\end{definition}
+
+Note that this definition of modal refinement coincide with the modal refinement for MTS, DMTS and OTS, if we restrict our models as described after the definition of BMTS. 
+
+\begin{example}
+If we again look at the specifications $\mathcal{S}_1$ and $\mathcal{S}_2$ and implementations $\mathcal{I}_1$ and $\mathcal{I}_2$. % in Figure~\ref{fig:cont}. 
+It should be clear that $\mathcal{S}_2 \mr \mathcal{S}_1$, $\mathcal{I}_1 \mr \mathcal{S}_1$, $\mathcal{I}_2 \mr \mathcal{S}_1$, and $\mathcal{I}_1 \mr \mathcal{S}_2$. But as $\Choc$ is not implemented in $\mathcal{I}_2$, we have that $\mathcal{I}_2 \not\mr \mathcal{S}_2$.
+\end{example}

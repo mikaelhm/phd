@@ -1,0 +1,75 @@
+%!TEX root = ../../../thesis.tex
+\begin{tikzpicture}[scale=0.65, every node/.style={transform shape}]
+
+%%%%% CompressorAssembly %%%%%
+\node at (0,0) (structure) {\input{papers/tgc/figures/ex-static-structure}};
+\node[above=-1mm of structure] (structuretitle){\textsf{CompressorAssembly}};
+\node[fit=(structure)(structuretitle), draw] (comprAssBox){};
+
+%%%%% MR 3 %%%%%
+\node at ($ (comprAssBox.south) + (0,-.35) $) (mr3) {\rotatebox{90}{$\mrw$}};
+\node[left=0.1mm of mr3] {3)};
+
+%%%%% CompressorAssemblyRef %%%%%
+\node at (0,-6.95) (structureref) {\input{papers/tgc/figures/ex-static-structureref}};
+\node[above=-1mm of structureref] (structurereftitle){\textsf{CompressorAssemblyRef}};
+\node[fit=(structureref)(structurereftitle), draw] (comprAssRefBox) {};
+
+
+
+%%%%% CompressorHide1 %%%%%
+\draw[fill=lightlightblue] ($ (comprAssBox.south east) + (2,0) $) rectangle ($ (comprAssBox.south east) + (6.35,1.5) $) node[fitting node] (comprHideBox) {};
+\node at (comprHideBox) (comprHide) {
+\begin{tabular}{c}
+     \textsf{CompressorAssembly} \\
+     $\hidepn \{\trans{gif},\trans{jpg},\trans{fail},\trans{txt},\trans{zip}\}$
+  \end{tabular}
+ };
+
+%%%%% MR 4 %%%%%
+\node at ($ (comprHideBox.south) + (0,-.35) $) (mr4) {\rotatebox{90}{$\mrw$}};
+\node[left=0.1mm of mr4] {4)};
+
+%%%%% CompressorHide2 %%%%%
+\draw[fill=lightlightblue] ($ (comprHideBox.south west) + (0,-.85) $) rectangle ($ (comprHideBox.south east) + (0,-2.35) $) node[fitting node] (comprHide2Box) {};
+\node at (comprHide2Box) (comprHide) {
+\begin{tabular}{c}
+     \textsf{CompressorAssemblyRef} \\
+     $\hidepn \{\trans{gif},\trans{jpg},\trans{fail},\trans{txt},\trans{zip}\}$
+  \end{tabular}
+ };
+
+%%%%% CompressorInterface %%%%%
+\draw[fill=lightlightblue] ($ (comprHideBox.north east) + (0,1) $) rectangle ($ (comprHideBox.north west) + (0,2.15) $) node[fitting node] (comprIntBox) {};
+\node at (comprIntBox) (comprInt) {\textsf{CompressorInterface}};
+
+%%%%% MR 1 %%%%%
+\node at ($ (comprIntBox.south) + (0,-.5) $) (mr1) {\rotatebox{90}{$\mrw$}};
+\node[left=0.1mm of mr1] {1)};
+
+
+%%%%% Hide 1 %%%%%
+\draw[arc,thin] ($ (comprHideBox.west) + (-1.6,0) $) -- ($ (comprHideBox.west) + (-.4,0) $)  node[midway,above]{{hide}} {};
+
+%%%%% Hide 2 %%%%%
+\draw[arc,thin] ($ (comprHide2Box.west) + (-1.6,0) $) -- ($ (comprHide2Box.west) + (-.4,0) $)  node[midway,above]{{hide}} {};
+
+
+%%%%% GifCompressor %%%%%
+\draw[fill=lightlightblue] ($ (comprAssBox.south west) + (-2,0) $) rectangle ($ (comprAssBox.south west) + (-5.8,1.0) $) node[fitting node] (gifComprBox) {};
+\node at (gifComprBox) (gifCompr) {\textsf{GifCompressor}};
+
+%%%%% MR 2 %%%%%
+\node at ($ (gifComprBox.south) + (0,-.35) $) (mr2) {\rotatebox{90}{$\mrw$}};
+\node[left=0.1mm of mr2] {2)};
+
+%%%%% GifCompressorRef %%%%%
+\draw[fill=lightlightblue] ($ (gifComprBox.south west) + (0,-.85) $) rectangle ($ (gifComprBox.south east) + (0,-2) $) node[fitting node] (gifCompr2Box) {};
+\node at (gifCompr2Box) (gifCompr2) {\textsf{GifCompressorRef}};
+
+%%%%% Compose 1 %%%%%
+\draw[arc,thin] ($ (gifComprBox.east) + (0.4,0) $) -- ($ (gifComprBox.east) + (1.6,0) $)  node[midway,above]{{compose}} {};
+
+%%%%% Compose 1 %%%%%
+\draw[arc,thin] ($ (gifCompr2Box.east) + (0.4,0) $) -- ($ (gifCompr2Box.east) + (1.6,0) $)  node[midway,above]{{compose}} {};
+\end{tikzpicture}

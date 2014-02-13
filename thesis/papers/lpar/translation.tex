@@ -1,0 +1,180 @@
+%!TEX root = /Users/mikaelhm/projects/biPriced-MTS/bipriced/main.tex
+
+We first focus on the implementation problem without considering 
+the hardware ($H=\emptyset$).
+We show how the implementation problem can be solved by reduction to the
+weighted MPGs. The first translation we present is exponential, 
+however, we provide methods for making it smaller 
+%afterwards.
+in the subsequent section.
+
+We are given an~MTSD $\Spec = (S,T,D,\Phi,s_0)$ and a~dual-price scheme
+$(r,H,\Psi,\hc)$ and assume that there is no state $s$ with $\emptyset \in
+\val(s)$. 
+%, i.e.~no deadlocks are allowed.  
+Let us define the following auxiliary
+vertices that will be used to simulate the more complicated transitions of MTSD
+in the simpler setting of weighted MPG (by convention all singleton
+intervals are treated as uncontrollable).
+\begin{align*}
+T_\un &= \{(s,a,t) \mid (s,a,t) \in T;\,D(s,a,t) \in \mathcal I_\un\}\\
+T_\cn &= \{(s,a,t) \mid (s,a,t) \in T;\,D(s,a,t) \in \mathcal I_\cn\}\\
+\modT  &= \{(s,a,j,t) \mid (s,a,t) \in T;\,j \in D(s,a,t) \}
+\end{align*}
+We construct the weighted mean-payoff game with
+%\begin{itemize}
+%\item $V = S  \cup 2^T \cup T \cup \modT$
+%\item 
+$V_{min} = S \cup T_\cn \cup \modT$, 
+%\item 
+$V_{max} = 2^T \cup T_\un$ and
+%\item 
+$E$ defined as follows:
+\begin{align*}
+	(s, X) &\in E &&\iff \exists V \in \val(s) : 
+	X = \{ (s,a,t) \mid (a,t) \in V\}\\
+	(X,(s,a,t)) &\in E &&\iff (s,a,t) \in X\\
+	((s,a,t),(s,a,j,t)) &\in E &&\iff j \in D(s,a,t)\\
+	((s,a,j,t),t) &\in E && \text{(always)}
+\end{align*}
+Further, 
+%\item 
+$r((s,a,j,t),t) = r(a)$, $d((s,a,j,t),t) = j$
+and $r(-,-) = d(-,-) = 0$ otherwise.
+%\end{itemize}
+
+% A~strategy for \emph{min} can now be translated into an implementation of the
+% original MTSD in a straightforward way. The implemented transitions in $s$ are
+% given by $\sigma(s)$, similarly the durations of a transition $(s,a,t)$ with a controllable
+% interval is given by the third component of $\sigma((s,a,t))$. Details are given in Appendix.
+
+
+\begin{example}
+In Figure~\ref{fig:example:exp} we show an example of how this
+translation to weighted MPG works. For simplicity we only translate a part of
+the MTSD $\Spec$ shown in Figure~\ref{fig:trans1}. 
+%Note that $S$ is not a valid specification, since it contain deadlocks. 
+The resulting weighted MPG is shown in Figure~\ref{fig:trans2}. The
+diamond shaped states belong to $min$ and the squared states belong to $max$.
+In the vertex $s$, $min$ chooses which outgoing transition are implemented.
+Only the choices satisfying $\Phi(s)$ are present in the game. Afterwards, $max$
+decides which transition to take. The chosen transition is then assigned 
+by one of the players a time that it is going to take.
+
+Notice that $(s,a,t_1)$ is the only
+transition controlled by $min$, because it has a controllable interval
+$\ci{2,3}$. The remaining transitions with uncontrollable intervals are operated
+by $max$ who chooses the time from these intervals. All the ``auxiliary''
+transitions are displayed without any labels meaning their duration (and rate)
+is zero. Thus, only the transitions corresponding to ``real'' transitions in
+MTSDs are taken into account in the value of every play.
+\end{example}
+\input{papers/lpar/translation_example}
+
+
+% A~strategy for \emph{min} can now be translated into an implementation of the
+% original MTSD in a straightforward way. The implemented transitions in $s$ are
+% given by $\sigma(s)$, similarly the durations of a transition $(s,a,t)$ with a controllable
+% interval are given by the third component of $\sigma((s,a,t))$. 
+%Details are given in Appendix.
+
+We now show how a~strategy for player \emph{min} in the constructed weighted MPG may
+be translated into an implementation of the original MTSD. In Section~\ref{mpgd}, we have shown that there are optimal \emph{positional} strategies. Hence, we may safely restrict this translation to positional strategies.
+%, and for sake of simplicity, we do so. 
+Let $\sigma$ be such a positional
+strategy. We build the implementation as $\Impl=(S',T',D',\Phi',s_{0\ii})$ where
+\begin{itemize}
+\item $S' = \{  s_\ii \mid s \in S \}$
+\item $(s_\ii,a,t_\ii) \in T'$ if $(s,a,t) \in X$ where $\sigma(s) = X$
+\item $D'(s_\ii,a,t_\ii) = D(s,a,t)$ if $D(s,a,t) \in \mathcal I_\mathsf u$
+\item $D'(s_\ii,a,t_\ii) = j$ if $D(s,a,t) \in \mathcal I_\mathsf c$ and
+	$\sigma((s,a,t)) = (s,a,j,t)$
+\item $\Phi'(s_\ii) = \bigwedge_{(s_\ii,a,t_\ii)\in T'} (a,t_\ii)$
+\end{itemize}
+The set of states remains the same as in the original MTSD; we change every
+state $s$ into $s_\ii$ to be able to reason about the states of the original
+MTSD and of the implementation separately.
+%
+The following two lemmas state that the construction is sound.
+
+
+\begin{lemma}\label{lem:strat2impl}
+The constructed implementation $\Impl$ is %indeed 
+an implementation of the original
+MTSD. 
+\end{lemma}
+
+\begin{proof}
+We show that $R = \{ (s_\ii,s) \mid s \in S \}$ is a~modal refinement relation.
+Let $(s_\ii,s) \in R$ and let $M \in \val(s_\ii)$. Clearly 
+$M = \{ (a,t_\ii) \mid (s_\ii,a,t_\ii) \in T'\}$.
+We take $N = \{ (a,t) \mid (a,t_\ii) \in M \}$. The fact that $N \in \val(s)$ 
+is clear from the construction. We now need to show that
+$D'(s_\ii,a,t_\ii) \le D(s,a,t)$. 
+If $D(s,a,t) \in \mathcal I_\un$ then $D'(s_\ii,a,t_\ii) = D(s,a,t)$ and
+the statement holds.
+If $D(s,a,t) \in \mathcal I_\cn$ then $D'(s_\ii,a,t_\ii) = j$ where
+$j \in D(s,a,t)$ due to the construction.
+Thus $R$ is a~modal refinement relation where 
+$s_\ii \mr s$ for all $s \in S$ %also $s_{0\ii} \mr s_0$ 
+and therefore $\Impl \mr \Spec$.%\qed
+\end{proof}
+
+
+
+\begin{lemma}\label{lem:keepsvalue}
+We have $\rc(\Impl)\leq\lambda$ if and only if the strategy $\sigma$ 
+%guarantees $v(s_0) \leq \lambda$.
+ensures a value of at most $\lambda$.
+\end{lemma}
+
+\begin{proof}
+Every run of the implementation corresponds to a~play (where player \emph{min}
+plays according to strategy $\sigma$) and vice versa. Hence, the worst case of
+the long run average over all runs in $\Impl$ is the same as over all plays
+according to $\sigma$.%\qed
+\end{proof}
+
+We conclude the proof of correctness of the reduction by showing its completeness.
+
+\begin{lemma}\label{impl2strat}
+For every implementation $\Impl$ of $\Spec$, there exists
+a~strategy $\sigma$ for player \emph{min} such that $\sigma$ ensures value of
+at most $\rc(\Impl)$.
+\end{lemma}
+\begin{proof}
+ We show how to transform an arbitrary implementation $\Impl$ into a strategy $\sigma:V^*\to V$ (depending on the whole prefix of a play where we currently are) for player
+\emph{min} that guarantees the same or smaller value. (Although this is not a positional
+strategy, we know there is also a positional strategy ensuring the same or
+smaller value.) The idea of the construction is that for each history $\sigma$ mimics the behaviour of the implementation at its respective state. In other words, the decision of $\sigma$
+in some history is based on mapping the history to the implementation and doing
+what the implementation does. However, there is a small catch: the implementation may implement more possible decisions (its branching may be even uncountable). Nonetheless, we may take any of the decisions, as the resulting strategy then corresponds to a pruning of the original implementation and the strategy's worst case long run average is thus either the same or even smaller. 
+
+Let $i_0$ be the initial state of $\Impl$ and $s_0$ the initial state of
+$\Spec$; we have~$i_0\mr s_0$. The corresponding vertex of the constructed
+weighted MPG also bears the name $s_0$.  We first define a mapping $\mu:V^*\to
+I^*$ from paths in the weighted MPG of the form $s_0\, (s_0,N_0)\,
+(s_0,a_0,s_1)\, (s_0,a_0,j_0,s_1)\, s_1\, \cdots s_{n}$ to sequences of states
+of $\Impl$ inductively as follows.
+\begin{align*}
+ \mu(s_0)&=i_0\\
+ \mu(s_0\cdots s_n\, (s_n,N_n)\, (s_n,a_n,s_{n+1})\, (s_n,a_n,j_n,s_{n+1})\, s_{n+1})&=\mu(s_0\cdots s_n)i_{n+1} 
+\end{align*}
+where $i_{n+1}$ is an arbitrary state satisfying $(i_n,a_n,i_{n+1})\in T$ and
+$i_{n+1}\mr s_{n+1}$.  The image of $\mu$ now defines the desired pruning of
+$\Impl$ that is still an implementation of $\Spec$, has at most the same worst
+case long run average, and can now be canonically mapped to a deterministic
+strategy $\sigma$ as follows.
+
+Let $\pi=s_0\, (s_0,N_0)\, (s_0,a_0,s_1)\, (s_0,a_0,j_0,s_1)\, s_1\, \cdots x\in V^*$ be a prefix of a play with $x\in V_{min}$. Denote $s_n$ the last element of $\Spec$ in $\pi$ and $i_0\cdots i_n=\mu(s_0\cdots s_n)$.
+We define $\sigma(\pi)$ as follows.
+\begin{itemize}
+\item If $x\in S$, then $\pi=s_0\cdots s_n$ and due to $i_n\mr s_n$ there exists $N$ from the definition of modal refinement. We set $\sigma_s(\pi) = (s_n,N)$.
+\item If $x\in T_\cn$, then $\pi=s_0\cdots s_n\, (s_n,N_n)\,(s_n,a_n,s_{n+1})$ and there exists a unique $i_{n+1}$ such that $i_0\cdots i_ni_{n+1}=\mu(s_0\cdots s_n s_{n+1})$. Here we use the fact that $\mu$ does not depend on which vertices of the form $(s,a,j,t)$ were visited. We set $\sigma(\pi) = (s_n,a_n,D(i_n,a_n,i_{n+1}),s_{n+1})$. 
+\item If $x\in \modT$, then $x=(s_n,a_n,j_n,s_{n+1})$ and there exists only one outgoing edge. We set $\sigma(\pi)=s_{n+1}$.
+\end{itemize}
+Now for each play that player \emph{min} plays according
+to $\sigma$, there is a~run in the original implementation that has the same long-run average.
+Hence the supremum over all plays is at most the supremum over all runs. %\qed
+\end{proof}
+

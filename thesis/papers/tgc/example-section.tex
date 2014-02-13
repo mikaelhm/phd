@@ -1,0 +1,143 @@
+%!TEX root = ../../thesis.tex
+\section{Illustrating Example}\label{sec:example}
+
+We introduce an illustrating example to motivate our notions of modal asynchronous I/O-Petri nets (\MAIOPNs),
+their composition, hiding and refinement. For this purpose we consider a top down approach to the design
+of a simple compressing system  (inspired by \cite{BCD02}) which is able to receive files for compression and outputs either zip- or jpg-files.
+We start with an interface specification of the system  modelled by the \textsf{CompressorInterface} in  Fig.~\ref{fig:compr-intf}.
+
+\begin{figure}[ht]
+	\centering
+	\input{papers/tgc/figures/ex-interface}
+	\caption{\textsf{CompressorInterface}.\label{fig:compr-intf}}
+\end{figure}
+
+The interface specification is presented by a labelled Petri net with distinguished input and output labels and with modalities on the transitions.
+The label \textsf{file} suffixed with ``?'' indicates an input action and the labels \textsf{comprJpg}, \textsf{comprZip}
+ suffixed with ``!'' indicate output actions. Following the idea of modal transition systems introduced by Larsen and Thomsen
+in~\cite{DBLP:conf/lics/LarsenT88} transitions are equipped with ``must'' or ``may'' modalities. A must-transition, drawn black, indicates that
+this transition is required for any refinement while a may-transition, drawn white, may also be removed or turned
+into a must-transition. Models contain only must-transitions represent implementations.
+In the example it is required that input files must always be received
+and that the option to produce zipped text files is always available while
+a refinement may or may not support the production of compressed jpg-files for graphical data.
+Our interface specification models an infinite state system since an unbounded number of files can be received. 
+
+\begin{figure}[ht]
+	\centering
+	\input{papers/tgc/figures/ex-static-structure}
+	\caption{\textsf{CompressorAssembly} (architecture).\label{fig:ex-static-structure}}
+\end{figure}
+
+In the next step we propose an architecture for the realisation of the compressing system as shown in Fig.~\ref{fig:ex-static-structure}.
+It is given by an assembly of three connected components, a \textsf{Controller} component which delegates the compression tasks,
+a \textsf{GifCompressor} component which actually performs the compression of gif-files into jpg-files
+and a \textsf{TxtCompressor} component which produces zip-files from text files.
+The single components are connected by unbounded and unordered channels  \textsf{gif, jpg, ...} for asynchronous communication.
+
+\begin{figure}[h!]
+	\centering
+	\subfloat[\textsf{Controller}.]{\label{fig:ex-controller}\input{papers/tgc/figures/ex-controller}}\qquad 
+	\subfloat[\textsf{GifCompressor}.]{\label{fig:ex-gifCompressor}\input{papers/tgc/figures/ex-gifCompressor}}	\qquad
+	\subfloat[\textsf{TxtCompressor}.]{\label{fig:ex-txtCompressor}\input{papers/tgc/figures/ex-txtCompressor}}
+	\caption{\MAIOPN components.}
+\end{figure}
+
+The behaviour of the single components is modelled by the \MAIOPNs shown  in Figs.~\ref{fig:ex-controller},~\ref{fig:ex-gifCompressor} and~\ref{fig:ex-txtCompressor}.
+The behaviour of the \textsf{CompressorAssembly} is given by the asynchronous composition of the single Petri nets
+shown in Fig.~\ref{fig:ex-async-comp}.
+For each pair of shared input and output actions a new place is introduced, called communication channel.
+Transitions with a shared output label $a$ (of a given component) are connected to the new place $a$ and the transition label is renamed to
+$\outact{a}$ in the composition. Similarly the place $a$ is connected to transitions with the corresponding input label $a$
+which is then renamed to $\inact{a}$  in the composition. 
+The result of our composition is very similar to the composition of open Petri nets,
+see e.g.~\cite{Lohmann07}, which relies on matching of interface places.
+But our approach is methodologically different since we introduce the communication places
+only when the composition is constructed. In that way our basic components are not biased to
+asynchronous composition but could be used for synchronous composition as well.
+In this work we focus on asynchronous composition and we are particularly interested in the analysis
+of generic communication properties ensuring
+that messages pending on communication channels are eventually consumed. 
+Therefore our notion of modal asynchronous I/O-Petri net will comprise an explicit discrimination of
+channel places and, additionally to input/output labels we use, for each channel $a$,
+distinguished communication labels $\outact{a}$ for putting messages on the channel and
+$\inact{a}$ for consuming messages from the channel.  If the set of channels is empty a \MAIOPN
+models an interface or a primitive component from which larger systems can be constructed by asynchronous composition.
+
+\begin{figure}[ht]
+	\centering
+	\input{papers/tgc/figures/ex-async-comp}
+	\caption{\textsf{CompressorAssembly}.\label{fig:ex-async-comp}}
+\end{figure}
+
+In our example the behaviour of the \textsf{CompressorAssembly} is given by the asynchronous composition
+\textsf{Controller} $\compospn$ \textsf{TxtCompressor}  $\compospn$ \textsf{GifCompressor}
+shown in Fig.~\ref{fig:ex-async-comp}. It models a highly parallel system such that compressing of files can be executed concurrently and
+new files can be obtained at the same time. 
+Each single compressing tool, however, is working sequentially.
+Its behaviour should be clear from the specifications.
+The \textsf{GifCompressor} in Fig.~\ref{fig:ex-gifCompressor} has an optional behaviour modelled by a may-transition 
+to indicate a compressing failure and then the controller will submit the file again.
+
+After the assembly has been established we are interested in whether communication works properly in the sense
+that pending messages on communication channels will be consumed. We will distinguish between two variants of
+consumption requirements (see Sect.~\ref{sec:mcs}) expressing that for non-empty channels there must be a possibility for consumption or,
+more strongly, that consumption must always happen on each (observationally weakly fair) run.
+The fairness assumption is essential to support incremental design (Thm.~\ref{thm:inc-design-tgc}); for instance we can first check
+that \textsf{Controller} $\compospn$ \textsf{TxtCompressor} has the desired communication properties for the
+channels $\{$\textsf{txt, zip}$\}$, then we check that the full assembly
+ has the desired communication properties for its
+channel subset $\{$\textsf{gif, jpg, fail}$\}$ and from this we can automatically derive that the assembly has the
+properties for \emph{all} its channels. 
+
+It remains to show that the \textsf{CompressorAssembly} is indeed a realisation of the \textsf{CompressorInterface}.
+For this purpose we consider the black-box behaviour of the assembly obtained by hiding the
+communication channels. This is done by applying our hiding operator to the \textsf{CompressorAssembly}
+denoted by \textsf{CompressorAssembly}$\setminus_{pn}\{$\textsf{gif, jpg, fail, txt, zip}$\}$; see Fig.~\ref{fig:ex-method}.
+Hiding moves all communication labels
+$\outact{a}$ and $\inact{a}$  for the hidden channels $a$ to the invisible action $\tau$.
+In this way producing and consuming messages from hidden channels become silent transitions.
+Now we have to establish a refinement relation between \textsf{CompressorAssembly}$\setminus_{pn}\{$\textsf{gif, jpg, fail, txt, zip}$\}$
+and the \textsf{CompressorInterface} by taking into account the modalities on the transitions such that
+must-transitions of the abstract specification must be available in the refinement and all transitions of the refinement
+must be allowed by corresponding may-transitions of the abstract specification.
+In our example the assembly has implemented the optional jpg compression of the interface by a must-transition.
+Obviously we must also deal with silent transitions which, in our example,
+occur in \textsf{CompressorAssembly}$\setminus_{pn}\{$\textsf{gif, jpg, fail, txt, zip}$\}$. For this purpose we use
+a modal refinement relation, denoted by $\mrw$, which supports observational abstraction. 
+In our case study this is expressed by the proof obligation (1) in Fig.~\ref{fig:ex-method}.
+
+Fig.~\ref{fig:ex-method} illustrates that after the assembly is proven to be a correct realisation of the interface
+one can still further refine the assembly by component-wise refinement of
+its constituent parts. For instance, we can locally refine the \textsf{GifCompressor} by resolving
+the may-modality for producing failures. There are basically two possibilities: Either the failure option is removed
+or it is turned into a must-transition. The component \textsf{GifCompressorRef} in Fig.~\ref{fig:ex-method}
+represents such a refinement of \textsf{GifCompressor} indicated by (2).
+We will show in Thm.~\ref{thm:wmr}.\ref{thm:copos-wmr} that refinement is compositional,
+i.e.\ we obtain automatically that the assembly \textsf{CompressorAssemblyRef} obtained by composition
+with the new gif compressor is a refinement of
+ \textsf{CompressorAssembly} indicated by (3) in  Fig.~\ref{fig:ex-method}. 
+As a crucial result we will also show in Thm.~\ref{thm:wmr-properties}
+that refinement preserves communication properties which then can be automatically
+derived for \textsf{CompressorAssemblyRef}.
+Finally, we must be sure that
+the refined assembly provides a realisation of the original interface specification \textsf{CompressorInterface}.
+This can be again automatically achieved since hiding preserves refinement
+(Thm.~\ref{thm:wmr}.\ref{thm:wmr-hiding})
+which leads to (4)  in  Fig.~\ref{fig:ex-method} and since refinement is transitive.
+
+\begin{figure}%
+\centering
+\input{papers/tgc/figures/ex-method}
+\caption{System development methodology.}%
+\label{fig:ex-method}%
+\end{figure}
+
+In the next sections we will formally elaborate the notions discussed above.
+We hope that their intended meaning is already sufficiently explained
+such that we can keep the presentation short.
+An exception concerns the consideration of the message consuming properties in Sect.~\ref{sec:mcs}
+which must still be carefully studied to ensure incremental design and preservation by refinement.
+
+
+

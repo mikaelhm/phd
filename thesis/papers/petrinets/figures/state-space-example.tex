@@ -1,0 +1,65 @@
+%!TEX root = ../main.tex
+\newcommand*{\vdist}{1.0cm}%
+\begin{tikzpicture}[scale=0.75, every node/.style={transform shape}]
+\node (q00) {\underline{01010}};
+\node[right= \vdist of q00] (q01) {10010};
+\node[right= \vdist of q01] (q02) {01110};
+\node[right= \vdist of q02] (q03) {10110};
+\node[right= \vdist of q03] (q04) {01210};
+\node[right= \vdist of q04] (q05) {10210};
+\node[right= \vdist of q05] (q06) {01310};
+% \node[right= \vdist of q06] (q07) {10310};
+\node[right= \vdist of q06] (q08) {};
+% \node[right= \vdist of q08] (q09) {};
+
+\node[above=3.0cm of q00] (q10) {01001};
+\node[right= \vdist of q10] (q11) {10001};
+\node[right= \vdist of q11] (q12) {01101};
+\node[right= \vdist of q12] (q13) {10101};
+\node[right= \vdist of q13] (q14) {01201};
+\node[right= \vdist of q14] (q15) {10201};
+\node[right= \vdist of q15] (q16) {01301};
+% \node[right= \vdist of q16] (q17) {10301};
+\node[right= \vdist of q16] (q18) {};
+\node[right= \vdist of q18] (q19) {};
+
+
+\draw[arc] (q00) -- (q01) node[midway, below]{$in?$};
+\draw[arc] (q01) -- (q02) node[midway, below]{$\outact{msg}$};
+\draw[arc] (q02) -- (q03) node[midway, below]{$in?$};
+\draw[arc] (q03) -- (q04) node[midway, below]{$\outact{msg}$};
+\draw[arc] (q04) -- (q05) node[midway, below]{$in?$};
+\draw[arc] (q05) -- (q06) node[midway, below]{$\outact{msg}$};
+% \draw[arc] (q06) -- (q07) node[midway, above]{$in?$};
+\draw[arc,dotted] (q06) -- (q08);
+% \draw[dotted,thick] (q08) -- (q09){};
+
+\draw[arc] (q10) -- (q11) node[midway, above]{$in?$};
+\draw[arc] (q11) -- (q12) node[midway, above]{$\outact{msg}$};
+\draw[arc] (q12) -- (q13) node[midway, above]{$in?$};
+\draw[arc] (q13) -- (q14) node[midway, above]{$\outact{msg}$};
+\draw[arc] (q14) -- (q15) node[midway, above]{$in?$};
+\draw[arc] (q15) -- (q16) node[midway, above]{$\outact{msg}$};
+% \draw[arc] (q16) -- (q17) node[midway, above]{$in?$};
+\draw[arc,dotted] (q16) -- (q18);
+% \draw[dotted,thick] (q18) -- (q19){};
+
+\draw[arc] (q10) -- (q00) node[pos=0.11, left]{$out!$};
+\draw[arc] (q11) -- (q01) node[pos=0.11, left]{$out!$};
+\draw[arc] (q12) -- (q02) node[pos=0.11, left]{$out!$};
+\draw[arc] (q13) -- (q03) node[pos=0.11, left]{$out!$};
+\draw[arc] (q14) -- (q04) node[pos=0.11, left]{$out!$};
+\draw[arc] (q15) -- (q05) node[pos=0.11, left]{$out!$};
+\draw[arc] (q16) -- (q06) node[pos=0.11, left]{$out!$};
+% \draw[arc] (q17) -- (q07) node[pos=0.11, left]{$out!$};
+\draw[arc,dotted] (q18) -- (q08) node[midway, left]{};
+
+\draw[arc] (q02) -- (q10) node[pos=0.19, above, yshift=1mm]{$\inact{msg}$};
+\draw[arc] (q03) -- (q11) node[pos=0.19, above, yshift=1mm]{$\inact{msg}$};
+\draw[arc] (q04) -- (q12) node[pos=0.19, above, yshift=1mm]{$\inact{msg}$};
+\draw[arc] (q05) -- (q13) node[pos=0.19, above, yshift=1mm]{$\inact{msg}$};
+\draw[arc] (q06) -- (q14) node[pos=0.19, above, yshift=1mm]{$\inact{msg}$};
+% \draw[arc] (q07) -- (q15) node[pos=0.19, above]{$\inact{msg}$};
+\draw[arc,dotted] (q08) -- (q15) node[pos=0.15, above]{};
+
+\end{tikzpicture}

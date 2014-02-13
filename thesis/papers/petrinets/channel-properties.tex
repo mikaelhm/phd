@@ -1,0 +1,256 @@
+%!TEX root = /Users/mikaelhm/projects/PNInterfaceTheory/main.tex
+
+\section{Channel Properties and Their Compositionality}\label{sec:communication}
+
+In this section we consider various properties concerning the asynchronous communication via channels.
+We give a classification of the properties, show their relationships and prove that they are compositional
+w.r.t.\ asynchronous composition, a prerequisite for incremental design.
+%Examples will be discussed by Petri net representations. 
+
+\subsection{Channel Properties}\label{sec:def-communication-prop}
+
+We consider two classes of channel properties. The first class deals with the requirements that messages sent to a communication channel should also be consumed; the second class concerns the termination of communication in the sense that if consumption from a channel has been stopped then also production on this channel will stop. The channel properties will be defined by considering the semantics of AIOPNs, i.e.\ they will be formulated for AIOTSs.
+
+Some of the properties, precisely the ``necessarily properties'' of type (c) in Def.~\ref{def:cp} below,
+rely on the consideration of system runs.
+In principle a system run is a maximal execution trace; it can be infinite but also finite if no further actions are enabled. It is important to remember, that we deal with open systems whose possible behaviours are also determined by the environment. Hence, the definition of a system run must take into account the possibility that the system may stop in a state where the environment does not serve any offered input of the system while at the same time the system has no enabled autonomous action, i.e. an action which is not an input from the environment. Such states will be called pure input states. 
+They correspond to markings that ``stop except for inputs'' in~\cite{Stahl12}.
+Note that all possible communication actions inside the system can be autonomously executed. The same holds for output actions to the environment, since we are working with asynchronous communication such that messages can always be sent, even if they are never accepted by the environment. Formally, system runs are defined as follows.
+
+Let $\S = \aiotstup{}$ be an \AIOTS with $\ioalpha{}$.\linebreak A state $q \in Q$ is called a \emph{pure input state} if $\post(q, \Sigma \setminus \inset) = \emptyset$, i.e. only inputs are enabled. A pure input state is a potential deadlock, as the environment of $\S$ might not serve any inputs for \S. 
+% A state $q \in Q$ which is not a pure input state is called a \emph{self-enabled state}. 
+Let $q_1 \in Q$. A \emph{run} of $\S$ starting in $q_1$ is a trace of $\S$ starting in $q_1$, that is either infinite or finite such that its last state is a pure input state. We denote the set of all runs of $\S$ starting from $q_1$ as $\run{\S}(q_1)$. 
+
+In the following we also assume that system runs are only executed in a runtime infrastructure which follows a weakly fair scheduling policy. In our context this means that any autonomous action $a$, that is always enabled from a certain state on, will infinitely often be executed. Formally,
+a run $\rho \in \run{\S}(q_1)$ with $q_1 \in Q, \rho = q_1 \goes{a_1} q_2 \goes{a_2} \cdots$, is called \emph{weakly fair} if it is finite or if it is infinite and for all $a \in (\Sigma \setminus \inset)$ the following holds:
+\[
+    (\exists k \geq 1\;.\; \forall i \geq k \;.\; q_i \goes{a} ) \implies (\forall k \geq 1 \;.\; \exists i \geq k \;.\; a_i = a).\]
+We denote the set of all weakly fair runs of $\S$ starting from $q_1$ by $\frun{\S}(q_1)$.
+It should be noted that for our results it is sufficient to use weak fairness instead of strong fairness.\footnote{For a discussion of the different fairness properties see, e.g.,~\cite{berard-et-al-2001}.}
+%This has the advantage that weak fairness is decidable for Petri nets while strong fairness is not; see Sec.~\ref{sec:decidability}.
+% A \emph{minimal run} starting from $q$ is a run $\rho \in \run{\S}(q)$, such that either $\rho$ is infinite and does not visit any pure input states, or it is finite such that its last state is the only pure input state visited by $\rho$. Intuitively minimal runs characterize these runs that can be performed by $\S$ in any environment. Examples will be given later in Ex.~\ref{ex:maxtraces}.
+
+% \begin{lemma}
+%     \label{lem:minimal-prefix}
+%     Let $\S$ be an \AIOTS, and $q$ a state of $\S$. For any $\rho \in \run{\S}(q)$, then there exists $\rho' \in \minr{\S}(q)$, such that $\rho'$ is a prefix of $\rho$. 
+% \end{lemma}
+% \begin{proof}
+%     There are two cases. First assume there exists a pure input state $q' \in \rho$. Then the prefix starting from $q$ and stopping in the first pure input state of $\rho$, is a minimal run.
+%     Otherwise $\rho$ only visits self-enabled states, thus it must be infinite. Then $\rho \in \min{\S}(q)$.
+% \end{proof}
+\begin{example}\label{ex:maxtraces}
+ Let $\S = \aiots(\pnN_3)$ be the associated \AIOTS of the Petri net $\pnN_3$ in Fig.~\ref{fig:ex-aiopn} on page~\pageref{fig:ex-aiopn}. 
+An excerpt of $\S$ has been shown in Fig.~\ref{fig:ex-associatedAIOTS}.
+%   Recall that the states of $\S$ are markings of $\pnN_3$; we use the following notation for a state $m$ of $\S$: $\langle m(p_0), m(p_1), m(msg), m(p_2), m(p_3)\rangle$.
+The following are three traces of $\S$ starting in the initial state $01010$: \\[2mm]
+{$\rho_0 = 01010$,\\
+        $\rho_1 = 01010 \goes{{in?}} 10010 \goes{\outact{msg}} 01110 \goes{\inact{msg}} 01001$, \\
+        $\rho_2 = 01010 \goes{{in?}} 10010 \goes{\outact{msg}} 01110 \goes{\inact{msg}} 01001 \goes{out!} 01010$.}\\[2mm]
+    % 
+    The traces $\rho_0$ and $\rho_2$ are runs of $\S$ while $\rho_1$ is not a run, since
+    $01001$ is not a pure input state.
+    Now consider the infinite trace indicated at the bottom line in Fig.~\ref{fig:ex-associatedAIOTS}, 
+that is an infinite alternation of $in?$ and $\outact{msg}$. The trace is a run, since it is infinite. But the run is not weakly fair, since from the second state on $\inact{msg}$ is always enabled but never taken.
+\end{example}
+
+Our first class of channel properties deals with the consumption of previously produced messages.
+We consider four groups of such properties~\ref{def:cp:consuming} - \ref{def:cp:wholly-emptying} with different strength.  In each case we consider three variants which all are parametrised w.r.t. a subset $B$ of the communication channels.
+
+Let us discuss the consuming properties~\ref{def:cp:consuming} of Def.~\ref{def:cp} below for an AIOTS $\S$ and a subset $B$ of its channels.
+Property~\ref{def:cp:bas-consuming} requires,
+for each channel $a \in B$, that if in an arbitrary reachable state $q$ of $\S$ there is a message available on $a$, then $\S$ can consume
+the message possibly after the execution of some autonomous actions. 
+Let us comment on the role of the environment for the formulation of this property.
+First, we consider arbitrary reachable states $q \in \post^*(q^0)$ with $q^0$ being the initial state of $\S$.
+This means that we take into account the worst environment which can let $\S$ go everywhere by providing (non-deterministically)
+all inputs that $\S$ can accept.
+Then, at some point at which a message is available on channel $a$, the environment can stop
+to provide further inputs and waits whether $\S$ can \emph{autonomously} reach a state
+$q' \in \post^*(q,\Sigma\setminus \inset)$ in which it can consume from $a$, i.e. execute ${\inact{a}}$.
+To allow autonomous actions before consumption is inspired by the property of ``output compatibility'' studied for synchronously composed transition systems in~\cite{hennicker_knapp_2011}.
+%For the compositionality results later on, it will be important that we only allow autonomous actions and no (open) inputs before the consumption. 
+Property~\ref{def:cp:str-consuming} does not allow autonomous actions before consumption.
+It requires that $\S$ can immediately consume the message in state $q$, similar to the property of specified reception in~\cite{Brand:1983:CFM:322374.322380}.
+Property~\ref{def:cp:nec-consuming} requires that the message will definitely be consumed on each weakly fair run of $\S$ starting from $q$ and, due to the definition of a system run, that this will happen in any environment whatever inputs are provided.
+
+As an example consider the \AIOTS $\S = \aiots(\pnN_3)$  associated with the \AIOPN $\pnN_3$ in Fig.~\ref{fig:ex-aiopn}
+and its reachable state $01101$ such that one message is on channel $msg$.
+In this state $\S$ can autonomously perform the output $out!$ reaching state $01110$
+and then it can consume the message by performing $\inact{msg}$. Since also in all other reachable states
+in which the channel  is not empty $\S$ can autonomously reach a state in which it can consume from the channel,
+$\S$ satisfies property~\ref{def:cp:bas-consuming} (for its only channel $msg$).
+However, $\S$ is not strongly consuming~\ref{def:cp:str-consuming}.
+For instance in state $01101$, $\S$ cannot immediately consume the message.
+On the other hand, $\S$ is necessarily consuming~\ref{def:cp:nec-consuming}.
+Whenever in a reachable state $q$ the channel is not empty an autonomous action, either $\inact{msg}$ or $out!$,
+is enabled. Hence $q$ is not a pure input state and, due to the weak fairness condition, eventually $\inact{msg}$ or $out!$ must be performed
+in any weakly fair run starting from $q$. If $\inact{msg}$ is performed we are done. If $out!$ is performed we reach a state
+where $\inact{msg}$ is enabled and with the same reasoning eventually  $\inact{msg}$ will be performed. This can be easily detected
+by considering Fig.~\ref{fig:ex-associatedAIOTS}.
+
+The other groups of properties~\ref{def:cp:decreasing} - \ref{def:cp:wholly-emptying} express successively stronger (or equivalent) requirements on the kind of consumption. For instance,~\ref{def:cp:emptying} requires that the consumption will lead to a state in which the channel is empty. Again we distinguish if this can be achieved after some autonomous actions~\ref{def:cp:bas-emptying}, can be achieved immediately~\ref{def:cp:str-emptying}, or must be achieved in any weakly fair run~\ref{def:cp:nec-emptying}.
+
+
+%For NEC and Comm. Temination:
+%Our goal is to define the channel properties in such a way that that the property is always satisfied on all runs in any environment.
+
+\begin{definition}[Consumption properties]\label{def:cp}
+    Let $\S = \aiotstup{}$ be an \AIOTS with I/O-alphabet $\ioalpha{}$ and let $B \subseteq \chan$ be a subset of its channels.
+    \begin{enumerate}[label=P\arabic*:, ref=(P\arabic*), leftmargin=*]
+        \item\label{def:cp:consuming} \emph{(Consuming)}
+            \begin{enumerate}[label=\alph*), ref=(P\arabic{enumi}.\alph*), leftmargin=*, itemsep=1pt]
+                \item\label{def:cp:bas-consuming}$\S$ is \emph{$B$-consuming}, if for all $a \in B$ and all $q \in \post^*(q^0)$,
+                \[
+                    \val(q,a)>0 \implies \exists q' \in \post^*(q,\Sigma\setminus \inset)\: .\:q' \goes{\inact{a}}.
+                \]
+                \item\label{def:cp:str-consuming}$\S$ is \emph{strongly $B$-consuming},  if for all $a \in B$ and all $q \in \post^*(q^0)$, 
+                \[
+                    \val(q,a)>0 \implies q \goes{\inact{a}}.
+                \]
+                \item\label{def:cp:nec-consuming}$\S$ is \emph{necessarily $B$-consuming}, if for all $a \in B$ and all $q \in \post^*(q^0)$,
+                \[
+                  \val(q,a)>0 \implies \forall \rho \in \frun{\S}(q) \: .\:\inact{a} \in \rho \;.
+                \]
+            \end{enumerate}
+        \item\label{def:cp:decreasing} \emph{(Decreasing)}
+            \begin{enumerate}[label=\alph*), ref=(P\arabic{enumi}.\alph*), leftmargin=*, itemsep=1pt]
+                \item\label{def:cp:bas-decreasing}$\S$ is \emph{$B$-decreasing},  if for all $a \in B$ and all $q \in \post^*(q^0)$,
+                \[ 
+                    \val(q,a)>0 \implies \exists q' \in \post^*(q,\Sigma\setminus \inset)\: .\:\val(q',a)<val(q,a)\: .
+                \]   
+                \item\label{def:cp:str-decreasing}$\S$ is \emph{strongly $B$-decreasing},  if for all $a \in B$ and all $q \in \post^*(q^0)$,
+                \[ 
+                    \val(q,a)>0 \implies \exists q' \in \post(q,\Sigma\setminus \inset)\: .\:\val(q',a)<val(q,a)\: .
+                \]           
+                 \item\label{def:cp:nec-decreasing}$\S$ is \emph{necessarily $B$-decreasing},  if for all $a \in B$ and all $q \in \post^*(q^0)$,
+                \[
+                    \val(q,a)>0 \implies \forall \rho \in \frun{\S}(q),\exists q' \in \rho\:.\: \val(q',a)<\val(q,a).
+                \]
+            \end{enumerate}    
+        \item\label{def:cp:emptying} \emph{(Emptying)}
+            \begin{enumerate}[label=\alph*), ref=(P\arabic{enumi}.\alph*), leftmargin=*, itemsep=1pt]
+                \item\label{def:cp:bas-emptying} $\S$ is \emph{$B$-emptying},  if for all $a \in B$ and all $q \in \post^*(q^0)$,
+                \[
+                    \val(q,a)>0 \implies \exists q' \in \post^*(q,\Sigma\setminus \inset)\: .\:\val(q',a)=0\: .
+                \]
+                \item\label{def:cp:str-emptying} $\S$ is \emph{strongly $B$-emptying},  if for all $a \in B$ and all $q \in \post^*(q^0)$,
+                \[
+                    \val(q,a)>0 \implies \exists q' \in \post(q,\Sigma\setminus \inset)\: .\: \val(q',a)=0\: .
+                \]
+                \item\label{def:cp:nec-emptying} $\S$ is $B$-\emph{necessarily emptying},  if for all $a \in B$ and all $q \in \post^*(q^0)$,
+                \[
+                    \val(q,a)>0 \implies \forall \rho \in \frun{\S}(q),\ \exists q' \in \rho\: .\: \val(q',a)=0 \;.
+                \]
+            \end{enumerate}
+        \item\label{def:cp:wholly-emptying} \emph{(Wholly emptying)}
+            \begin{enumerate}[label=\alph*), ref=(P\arabic{enumi}.\alph*), leftmargin=*, itemsep=2pt]
+                \item\label{def:cp:bas-wholly-emptying} $\S$ is \emph{$B$-wholly emptying}, if for all $q \in \post^*(q^0)$,
+                \[
+                    \val(q,B)>0 \implies \exists q' \in \post^*(q,\Sigma\setminus \inset)\: .\:\val(q',B)=0.
+                \]
+                \item\label{def:cp:str-wholly-emptying} $\S$ is \emph{strongly $B$-wholly emptying}, if for all $q \in \post^*(q^0)$,
+                \[
+                    \val(q,B)>0 \implies \exists q' \in \post(q,\Sigma\setminus \inset)\: .\:\val(q',B)=0.
+                \] 
+                \item\label{def:cp:nec-wholly-emptying} $\S$ is $B$-\emph{necessarily wholly emptying}, if for all $q \in \post^*(q^0)$,
+                \[
+                    \val(q,B)>0 \implies \forall \rho \in \frun{\S}(q),\ \exists q' \in \rho\: .\:\val(q',B)=0 \;.
+                \] 
+            \end{enumerate}
+        \end{enumerate}
+\end{definition}
+Note if the initial state of $\S$ is reachable from all other reachable states, i.e. the initial state is a \emph{home state}, then $\S$ is $B$-wholly emptying.
+
+The next class of channel properties concerns the termination of communication. We consider two variants:~\ref{def:rp:bas-stopping} requires that in any weakly fair run, in which consumption from a channel $a$ has stopped, only finitely many subsequent productions are possible, i.e. the channel  is closed after a while.
+Property~\ref{def:rp:str-stopping} expresses that the channel is immediately closed.
+%Finally, we consider boundedness of communication channels.
+
+%   \rednote{Awareness is a global property, we cannot expect compositionality}
+%   \rednote{Remove awareness, only non-compositional property. Does not fit with others}
+% \begin{definition}[Awareness]\label{def:ap}
+% Let $\S = \aiotstup{}$ be an \AIOTS and let $B \subseteq \chan$ be a subset of its channels.
+% \begin{enumerate}[label=P\arabic*:, ref=(P\arabic*), leftmargin=*, start=5]
+%         \item\label{def:ap:aware} \emph{(Awareness)}\\
+%         $\S$ is $B$-\emph{aware}, if for all $q \in \post^*(q^0)$
+% \\\centerline{$\val(q,B)>0 \implies \post(q) \neq \emptyset\; \wedge\; \forall q' \in \post(q)\: .\:\val(q',B)=0$}
+% \end{enumerate}
+% \end{definition}
+
+% \begin{definition}[Necessarily consumption properties]\label{def:cp:nec}
+% Let $\S$ be an \AIOTS and $B \subseteq \chan$ be a subset of its channels.
+% \begin{enumerate}[label=P\arabic*:, ref=(P\arabic*), leftmargin=*, start=6]
+% \end{enumerate}
+% \end{definition}
+
+\begin{definition}[Communication stopping]\label{def:rp}
+    Let $\S$ be an \AIOTS and $B \subseteq \chan$ be a subset of its channels.
+\begin{enumerate}[label=P\arabic*:, ref=(P\arabic*), leftmargin=*,start=5]
+        \item\label{def:rp:stopping} \emph{(Communication stopping)}
+            \begin{enumerate}[label=\alph*), ref=(P\arabic{enumi}.\alph*), leftmargin=*, itemsep=4pt]
+            \item\label{def:rp:bas-stopping}$\S$ is \emph{$B$-communication stopping}, if for all $q\in \post^*(q^0),$ \\$\rho \in \frun{\S}(q)$ and $a \in B$, 
+            %\\\hspace*{20pt}
+                $\sharp_\rho(\inact{a})=0 \implies \sharp_\rho(\outact{a}) < \infty \;.
+            $  
+            \item\label{def:rp:str-stopping}$\S$ is \emph{strongly $B$-communication stopping}, if for all $q\in \post^*(q^0),$ $\rho \in \frun{\S}(q)$ and $a \in B$, 
+            %\\\hspace*{20pt} 
+               $ \sharp_\rho(\inact{a})=0 \implies \sharp_\rho(\outact{a})=0\;.
+            $
+        \end{enumerate}  
+\end{enumerate}
+\end{definition}
+
+%A standard property concerns boundedness of a channel which we do not discuss here.
+%%all results presented in the following would also hold for boundedness.
+%It may be observed that channel boundedness implies  communication stopping.
+%Moreover, if $\S$ is strongly $B$-emptying then any channel $a \in B$ is bounded by 1,
+%and  if $\S$ is strongly $B$-wholly emptying then then the whole channel set $B$ is bounded by 1.
+
+%\begin{definition}[Boundedness]\label{def:boundedness}
+%    Let $\S$ be an \AIOTS and $B \subseteq \chan$ be a subset of its channels.
+%\begin{enumerate}[label=P\arabic*:, ref=(P\arabic*), leftmargin=*,start=6]
+%        \item\label{def:rp:bounded} \emph{(Bounded)}\\
+%        % \begin{enumerate}[label=\alph*), ref=(P\arabic{enumi}.\alph*), leftmargin=*, itemsep=4pt]
+%            % \item\label{def:rp:bas-bounded}
+%            $\S$ is \emph{$B$-bounded}, if there exists a bound $K \in \N$ such that:
+%        \[
+%            \forall q \in Post^*(q^0)\ \val(q,B)\leq K\;.
+%        $ 
+%        % \end{enumerate}
+%        % $\S$ is $B$-$K$-bounded, if the equation above holds for $K$.
+%\end{enumerate}
+%\end{definition}
+
+We say that an \AIOTS $\S$ has a channel property $P$, if $\S$ has property $P$ with respect to the set $\chan$ of all channels of $\S$.
+
+\begin{definition}[Channel properties of AIOPNs]\label{def:cp-apn}
+Let $P$ be an arbitrary channel property as defined above.
+An \AIOPN $\pnN$ has property $P$ w.r.t.\ some subset $B$ of its channels
+if its generated \AIOTS $\aiots(\pnN)$ has property $P$ w.r.t.\ $B$;
+$\pnN$ has property $P$ if $\aiots(\pnN)$ has property $P$. 
+\end{definition}
+
+\smallskip \noindent {\bf Relevance of channel properties.} The generic properties that
+we have defined fit well with properties related to specific
+distributed mechanisms, algorithms and applications. For instance:
+\begin{itemize}
+%
+  \item When sending an email the user must be confident that its mail
+  will be eventually read. Such a property can be formalized 
+  as the necessarily consuming property. 
+%
+  \item Most distributed applications can be designed with an underlying token circulation
+  between the processes of the applications. This requires that at any time there is
+  at most one token in all channels and that this token can be immediately handled. 
+  Such a property can be formalized as the strong wholly emptying property. 
+%
+  \item Recovery points are useful for applications prone to faults.
+  While algorithms for building recovery points
+  can handle non-empty channels, the existence (and identification)
+  of states with empty channels eases this task.
+  Such a property can be formalized as the necessarily wholly emptying property.
+%
+  \item In UNIX, one often requires that a process should not write in a socket
+  when no reader of the socket is still present (and this could raise a signal).
+  Such a property can be formalized as the strong communication stopping property.
+%
+\end{itemize}

@@ -1,0 +1,36 @@
+\section{Introduction}
+
+Modal  Transition  Systems  (MTS)   \cite{DBLP:conf/lics/LarsenT88,AHLNW:EATCS:08} was developed as a flexible  and easy-to-use  compositional modeling framework for reactive systems. One of its core features is the support for stepwise refinement of specifications. 
+
+An MTS is basically a labeled transition system (LTS), but with two types of transitions: 
+\emph{may} transitions represent the only allowed behavior of a system specification and its implementations, and \emph{must} transitions represent required behavior. This means that every must transition has to be implemented in all implementations of the specification, whereas the may transitions are optional. An MTS system specification yields a set of different implementations, where they all fulfill the requirements of the specification. A modal refinement relation on MTS describes whether a specification or implementation fulfills the modal requirements of another MTS specification.
+
+Since the MTS was first introduced several extensions and generalizations have been presented, e.g. disjunctive MTS
+(DMTS)\cite{DBLP:conf/lics/LarsenX90}, %,fossacs-techrep},
+1-selecting MTS (1MTS) \cite{FS:JLAP:08}, transition  systems with
+obligations (OTS)\cite{benes_et_al:OASIcs:2011:3070} and parametric MTS (PMTS)\cite{BKLMS:ATVA:11}. 
+
+MTS has been shown to be closely related to logics, in fact MTS may be seen as a fragment of a temporal logic~\cite{DBLP:journals/tcs/BoudolL92}.
+Already in~\cite{DBLP:conf/avmfss/Larsen89} Larsen presented a logical characterization of MTS in Hennessy Milner Logic (HML), and in~\cite{xinxin1992specification} a similar characterization of DMTS was given. However it has been left as an open question whether the OTS and PMTS follow this trend. 
+
+OTS is a generalization of MTS, and PMTS is a further generalization of OTS.
+Instead of having the two may and must transition relations, both OTS and PMTS only have one transition relation, like a normal LTS. Instead the modalities of the transitions are expressed in an obligation formula for each state. The obligation function is a Boolean formula over outgoing transitions, and any set of outgoing transitions that satisfy the formula is a valid combination. 
+In OTS, only positive Boolean obligation formulas over transitions are allowed, where in PMTS arbitrary boolean formulas over transitions and a set of prefixed parameters are allowed.
+
+OTS and PMTS extend MTS in the sense that the (must and may) modalities assigned to transitions may be dependent.
+With this construction, OTS and PMTS support more complex modalities than just may and must.
+ 
+In this paper we will initially work with Boolean MTS (BMTS), an OTS with arbitrary Boolean obligation formulas. This model was also presented as parameter-free PMTS in~\cite{BKLMS:ATVA:11}.
+
+We define an interpretation of the Hennessy Milner Logic with recursion \cite{DBLP:conf/caap/Larsen88} to reason about BMTS specifications. We show that the logic characterizes the modal refinement relation on BMTSs. We apply the approach from~\cite{DBLP:journals/iandc/SteffenI94}, where the formula is actually a mutually recursive equation system, with an equation for each state of the specification.
+
+Finally we apply the logic on the more general PMTS. In \cite{BKLMS:ATVA:11} PMTS and the modal refinement relation on such specifications were defined. The modal refinement can be used to check whether a certain valuation of the parameters will refine a specification. However it is not known how one should select these parameters in order to refine a specification.
+
+As a PMTS with instantiated parameters is a BMTS, we will use our logic to solve this problem. We show that one can compute all the possible ways of instantiating the parameters, such that the resulting BMTS will satisfy the formula.
+This is done by expressing the problem as a mutually recursive equation system, and showing that it always has a unique maximal fix-point.
+
+In relation to this work, the formalism of Feature Transition Systems (FTS), presented in \cite{Classen2010}, is somewhat related to PMTS. A FTS is just a LTS, with an additional label on each transition, namely the feature this transition is a part of. The formalism is used in Software Product Lines, and each feature can be either optional or required, like may and must in the family of MTSs. This notion of features is very similar to the parameters of PMTS, which can be used to model features in the same way, but is a more general concept. In addition there are also no modalities on the transitions in FTS. Finally, very related to our last result, \cite{Classen2010} also gives a model checking algorithm, that given a requirement in LTL, lists the products (combinations of features) that fulfill the requirement. 
+
+% The structure of the paper is as follows;
+% First we formally define the Boolean MTS framework, and give a small example in Section 2. In Section 3 we present our Logic for BMTS and prove that it characterizes the modal refinement relation. In Section 4 we define PMTS and show how to solve the problem of selecting the parameters give a requirement. 
+% Finally we conclude our work in Section 5.

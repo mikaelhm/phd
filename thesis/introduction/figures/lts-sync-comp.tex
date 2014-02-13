@@ -1,0 +1,15 @@
+%!TEX root = ../../thesis.tex
+\begin{tikzpicture}
+    \node[state,initial] (q0) {$q_0,r_0$};
+    \node[state,below=2.2cm of q0] (q1) {$q_1,r_1$};
+    \node[state,below left=.9cm and .9cm of q0] (q2) {$q_0,r_1$};
+    \node[state,below right=.9cm and .9cm of q0] (q3) {$q_1,r_0$};
+
+    \path (q0) edge[->] node[left,midway] {\transition{msg}} (q1) {};
+
+    \path (q1) edge[->] node[sloped,midway,below] {\transition{post!}} (q3) {};
+    \path (q1) edge[->] node[sloped,midway,below] {\transition{pre?}} (q2) {};
+
+    \path (q2) edge[->] node[sloped,midway,above] {\transition{post!}} (q0) {};
+    \path (q3) edge[->] node[sloped,midway,above] {\transition{pre?}} (q0) {};
+\end{tikzpicture}

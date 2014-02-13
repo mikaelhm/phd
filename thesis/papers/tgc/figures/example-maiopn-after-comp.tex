@@ -1,0 +1,36 @@
+%!TEX root = ../main.tex
+
+\begin{tikzpicture}[scale=0.675, every node/.style={transform shape}]
+\node[place,tokens=0,label=above:$p_0$] at (0,0) (p0) {};
+\node[transition,rotate=90,label={[yshift=7,xshift=1]0:$\outact{msg}$}] at (1,-1.5) (tmsg_out) {};
+\node[place,tokens=1,label=below:$p_1$] at (0,-3) (p1) {};
+\node[transition,rotate=90,label={[yshift=4,xshift=-8]180:$in?$}] at (-1,-1.5) (ta_in) {};
+
+
+\node[place,tokens=1,label=above:$p_2$] at (5,0) (p2) {};
+\node[transition,rotate=90,label={[yshift=13,xshift=0]180:$\inact{msg}$}] at (4,-1.5) (tmsg_in) {};
+\node[place,tokens=0,label=below:$p_3$] at (5,-3) (p3) {};
+\node[transition,rotate=90,label={[yshift=-2,xshift=7]-00:$out!$}] at (6,-1.5) (tb_out) {};
+
+\node[place,label=below:$msg$] at (2.5,-1.5) (pa) {};
+
+\draw[arc] (p0) to[bend left] (tmsg_out) {};
+\draw[arc] (tmsg_out) to[bend left] (p1) {};
+\draw[arc] (p1) to[bend left] (ta_in) {};
+\draw[arc] (ta_in) to[bend left] (p0) {};
+
+\draw[arc] (tmsg_out) -- (pa) {};
+\draw[arc] (pa) -- (tmsg_in) {};
+
+\draw[arc] (p2) to[bend right] (tmsg_in) {};
+\draw[arc] (tmsg_in) to[bend right] (p3) {};
+\draw[arc] (p3) to[bend right] (tb_out) {};
+\draw[arc] (tb_out) to[bend right] (p2) {};
+% \node[above of=p0] {$\mathcal M_1$};
+% \node[above of=p2] {$\mathcal M_2$};
+
+% \begin{pgfonlayer}{background}
+% \node [fill=white,inner sep=8mm,fit=(p0) (tmsg_out) (p1) (tb_in)] {};
+% \node [fill=white,inner sep=8mm,fit=(p2) (tb_out) (p3) (tmsg_in)] {};
+% \end{pgfonlayer}
+\end{tikzpicture}

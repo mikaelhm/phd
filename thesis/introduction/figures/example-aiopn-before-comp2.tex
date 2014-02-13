@@ -1,0 +1,29 @@
+%!TEX root = ../../thesis.tex
+\begin{tikzpicture}
+
+
+
+\node[place,tokens=1,label=above:$r_0$] at (6,0) (p2) {};
+\node[transition,rotate=90,label={[yshift=0,xshift=-13]0:$\transition{msg?}$},enabled] at (5,-1.5) (tmsg_in) {};
+\node[place,tokens=0,label=below:$r_1$] at (6,-3) (p3) {};
+\node[transition,rotate=90,label={[yshift=0,xshift=0]-90:$\transition{out!}$}] at (7,-1.5) (tb_out) {};
+
+% \node[place,label=above:$msg$] at (3,-1.5) (pa) {};
+
+
+
+% \draw[arc] (tmsg_out) -- (pa) {};
+% \draw[arc] (pa) -- (tmsg_in) {};
+
+\draw[arc] (p2) to[bend right] (tmsg_in) {};
+\draw[arc] (tmsg_in) to[bend right] (p3) {};
+\draw[arc] (p3) to[bend right] (tb_out) {};
+\draw[arc] (tb_out) to[bend right] (p2) {};
+% \node[above of=p0] {$\mathcal M_1$};
+% \node[above of=p2] {$\mathcal M_2$};
+
+% \begin{pgfonlayer}{background}
+% \node [fill=white,inner sep=8mm,fit=(p0) (tmsg_out) (p1) (tb_in)] {};
+% \node [fill=white,inner sep=8mm,fit=(p2) (tb_out) (p3) (tmsg_in)] {};
+% \end{pgfonlayer}
+\end{tikzpicture}

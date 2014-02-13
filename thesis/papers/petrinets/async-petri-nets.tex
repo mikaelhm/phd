@@ -1,0 +1,254 @@
+%!TEX root = ./main.tex
+
+\section{Asynchronous I/O-Petri Nets}
+\label{sec:AIOPN}
+
+\subsection{Basic Notions}\label{subsec:basics}
+We recall some basic notions of labelled Petri nets and define their transition semantics. 
+
+\begin{definition}[Labelled Petri Net]
+A \emph{labelled Petri net} is a tuple \pndef, such that
+\begin{itemize}
+    \item $P$ is a finite set of places,
+    \item $T$ is a finite set of transitions with $P \cap T = \emptyset$,
+    \item $\Sigma$ is a finite alphabet,
+    \item $W^-$ (resp. $W^+$) is a matrix indexed by $P\times T$ with values in \N;\\ it is called the \emph{backward} (resp. \emph{forward}) \emph{incidence matrix},
+    \item $\lambda : T \rightarrow \Sigma$ is a transition labelling function, and
+%    \item $m^0 : P \mapsto \N$ is the initial marking.
+    \item $m^0$ is a vector indexed by $P$ and called the initial marking.
+\end{itemize}     
+\end{definition}
+
+
+%A transition $t \in T$ is called \emph{silent}, if $\lambda(t) = \epsilon.$
+The labelling 
+function $\lambda$ is extended as usual to sequences of transitions. 
+%For each $t \in T$, $^\bullet t\ (t^\bullet$ resp.) denotes the set of 
+%\emph{input (output) places} of $t$. i.e. $^\bullet t= \{ p \in P \mid 
+%W^{-}(p,t) > 0\}$ ($t^\bullet = \{p \in P \mid W^{+}(p,t) > 0\}$ resp.).
+The input (output resp.) vector $W^{-}(t)$ ($W^{+}(t)$ resp.) of a transition $t$ is the column
+vector of matrix $W^{-}$ ($W^{+}$ resp.) with index $t$.
+Given two vectors $\overrightarrow{v}$ and $\overrightarrow{v}'$, one writes $\overrightarrow{v}\geq \overrightarrow{v}'$
+if  $\overrightarrow{v}$ is componentwise greater or equal than $\overrightarrow{v}'$.
+%\emph{A marking} is a mapping $m: P \mapsto \mathbb{N}$.
+\emph{A marking} is a vector indexed by $P$.
+A transition $t \in T$ is \emph{firable} 
+from a marking $m$, denoted by $m \goes{t}$, if
+$\ m \geq W^{-}(t)$. The firing of $t$ 
+from $m$ leads to the marking $m'$, denoted by $m \goes{t} m'$, and defined 
+by $m' = m - W^{-}(t) + W^{+}(t)$. If $\lambda (t) = a$ we write $m \goes{a} m'$.
+The firing of a transition is extended as usual to firing sequences $m \goes{\sigma} m'$ with $\sigma \in  T^{*}$.
+A marking $m$ is reachable if there exists a firing sequence $\sigma \in  T^{*}$ such that  $m^{0} \goes{\sigma} m$.
+
+Our approach is based on a state transition system semantics for Petri nets.
+
+\begin{definition}[Labelled Transition System]
+A \emph{labelled transition system} (\LTS) is a tuple $\S = (\Sigma, Q, q^0, \goes{})$, such that
+\begin{itemize}
+    \item $\Sigma$ is a finite set of labels, 
+    \item $Q$ is a (possibly infinite) set of states, 
+    \item $q^0 \in Q$ is the initial state, and
+    \item $\goes{} \; \subseteq Q \times \Sigma \times Q$ is a labelled transition relation.
+    % ; $\tau$-transitions are called \emph{silent transitions}
+\end{itemize}
+    
+\end{definition}
+We will write $q \goes{a} q'$ for $(q,a,q') \in \;\goes{}$, and we write $q \goes{a}$ if there exists $q' \in Q$ such that $q \goes{a} q'$. 
+Let $q_1 \in Q$. A \emph{trace} of $\S$ starting in $q_1$ is a finite or infinite sequence $\rho =q_1  \goes{a_1} q_2 \goes{a_2} q_3 \goes{a_3} \cdots$.
+% such that $a_i \in \Sigma$ and $q_i \in Q$ for all $i$.
+For $a \in \Sigma$ we write $a \in \rho$, if there exists $a_i$ in the sequence $\rho$ such that $a_i = a$, and $\sharp_\rho(a)$ denotes the (possibly infinite) number of occurrences of $a$ in $\rho$. 
+For $q \in Q$ we write $q \in \rho$, if there exists $q_i$ in the sequence $\rho$ such that $q_i = q$.
+For $\sigma=a_1 a_2 \cdots a_n \in \Sigma^*$ and $q,q'\in Q$ we write $q \goes{\sigma} q'$ if there exists a (finite) trace $q \goes{a_1} q_2 \goes{a_2} \cdots \goes{a_n} q'$. 
+Often we need to reason about the successor states reachable from a given state $q \in Q$ with a subset of labels $\bar\Sigma \subseteq \Sigma$. 
+We define $\post(q,\bar\Sigma) = \{q' \in Q \mid \exists a\in \bar\Sigma \; . \; q \goes{a} q'\}$ and we write $\post(q)$ for $\post(q,\Sigma)$. 
+Further we define $\post^*(q,\bar\Sigma)  = \{q' \in Q \mid \exists \sigma \in \bar\Sigma^* \; . \; q \goes{\sigma} q'\}$ and we write $\post^*(q) $ for $ \post^*(q,\Sigma)$.
+
+\begin{definition}[Associated Labelled Transition System]
+The semantics of a labelled Petri net $\pnN = \pntup{}$ is given by its \emph{associated} labelled transition system
+$\lts(\pnN) = (\Sigma, Q, q^0, \goes{})$ which represents the reachability graph of the net and is defined by
+    \begin{itemize}
+        \item $Q \subseteq \N^P$ is the set of reachable markings of \pnN,
+        \item $\goes{} \; = \{(m, a, m') \mid a \in \Sigma \text{ and } m \goes{a} m'\}$, and
+        \item $q^0 = m^0$.
+    \end{itemize}    
+\end{definition}
+
+
+%For technical simplicity the state space of $\lts(\pnN)$ consists of all markings of the Petri net $\pnN$.
+%If we restrict to the reachable markings the transition system semantics is an abstraction of the reachability graph of $\pnN$, possibly with infinitely many states. For the channel properties considered later on only the reachable markings (reachable states resp.) are relevant but to prove semantic compositionality it is technically easier to stick to all states.
+
+\subsection{Asynchronous I/O-Petri Nets and Their Composition}\label{sec:aiopns-defs}
+
+In this paper we consider systems which may be open for communication with other systems and may be composed to larger systems.
+Both the behaviour of primitive components \emph{and} of larger systems obtained by composition can be described by asynchronous I/O-Petri nets introduced in the following.
+We assume that communication is asynchronous and takes place via unbounded and unordered channels such that  for each message type to be exchanged within a system there is exactly one communication channel. 
+%Methodologically, systems are built up starting with basic, open components that do not contain communication channels yet. Channels are only 
+The open actions are modelled by distinguished input and output labels while communication inside the system via the channels
+%within an asynchronously composed system
+is modelled by communication labels. 
+Given a finite set $\chan$ of channels, an \emph{I/O-alphabet over $\chan$} is the disjoint union $\ioalpha{}$ of pairwise disjoint sets $\inset$ of input labels, $\outset$ of output labels and $\com$ of communication labels, such that $\Sigma \cap \chan = \emptyset$, $\com = \{\inact{a},\outact{a} \mid a \in \chan\}$ and \inset and \outset do not contain labels of the form $\inact{x}$ or $\outact{x}$.
+For each channel $a \in \chan$, the communication label $\inact{a}$ represents consumption of a message from the channel $a$ and $\outact{a}$ represents putting a message on $a$ .
+% Similarly to asynchronous I/O-transition systems also asynchronous I/O-Petri nets (AIOPNs) are based on a finite set of communication channels
+% and on an I/O-alphabet. 
+Each channel is modelled as a place and the transitions for communication actions are modelled
+by putting or removing tokens from the channel places.
+ Three examples of \AIOPNs are shown in Fig.~\ref{fig:ex-aiopns}. The nets $\pnN_1$ and $\pnN_2$ model primitive
+components (without channels) which repeatedly input and output messages.
+The net $\pnN_3$ in Fig.~\ref{fig:ex-aiopn} models a simple producer/consumer system with one channel $msg$
+obtained by composition of the two primitive components; see below.
+Here and in the following drawings input labels are indicated by ``$?$'' and output labels by ``$!$''. 
+
+
+\begin{figure}[htb]%
+\centering
+\subfloat[$\pnN_1$.]{\label{fig:ex-aiopn1}\input{papers/petrinets/figures/example-aiopn-before-comp.tex} }\quad
+\subfloat[$\pnN_2$.]{\label{fig:ex-aiopn2}\input{papers/petrinets/figures/example-aiopn-before-comp2.tex} }\quad
+\subfloat[$\pnN_3$.]{\label{fig:ex-aiopn}\input{papers/petrinets/figures/example-aiopn.tex} }
+\caption{Asynchronous I/O-Petri nets.}%
+\label{fig:ex-aiopns}%
+\end{figure}
+
+\begin{definition}[Asynchronous I/O-Petri net]
+An \emph{asynchronous I/O-Petri net} (\AIOPN) is a tuple $\pnN = \apntup{}$, such that 
+\begin{itemize}
+    \item $\pntup{}$ is a labelled Petri net,  
+    \item $\chan$ is a finite set of channels, 
+    \item $\chan \subseteq P$, i.e. each channel is a place, 
+    \item $\ioalpha{}$ is an I/O-alphabet over $\chan$, 
+    \item for all $a \in \chan$ and $t \in T$,\\
+            $W^-(a,t) = \begin{cases}
+                    1 &\text{ if } \lambda(t) = \inact{a},\\
+                    0 &\text{ otherwise }
+                \end{cases}$\qquad
+            $W^+(a,t) = \begin{cases}
+                    1 &\text{ if } \lambda(t) = \outact{a},\\
+                    0 & \text{ otherwise}
+                \end{cases}$
+    \item for all $a \in \chan$, $m^0(a) = 0$.
+    \end{itemize}
+\end{definition}
+
+
+Two I/O-alphabets are composable if there are no name conflicts between labels and channels and, %they overlap only on complementary types, i.e.
+following \cite{alfaroHenzinger2005}, if
+shared labels are either input labels of one alphabet and output labels of the other or conversely. For the composition each shared label $a$ gives rise to a new communication channel, also called $a$, and hence to new communication labels $\outact{a}$ for putting and $\inact{a}$ for removing messages. 
+The input and output labels of the alphabet composition are the non-shared input and
+output labels of the underlying alphabets.
+%which are not shared, and hence are left open. 
+
+\begin{definition}[Alphabet composition]
+    Let $\ioalpha{\S}$ and $\ioalpha{\T}$ be two I/O-alphabets over channels $\chan_\S$ and $\chan_\T$ resp. $\Sigma_\S$ and $\Sigma_\T$ are \emph{composable} if
+$(\Sigma_\S \cup \Sigma_\T) \cap (\chan_\S \cup \chan_\T) = \emptyset$ and
+$\Sigma_\S \cap \Sigma_\T = (\inset_\S \cap \outset_\T) \cup (\inset_\T \cap \outset_\S)$.%\footnote{
+%In particular for composable alphabets $\inset_\S \cap \inset_\T = \emptyset$, $\outset_\S \cap \outset_\T = \emptyset$, $\com_\S \cap \com_\T = \emptyset$, and hence also $\chan_\S \cap \chan_\T = \emptyset$.}
+The composition of $\Sigma_\S$ and $\Sigma_\T$ is the I/O-alphabet $\ioalpha{}$ over the composed set of channels $\chan = \chan_\S \uplus \chan_\T \uplus \chan_{\S\T}$, with new channels $\chan_{\S\T} = \Sigma_\S \cap \Sigma_\T$, such that
+\begin{itemize}
+        \item $\inset = (\inset_\S \setminus \outset_\T) \uplus (\inset_\T \setminus \outset_\S)$,
+        \item $\outset = (\outset_\S \setminus \inset_\T) \uplus (\outset_\T \setminus \inset_\S)$, and
+        \item $\com = \{\outact{a}, \inact{a} \mid a \in \chan \}$\footnote{$\ioalpha{}$ is indeed a disjoint union, since for all
+$ a \in \chan_{\S\T}$ the communication labels $\outact{a}, \inact{a}$ are new names due to the general assumption that
+input and output labels are not of the form  $\outact{x}, \inact{x}$.}
+
+    \end{itemize}
+\end{definition}
+
+Two AIOPNs can be (asynchronously) composed, if their underlying I/O-alphabets are composable.
+The composition is constructed by taking the disjoint union of the underlying nets and
+adding a new channel place for each shared label.
+Every transition with shared output label $a$ becomes a transition with the communication label $\outact{a}$
+that produces a token on the (new) channel place $a$ and, similarly,  any transition with shared input label $a$ becomes a transition with the communication label $\inact{a}$
+that consumes a token from the (new) channel place $a$.
+For instance, the \AIOPN $\pnN_3$ in Fig.~\ref{fig:ex-aiopn} is the result of the asynchronous composition of the two \AIOPNs $\pnN_1$ and $\pnN_2$ in Fig.~\ref{fig:ex-aiopn1} and Fig.~\ref{fig:ex-aiopn2} resp. The newly introduced channel place is the place $msg$.
+
+Our approach looks very similar to open Petri nets, see e.g.~\cite{Lohmann07}, which use interface places for communication.
+But there are two important differences: First, we explicitely distinguish channel places thus being able to reason
+on the communication behaviour between composed components; see Sect.~\ref{sec:communication}.
+The second difference is quite important from the software engineer's point of view.
+We do not use interface places to indicate communication abilities of a component but we use distinguished input and output labels instead.
+We believe that this has an important advantage to achieve separation of concerns:
+The designer of a component has not to take care whether the component will
+be used in a synchronous or in an asynchronous environment later on; this should be the decision of the system architect.
+Indeed open Petri nets already rely on asynchronous composition while our formalism would also support synchronous
+composition, see~\cite{peterson1981}, and mixed architectures. Since synchronous composition relies on matching of transitions rather than
+communication channels we have not elaborated this case here. 
+The difference between AIOPNs and modal I/O-Petri nets introduced in~\cite{EHH12} is that AIOPNs comprise distinguished channel places
+but they do not support modalities for refinement (yet).
+
+  
+
+\begin{definition}[Asynchronous composition of \AIOPNs]\label{def:aync-comp-aiopn}
+Let $\pnN = \apntup{\pnN}$ and $\M = \apntup{\M}$ be two \AIOPNs.
+$\pnN$ and $\M$ are \emph{composable} if $\Sigma_{\pnN}$ and  $\Sigma_{\M}$ are composable and if
+$P_{\pnN} \cap P_{\M} = \emptyset$, $(P_{\pnN} \cup P_{\M}) \cap (\Sigma_\pnN \cap \Sigma_\M) = \emptyset$, and $T_{\pnN} \cap T_{\M} = \emptyset$. In this case their 
+\emph{asynchronous composition}
+is the \AIOPN $\pnN \compospn \M = \apntup{}$ defined as follows:
+    \begin{itemize}
+    \item $\chan = \chan_\pnN \uplus \chan_\M \uplus \chan_{\pnN\M}$, with $\chan_{\pnN\M} = \Sigma_\pnN \cap \Sigma_\M$,
+    \item $P = P_{\pnN} \uplus P_{\M} \uplus \chan_{\pnN\M}$,
+
+    \item $T = T_{\pnN} \uplus T_{\M}$,
+    \item $\Sigma$ is the alphabet composition of $\Sigma_\S$ and $\Sigma_\T$,
+    
+    \item $W^{-}$ (resp. $W^{+}$) is the backward (forward) incidence matrix defined by:
+        \[
+            \text{for all } p \in P_{\pnN} \cup P_{\M} \text{ and } t\in T
+        \]
+        \[
+            W^{-}(p,t)= \left\{\begin{array}{ll}
+                   W^{-}_{\pnN}(p,t) & \textrm{if $p \in P_{\pnN}, t \in T_{\pnN}$ }\\
+                   W^{-}_{\M}(p,t) & \textrm{if $p \in P_{\M}, t \in T_{\M}$ }\\
+                   0 & \textrm{otherwise}
+                   \end{array} \right. 
+        \] 
+        \[    
+            W^{+}(p,t)= \left\{\begin{array}{ll}
+                    W^{+}_{\pnN}(p,t) & \textrm{if $p \in P_{\pnN}, t \in T_{\pnN}$} \\
+                    W^{+}_{\M}(p,t) & \textrm{if $p \in P_{\M}, t \in T_{\M}$} \\
+                    0 & \textrm{otherwise}
+                    \end{array} \right.
+        \]
+        \[
+            \text{for all } a \in \chan_{\pnN\M} \text{ and } t \in T
+        \]
+        \[
+            \begin{array}{ccc}
+                W^{-}(a,t)= \left\{\begin{array}{ll}
+                            1 & \textrm{if $\lambda(t) = \inact{a}$ }\\
+                            0 & \textrm{otherwise}
+                            \end{array} \right. 
+            &  \qquad   &
+                W^{+}(a,t)= \left\{\begin{array}{ll}
+                            1 & \textrm{if $\lambda(t) = \outact{a}$ }\\
+                            0 & \textrm{otherwise}
+                            \end{array} \right.
+            \end{array}
+        \]
+    \item $\lambda: T \rightarrow \Sigma$ is defined, for all $t \in T$, by 
+    \begin{displaymath}
+     \lambda(t) = \left\{\begin{array}{ll}
+        \lambda_{\pnN}(t) & \textrm{if $t \in T_{\pnN},\ \lambda_{\pnN}(t) \notin \Sigma_\pnN \cap \Sigma_\M$}\\
+        \lambda_{\M}(t) & \textrm{if $t \in T_{\M},\ \lambda_{\M}(t) \notin \Sigma_\pnN \cap \Sigma_\M$}\\
+        ^\rhd\lambda_{\pnN}(t) & \textrm{if $t \in T_{\pnN},\ \lambda_{\pnN}(t) \in in_\pnN \cap out_\M$  }\\
+        ^\rhd\lambda_{\M}(t) & \textrm{if $t \in T_{\M},\ \lambda_{\M}(t) \in in_\M \cap out_\pnN$  }\\
+        \lambda_{\pnN}(t)^\rhd & \textrm{if $t \in T_{\pnN},\ \lambda_{\pnN}(t) \in in_\M \cap out_\pnN$  }\\
+        \lambda_{\M}(t)^\rhd & \textrm{if $t \in T_{\M},\ \lambda_{\M}(t) \in in_\pnN \cap out_\M$  }
+    \end{array} \right.
+    \end{displaymath}
+
+    \item $m^0$ is defined, for all $p \in P$, such that 
+    % $m^{0}(p) = m^{0}_{\pnN}(p)$ if $p \in P_{\pnN}$, \\
+    % $m^{0}(p) = m^{0}_{\M}(p)$ if $p \in P_{\M}$,
+    % and $m^{0}(p) = 0$ otherwise. 
+    \begin{displaymath}
+     m^0(p) = \left\{\begin{array}{ll}
+        m^{0}_{\pnN}(p) & \textrm{if $p \in P_{\pnN}$}\\
+        m^{0}_{\M}(p) & \textrm{if $p \in P_{\M}$}\\
+            0 & \textrm{otherwise}
+    \end{array} \right.
+    \end{displaymath}
+    
+   \end{itemize} 
+\end{definition}  
+%Obviously the asynchronous composition is commutative.
+
+

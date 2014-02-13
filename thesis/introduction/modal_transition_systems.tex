@@ -1,0 +1,260 @@
+%!TEX root = ../thesis.tex
+\chapter{Modal System Specification and Refinement}
+~\\
+In order to use formal methods in a system design process it is crucial to use a formal modelling framework that fits the needs and is expressive enough to model all the abstracts of the system being designed. Initially in a design process the system specification can be loose and abstract, meaning that some features or system behaviour is not completely settled. During the design process these specification are refined into more and more precise specifications. There exist formal models that support this style of system developing, however they are not always expressive enough.
+
+
+\section{Labelled Transition Systems}
+
+One of the most used modelling formalisms within formal methods is the \emph{Labelled Transition System} (LTS), introduced by Keller~\cite{Keller1976} in~\citeyear{Keller1976} and later applied by Plotkin~\cite{Plotkin81} in~\citeyear{Plotkin81}.
+The basic idea of an LTS is to give a description of a system behaviour by a set of states and a set of labelled transitions between these states. The labelled transitions describe the possible actions the system can perform. By performing an action the system might change its state. LTSs are represented graphically by a directed-graph structure, where each state is a node and each transition is an arc with an attached label. 
+
+For instance, Figure~\ref{fig:lts-file-service} shows a transition system specification of a very simple web-service, where you can send a request for data to a server, the server can then respond to the request by sending back the data. The small arrow going into state $q_0$ illustrates the initial state of the system, in which state the system is started. 
+
+\begin{figure}[ht]           
+\centering
+    \input{introduction/figures/lts-file-service}
+    \caption{Simple transition system specification of a file web-service.}
+    \label{fig:lts-file-service}
+\end{figure}        
+
+As this example is very simple, there is actually only one execution of this system. An execution of such system is a sequence of transitions. In the web-service example the only one possible execution is the infinite and alternating sequence of \transition{request} and \transition{respond} transitions.
+
+Formally an LTS is defined as follows.
+
+\begin{definition}[Labelled Transition System]
+    A \emph{labelled transition system} (LTS) is a 4-tuple $(Q,\Sigma,\must{},q_0)$ such that
+    \begin{itemize}
+        \item $Q$ is a set of states,
+        \item $\Sigma$ is a set of labels,
+        \item $\must{} \subseteq Q \times \Sigma \times Q$ is a set of labelled transitions, and
+        \item $q_0$ is the initial state.
+    \end{itemize}
+\end{definition}        
+
+\section{Modal Transition Systems and Refinement}
+Even though LTS is a very useful formalism it is not always that well suited for software development processes. An LTS can be a very precise low-level system specification. However, in a development process, like model-driven development, it is natural to start with a loose and simple specification of the system and then refine the specification during the process. For example, by removing optional features. In such case LTSs are too strict as they cannot express that some parts are allowed but not necessarily required. 
+
+In order to fix this problem, Larsen and Thomsen introduced the \emph{Modal Transition System} (MTS) \cite{DBLP:conf/lics/LarsenT88},  to integrate model checking more easily into model-driven development. An MTS is like an LTS, the only difference being that it has two types of transitions, \emph{may-transitions} and \emph{must-transitions}, whereas an LTS only has one type. May-transitions represent allowed, but not required, system behaviour and must-transitions represent mandatory behaviour. MTSs are represented graphically like LTSs with may-transitions drawn as dashed arcs and must-transitions drawn as solid arcs.
+
+In Figure~\ref{fig:mts-file-service}, a modal transition system specification of a web-service is shown. This specification is an extension of the LTS in Figure~\ref{fig:lts-file-service}. The MTS specification aims at capturing two types of web-services a secure one and a non-secure one. The system \emph{may} receive a \transition{request} for data in two different ways, where it in one case \emph{must} \transition{validate} the client, before it \emph{must} reply with the requested data. The main idea of the specification is to model that the web-service can either be secure or not. This is achieved by having the two \transition{request} transitions as may-transitions in the specification. 
+Formally an MTS is defined as follows.
+
+\begin{definition}[Modal Transition System]
+    A \emph{modal transition system} (MTS) is a 5-tuple $(Q,\Sigma,\may{},\must{},q_0)$, such that
+    \begin{itemize}
+        \item $Q$ is a set of states,
+        \item $\Sigma$ is a set of labels,
+        \item $\may{} \subseteq Q \times \Sigma \times Q$ is a set of labelled may-transitions,
+        \item $\must{} \subseteq\; \may{}$ is a set of labelled must-transitions, and
+        \item $q_0$ is the initial state.
+    \end{itemize}
+\end{definition}  
+
+Note that each must-transition is also a may-transition. This is done for consistency, as it unclear what it means if a transition is required but not allowed. On the other hand, when starting to compose modal tranisition systems it can be the case that two MTS specifications do not fit, i.e. thier composition becomes incositent.
+
+The main concept of MTSs is that a system specification can be loose in the sense that the complete system behaviour is not yet completely fixed, like with the \transition{request} transitions in Figure~\ref{fig:mts-file-service}. An MTS containing may-transitions is called an \emph{abstract} system specification. Abstract specifications can be refined into \emph{implementations} by removing some may-transitions, i.e. leaving out optional behaviour, and converting other may-transitions into must-transitions, i.e. making optional system behaviour mandatory. An implementation is an MTS where every transition is a must-transition, i.e. the system behaviour is fixed. In our example we can for instance convert the may-transition \transition{request} from $q_0$ to $q_2$ into a must-transition and remove the may-transition \transition{request} from $q_0$ to $q_1$. This will give us the MTS implementation in Figure~\ref{fig:mts-file-service-imp0}. 
+Note that any MTS implementation is actually an LTS. 
+
+As there are several ways to refine the abstract MTS specification, each MTS yields a set of different implementations. For instance the LTS in Figure~\ref{fig:lts-file-service} is also an implementation of $\T$ in Figure~\ref{fig:mts-file-service}. Observe that the must-transition \transition{validate} has been removed in that last implementation. The only way we can remove this transition is by removing the may-transition \transition{request} going from $q_0$ to $q_2$. Then we can no longer reach $q_2$ from the initial state, which mean that $q_2$ and its outgoing transition is not contributing to the specification any more, thus they can be removed.
+
+\begin{figure}[ht]    
+\centering
+    \subfloat[MTS specification $\T$.\label{fig:mts-file-service}]{\input{introduction/figures/mts-file-service}}
+    \subfloat[MTS implementation $S_0$.\label{fig:mts-file-service-imp0}]{\input{introduction/figures/mts-file-service-imp0}}
+    \caption{Examples of modal transition systems.}
+\end{figure}    
+
+We have briefly mentioned how to refine an abstract specification into an implementation. However, the process of specification refinement can be done in a sequence of steps where each abstract specification is refined into a less abstract specification. In each refinement step there are two requirements that must hold to ensure that the refinement is valid: (1) everything that is mandatory in the abstract specification must also be mandatory in the refined specification, and (2) the refined specification cannot allow behaviour that is not allowed by the abstract specification. The process of refining an MTS is formally defined as \emph{modal refinement} and is formally defined as follows.
+\begin{definition}[Modal refinement]\label{def:intro-mr}
+   Let $\S = \MTStupmr{\S}$ and $\T = \MTStupmr{\T}$ be two MTSs with the same set of labels $\Sigma$. 
+    A relation $R \subseteq Q_\S \times Q_\T$ is a \emph{modal refinement relation} between $\S$ and $\T$ if for all $(q_\S,q_\T) \in R$ and for all$ a \in \Sigma$:% the following holds: 
+    \begin{enumerate}
+        \item\label{def:wmr:must:a} $ q_\T \must{a}_\T q_\T' \implies \,\exists q_\S' \in Q_\S \;.\; q_\S \must{a}_\S q_\S' \wedge (q_\S',q_\T') \in R$,
+        \item\label{def:wmr:may:a} $ q_\S \may{a}_\S q_\S'\, \implies \exists q_\T' \in Q_\T \;.\; q_\T \may{a}_\T q_\T' \wedge (q_\S',q_\T') \in R$,
+    \end{enumerate}
+ We say that $\S$ is a \emph{modal refinement} of $\T$, written $\S \mr \T$, if there exists a modal refinement relation $R$ between $\S$ and $\T$ such that $(q^0_{\S},q^0_{\T}) \in R$. 
+ % We also write $q_\S \mr q_\T$ when $(q_{\S},q_{\T}) \in R$ for a modal refinement relation $R$.
+\end{definition} 
+
+Note that modal refinement does not require a one to one mapping between states in the two specifications, it only considers the allowed and required behaviour in a given state. Thus, the MTSs in Figure~\ref{fig:mts-file-service-imps} are all refinements and implementations of the MTS in Figure~\ref{fig:mts-file-service}. It might seem strange that the MTS $\S_2$ in Figure~\ref{fig:intro:mts-imp2} is a valid implementation, but this is actually the case since all outgoing transitions from $q_0$ are may-transitions and can be omitted.
+
+\begin{figure}[ht]        
+\centering
+    \subfloat[$\S_1$\label{fig:intro:mts-imp1}]{\input{introduction/figures/mts-file-service-imp1}}
+    \subfloat[$\S_2$\label{fig:intro:mts-imp2}]{\input{introduction/figures/mts-file-service-imp2}}
+    \subfloat[$\S_3$\label{fig:intro:mts-imp3}]{\input{introduction/figures/mts-file-service-imp3}}
+    \caption{Examples of MTS implementations of $\T$.}
+    \label{fig:mts-file-service-imps}
+\end{figure} 
+
+\section{Extending Modal Transition Systems}
+MTS is a simple formalism and it is not always expressive enough to model complex systems. It models the behaviour of a system by modelling the different states of the system and transitions between these different states. Each transition can then be either required or optional. As MTS is that simple, there is no way to model that two features are exclusive or give timing constrains on the transitions. This means that the MTS formalism can be limited in its applications. 
+
+Even though, the specification $\T$ in Figure~\ref{fig:mts-file-service} looks natural, it is not as precise as we can hope for. The three implementations $\S_1,\S_2$ and $\S_3$ in Figure~\ref{fig:mts-file-service-imps} are actually all problematic. Recall that the main concept of the specification $\T$ is to specify a web-service that can be either secure or non-secure. The only intended implementations are those shown in Figure~\ref{fig:lts-file-service} and Figure~\ref{fig:mts-file-service-imp0}. 
+
+There is a unique problem with each of the implementations $\S_1,\S_2$ and $\S_3$. In $\S_1$ both \transition{request} transitions has been implemented. This is a problem as we do not know what happens when the server receives a request. It might not validate the client even though that might have been what we wanted. The problem is that there is no way to express an exclusive choice between transitions. In $\S_2$, it is again a problem that both \transition{request} transitions are may-transitions, as we do not need to implement them. However, having them both as must-transitions will not fix the problem, as seen with $\S_1$. The problem is that we can not express that we must implement at least one of the transitions. Finally in $\S_3$ the problem is that the server is alternating between being a secure and non-secure web-server. Every second request requires validation of the client. This is not an expected behaviour.
+
+
+Since the introduction of MTS, several extensions of the formalism have been proposed \cite{DBLP:conf/lics/LarsenX90,FS:JLAP:08, benes_et_al:OASIcs:2011:3070}, and they solve some of the issues mentioned above. In \cite{DBLP:conf/lics/LarsenX90} Larsen and Xinxin present an extension called \emph{disjunctive modal transition system} (DMTS). The extension is disjunctive in the way that must-transitions can be a disjunction of must-transitions with the same source state. An example of a DMTS is shown in Figure~\ref{fig:dmts-file-service}, it is an extension of our previous MTS example. The new full lined arc that is splitting from $q_0$ to $q_1$ and $q_2$ illustrates the disjunction between the \transition{request} transitions. This means that at least one of the \transition{request} transitions must be part of any implementation. Note that the underlying may-transitions are kept in the figure. By utilizing this disjunction technique on the \transition{request} transitions we can avoid the problematic implementation $\S_2$. However, $\S_1$ and $\S_3$ are still valid implementations that we may wish to eliminate.
+
+
+\begin{figure}[ht]      
+\centering
+    \input{introduction/figures/dmts-file-service}
+    \caption{Disjunctive MTS specification $\T$.}
+    \label{fig:dmts-file-service}
+\end{figure}
+
+Recently, Bene\v{s} and K\v{r}et\'{i}nsk\'{y} suggested a generalisation of the MTS framework, Transition Systems with Obligations (OTS)~\cite{benes_et_al:OASIcs:2011:3070}. Their idea is to add constrains or \emph{obligations} on transitions instead of having may-transitions and must-transitions, as this is more expressive than MTS. The transition modalities in OTSs are expressed by an obligation, saying which transitions are allowed and how to combine them in valid implementations. Therefore, there is only one type of transition, as the obligation function can express both may and must modalities. An obligation is a positive Boolean formula over transitions bound to a state. The obligation specifies the allowed combinations of outgoing transitions from a state, in the way that each truth assignment of the obligation is a valid implementation.
+
+An OTS specification of the previously introduced web-service is shown in Figure~\ref{fig:ots-file-service}. Even though OTSs only have one type of transitions we still use full and dashed arcs for transitions. Transitions drawn as full lines are those that must be in any implementation, i.e. the obligation on the source state reqiures it. For instance, the obligation for $q_1$ is $(\transition{response}, q_0)$ meaning that the $\transition{responce}$ must be there, thus drawn as a full line. On the other hand, the obligation for $q_0$ is $(\transition{request},q_2) \vee (\transition{request},q_1)$, which specifies that at least one of the $\transition{request}$ transitions must be present in any refinement. If we needed a classical may-transition equivalent to those in an MTS we can do that by leaving the transition out of the obligation, then the obligation can be satisfied independently of that transitions. 
+
+Note that it is important that each formula is satisfiable by the present transitions, as it will be inconsistent otherwise. 
+% This also means that in any refinement there 
+The OTS formalism is in fact a generalisation of the MTS, but it is just as expressive as DMTS. This is the case, as a DMTS is just a OTS with the obligations in \emph{conjunctive normal form} and any positive Boolean formula can be converted to a formula in CNF. However, such convertion might lead to an exponetial blow-up in size. Thus OTS will not help us to get rid of the two problematic implementations $\S_1$ and $\S_3$ shown in Figure~\ref{fig:mts-file-service-imps}. 
+ 
+
+\begin{figure}[ht]           
+\centering
+    \input{introduction/figures/ots-file-service}
+    \caption{Transition system with obligations specification $\T_2$.}
+    \label{fig:ots-file-service}
+\end{figure}
+
+We started by extending the OTS framework to support arbitrary Boolean formula, and call it Boolean MTS (BMTS). With BMTS we can express an exclusive choice between transitions, which is what we need to avoid $\S_1$ as a valid implementation.
+Such BMTS will be identical to the one in Figure~\ref{fig:ots-file-service} except that the obligation for $q_0$ will be 
+\[
+    ((\transition{request},q_2) \wedge \neg (\transition{request},q_1)) \vee (\neg(\transition{request},q_2) \wedge (\transition{request},q_1))\;,
+\] 
+meaning that each time we are in a $q_0$ we can only implement at most one of the \transition{request} transitions, and we have to implement at least one of them. The implementation $\S_1$ is not a valid implementation of such a specification. However, $\S_3$ is still valid, as we have not violated the obligation on $q_0$.
+
+% \begin{figure}           
+% \centering
+%     \input{introduction/figures/bmts-file-service}
+%     \caption{BMTS specification $\T_3$.}
+%     \label{fig:bmts-file-service}
+% \end{figure}
+
+The problem with implementation $\S_3$ stems from the fact that we try to make a system specification that captures 2 different web-services, a secure and a non-secure. System development is not always about designing a single piece of software. Companies often release a series of similar products. These products can be of different built-quality, have a different physical design and vary in functionality. Sometimes, two different products are built upon the same hardware, but with different software embedded in the product. The software can provide the core functionality of both products, as well as enable unique features that are only available in the expensive version. A concrete example of this is the  GPS navigator. Some manufacturers of GPS navigators offer a series of products on the basis of one single hardware design. Each of the products can assist with navigation using its GPS module, but only some products can provide additional information such as heavy traffic or roadwork. The strategy of developing software for such a family of products is known as a Software Product Line (SPL)~\cite{2001:SPL:501065}.
+
+Modal transition systems are particularly interesting in the context of software product lines. There is a natural correspondence between optional features in SPL and may-transitions in MTS. In SPLs, System developers can specify one abstract specification that fits all the products in the SPL, like in our small web-service example. Furthermore, as it is possible to prove that certain system requirements are satisfied by all products in the SPL by applying model checking to the abstract system model, it is clearly a significant benefit which can save developers some time~\cite{BCK2011, AHLNW:EATCS:08}.
+
+However, the MTS formalism in itself is not directly suited for SPL since it can be refined into implementations that do not correspond with any product in the SPL, as shown in our example. BMTS solves two out of our three problematic implementations. Nevertheless, we still need the ability to express a persistent choice, where we can set which features should be present and how this affects the modalities on the transitions.
+
+Therefore, we suggest a generalisation of the MTS family, Parametric MTS (PMTS). A PMTS is basically a BMTS with a set of Boolean parameters that can be used in the obligations. For instance, in the example shown in Figure~\ref{fig:pmts-file-service} we can introduce the parameter $\parameter{secure}$. This parameter is now used in the obligation for state $q_0$. This obligation restricts the possible implementations, based on how we set the parameter $\parameter{secure}$. If $\parameter{secure}$ is set to true, we can only satisfy the obligation for $q_0$ by implementing $(\transition{request},q_2)$. This forces requests to the web-server to be validated before a response is sent back. Furthermore, if $\parameter{secure}$ is set to false, we cannot implement $(\transition{request},q_2)$ as this will violate the obligation on $q_0$. Note that parameters can be used in more than one obligation, eventhough we only use \parameter{secure} in the obligation for $q_0$.
+
+\begin{figure}[ht]       
+\centering
+    \input{introduction/figures/pmts-file-service}
+    \caption{Parametric MTS specification $\T_3$.}
+    \label{fig:pmts-file-service}
+\end{figure}
+
+Unfortunatly, as we increase the expressivity of the modal specification formalism, the complexity of checking modal refinemt also increases. However, we have proven that even for our most general formalism PMTS the problem of modal refinement checking remains decidable.
+
+Similar to this approach the authors of \cite{Classen2010} introduce Feature Transition Systems (FTS). In FTSs, each transition is labelled with its corresponding feature and each combination of features then yields an implementation. This means that an FTS cannot be refined, you can only select a subset of features that combined yield an implementation. This means that it is not possible to give an abstract specification of a feature. In relation to our example an FTS of the web-service would have the same set of states and transitions. The two $\transition{request}$ transitions would each be attached with their own feature, non-secure and secure respectively. Even though there is a close relationship between the features of FTSs and the parameters in PMTSs, the parameters are a more general notion, that can be used to represent not only features, but for instance also the presence of a particular piece of hardware. 
+
+It is important to notice that MTS, disjunctive MTS, OTS and Boolean MTS are all sub-classes of parametric MTS. We study the computational complexity of checking modal refinement between these different sub-classes of parametric MTS.
+
+\begin{result}
+    We provide a comprehensive overview of the complexity of refinement checking on different sub-classes of parametric MTS. The complexity ranges from P-complete in the simplest case to $\PiP_4$ in the most general setting.
+\end{result}
+
+
+\section{Logics for Extended Modal Transition Systems}
+Given a PMTS and a system requirement, it is convenient to deduce which instantiations of the parameters yield implementations that fulfil the requirement. In order to achieve this, we define two new logics one for BMTS and one for PMTS. Both are developed on the basis of the well known Hennesy Milner Logic with recursion~\cite{DBLP:conf/caap/Larsen88}. With the logic for BMTS we can express certain requirements for the specification and verify whether they are met. For example, consider the requirement that our simple web-service must be able to do  a $\transition{request}$ from the initial state. Such requirement can be expressed in our logic as the following formula:
+\[
+    \ldia{ \transition{request} }\true\;.
+\]
+The ``diamond'' shaped brackets states that we must be able to do a $\transition{request}$ in any implementation of the specification, and the $\true$ in the end just means that we only care about the first step in this requirement.
+With such requirement we can formally state the question whether a state e.g. $q_0$ of $\T_2$ in Fig.~\ref{fig:ots-file-service} satisfies the requirement: 
+\[
+    q_0 \models \ldia{ \transition{request} }\true\;.
+\]
+
+In fact $q_0$ satisfies the requirement even though there is no fixed outgoing must-transition labelled $\transition{request}$. This is the case as the obligation for $q_0$ requires that we at least implement one the two $\transition{request}$ transitions going out the state. Note that by satisfying this requirement, we also ensure that $\S_2$ in Fig.~\ref{fig:intro:mts-imp2} is not a valid implementation of our specification.
+
+As another example, consider the following formula
+\[
+    \lbox{\transition{request}}\ldia{\transition{validate}}\true\;.
+\]
+In order to satisfy this requirement, a system specification may be able to do a $\transition{request}$ and when ever it can do a $\transition{request}$ it must be able to do a $\transition{validate}$ afterwards. This is not the case for the $\T_2$ in Fig.~\ref{fig:ots-file-service}, as we can implement the $\transition{request}$ going from $q_0$ to $q_1$, i.e. the system in Fig.~\ref{fig:lts-file-service} is a valid implementation, thus $\T_2$ does not satisfy the requirement in all its implementations. 
+
+ 
+\begin{result}
+    We present a characteristic formula for a BMTS specification and prove that our logic characterises modal refinement on BMTS. Meaning that given two specifications $\S$ and $\T$ we can express $\T$ as a logic formula $D_\T$ such that
+    \[
+        \S \models \T \text{ iff } \S \mr \T\;.
+    \]
+\end{result}
+
+Now consider PMTS instead of BMTS specification. We define the logic for PMTSs such that a formula is satisfied if there exists a configuration of the parameters such that the requirement is met. But more interestingly we can also compute all possible configurations that fulfil the requirement. 
+If we want to know how to set the parameters of $\T_3$ in Fig.~\ref{fig:pmts-file-service}, such that valid implementations  must always perform a $\transition{validate}$ after a $\transition{request}$, we can check the following:
+\[
+\T_3 \modelsp \lbox{\transition{request}}\ldia{\transition{validate}}\true\;.
+\]
+An answer to such a problem is a set of instantiations of the parameters that yield a BMTS for which each implementation satisfies the requirement. In the concrete example it is clear that if $
+\parameter{secure}$ is true, then the requirement is met.
+Note that a PMTS with a fixed configuration of the parameters is actually a BMTS.
+Similar to our approach, the authors of the FTS formalism~\cite{Classen2010} have also presented a technique where they decide which implementations satisfy a given requirement, i.e. they can deduce which combinations of features fulfil the requirement.
+
+\begin{result}
+    Given a PMTS specification and a requirement expressed in our logic we can decide for which parameter-configurations the requirement will be fulfilled.
+\end{result}
+
+\section{Time and Cost in Modal Transition Systems}
+Having a precise and formal system specification as a system model can enhance a system development process in many ways. Formal system models are great for formal verification and usually give a better overview of the system being designed. Furthermore, if we extend a system model to carry information about cost and time resources, we can use the specification to reason about expenses related to implementing and running the system, and how including different features will affect these costs. We have made such dual-priced extension to the MTS family. We consider this extension on the BMTS. However, it does not rely on any special feature of BMTS so we could have used it on PMTS without problems.
+
+The extension consists of two parts; first, extend the model with time duration for each transition and  secondly, add a price scheme on top of the model. We add the timings to the BMTS formalism by appending a time interval in each transitions. The time interval can either be \emph{controllable} or \emph{uncontrollable}, depending on whether we can refine the interval. In Fig.~\ref{fig:duration-mts-file-service} we have extended our running example of a web service with time intervals. Note that the interval $\ci{1,4}$ on the \transition{validate} transition is different from the rest. This is a controllable interval, that we can refine the interval, either by making it uncontrollable or narrowing the interval. Developers can use controllable intervals to model the lower- and upper-bound of the duration a transition which is not yet completely specified. We allow uncontrollable intervals and not just a fixed time duration as some transition might depend on parts we cannot control. For instance, we model the \transition{request} and \transition{response} transitions with a uncontrollable interval of $\ui{1,2}$ time units as for instance network latency can affect the timing. All uncontrollable intervals stay the same in all refinements of a specification.
+
+\begin{figure}[ht]          
+\centering
+    \input{introduction/figures/duration-bmts-file-service}
+    \caption{BMTS specification $\T_4$, with time durations.}
+    \label{fig:duration-mts-file-service}
+\end{figure}
+
+Besides this time extension we also add a \emph{price-scheme}. A price-scheme consists of four parts, a cost per time unit for each transition, a set of possibly required hardware, a price tag for each hardware piece, and a hardware requirement list for each transition. An example of a price-scheme for our running example is shown in Fig.~\ref{fig:price-scheme}. The web-service can require one or two different servers. All three transitions require the Server but the \transition{validation} transition also requires a ValidationServer. Thus we must purchase both servers if we plan to implement a secure web-service. Furthermore, we can see from the price-scheme that a \transition{Validation} transition is cheaper per time unit that the two other transitions.
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[node distance=.2]    
+    \node (HW){
+        \colorbox{lightlightblue}{%
+                \begin{tabular}{l|l}
+                Hardware  & Price\\ \hline
+                ValidationServer  & 100\\
+                Server & 50
+                \end{tabular}
+            }
+        };
+    \node[below= of HW]{
+    \colorbox{lightlightblue}{%
+                \begin{tabular}{l|l|l}
+                Transition  & Running Cost & Required Hardware \\ \hline
+                \transition{Validation} & 5 & Server and ValidationServer \\
+                % \hline
+                \transition{Request} & 10 & Server \\
+                % \hline
+                \transition{Response} & 10 & Server \\
+                \end{tabular}
+            }
+        };
+    \end{tikzpicture}
+\caption{Price Scheme.}\label{fig:price-scheme}
+\end{figure}    
+
+
+Given a modal specification annotated with time intervals and a price-scheme we can start reasoning about the cost of implementing a system and compute the expenses of running it. The implementation cost is computed on the basis of which hardware is required for a given implementation and its costs. The running expenses are computed as the worst-case long run average, on the basis of the transition durations and their running cost. 
+With these computations we prove that for a fixed hardware budget we can decide which system implementation will yield a system with the cheapest running cost on a long run average. Furthermore, we can decide if there exists an implementation within a fixed hardware budget and running cost budget. 
+
+
+This method can be used to make sure a product stays within the desired price range. For instance, consider an embedded system that relies on battery-power. In such case, it is interesting to determine how implementing a feature affects the size of the battery needed. This can be done with our approach, by using the battery consumption as running-cost on transitions. Moreover, if the model contains information about the cost implementing a feature, one can verify which solution is the cheapest one and meets the basic requirements. However, we prove that the problem of finding such implementation is hard.
+
+\begin{result}
+    The problem of deciding whether there exists an implementation within a fixed hardware budget and running cost budget is NP-complete.
+\end{result}
+% Nevertheless, most of the required information is already supported by different modelling frameworks that can express both time and cost.[INSERT REFERENCE]
+
+

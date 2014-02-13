@@ -1,0 +1,66 @@
+%!TEX root = ./main.tex
+\subsection{Relationships Between Channel Properties}\label{sec:relations}
+
+
+
+Table~\ref{tab:prop-rel} shows relationships between the channel properties and pointers to examples of \AIOPNs from Fig.~\ref{fig:ex-aiopns} and Fig.~\ref{fig:counterex} which have the indicated properties.
+
+%\vspace{-4mm}
+\input{papers/petrinets/tables/relations-prop} %table file
+
+
+%\vspace{-10mm}
+All the downward implications inside the boxes are direct consequences of the definitions. It is trivial to see that downward implication 3 is an equivalence, since \emph{immediate} consumption leads to a decreasing valuation. Downward implications 9 and 16 are equivalences, since repeated decreasing of messages on a channel will eventually lead to an empty channel.
+The implications 4, 5 and 7 will be proved in Prop.~\ref{prop1}, the implications 11-14 in Prop.~\ref{prop2}, and implication 18 in Prop.~\ref{prop3}.
+Additionally we have that all properties in box b) of Tab.~\ref{tab:prop-rel} imply the strongest property in box a), since if $\S$ is strongly $B$-consuming we can by repeated consumption empty all channels in $B$.
+
+In the following propositions we assume given  an \AIOTS $\S = \aiotstup{}$ and a subset $B \subseteq \chan$.
+%and implication 20 in  Prop.~\ref{prop4}.
+
+\begin{proposition}\label{prop1}
+ If $\S$ is  strongly $B$-wholly emptying (strongly $B$-emptying,\linebreak strongly $B$-consuming resp.), then $\S$ is necessarily $B$-wholly emptying (necessarily $B$-emptying, necessarily $B$-consuming resp.).
+\end{proposition}
+\begin{proof}
+    We only prove that strongly consuming implies necessarily consuming. The other implications are simple extensions of this proof.
+ Let $q \in \post^*(q^0)$, $a \in B$ such that $\val(q,a) > 0$, and let $\rho \in \run{\S}(q)$ be a weakly fair run. Assume for the contrary that $\inact{a} \not\in \rho$. By definition of \AIOTS we get that for all $q' \in \rho$, $\val(q',a), \geq \val(q,a)$. By assumption $\S$ is strongly $B$-consuming, which implies that $q' \goes{\inact{a}}$ for all $q' \in \rho$. This is a contradiction to $\rho$ being a weakly fair run. 
+\end{proof}
+
+\begin{proposition}\label{prop2}
+ If $\S$ is necessarily $B$-wholly emptying (necessarily\linebreak $B$-emptying, necessarily decreasing, necessarily $B$-consuming resp.), then $\S$ is $B$-wholly emptying ($B$-emptying, $B$-decreasing, $B$-consuming resp.).
+\end{proposition}
+\begin{proof}
+    The proof relies on the fact that for each $q \in \post^*(q^0)$ there exists a weakly fair run $\rho \in \frun{\S}(q)$, such that for all $a \in \inset, a \not\in \rho$. This run can be constructed by choosing, in a weakly fair manner in each reached state, some enabled non-input action. If no such action is enabled in the last visited state, the last state is a pure input state and we are done. Otherwise the resulting infinite run has the required property.
+
+    With this fact, we can prove the implication 14 in Tab.~\ref{tab:prop-rel} as follows: Let $q \in \post^*(q^0)$, $a \in B$ such that $\val(q,a) > 0$. By necessarily consuming, for all $\rho \in \frun{\S}(q)$ we have $\inact{a} \in \rho$. Since we know there exists a weakly fair run $\rho$ without input actions, we get that there exists $q' \in \post^*(q,\Sigma \setminus \inset)$ such that $q'\goes{\inact{a}}$.
+    The other implications are proven in the same way. 
+\end{proof}
+
+\begin{proposition}\label{prop3}
+ If $\S$ is necessarily $B$-consuming then $\S$ is strongly \linebreak $B$-communication stopping.
+\end{proposition}
+\begin{proof}
+    Assume the contrary, that $\S$ is not strongly $B$-communication stopping. This means that there exists $q \in \post^*(q^0) $, $a \in B$ and a weakly fair run $\rho \in \frun{\S}(q)$ such that $\sharp_\rho(\inact{a}) = 0$ and $\sharp_\rho(\outact{a}) > 0$. Then there exists $q' \in \rho$ reached after $q$, such that $\val(q',a) > 0$. Let $\rho'$ be the suffix of $\rho$ starting from $q'$ which is weakly fair as well. Since $\sharp_{\rho'}(\inact{a}) = 0$, $\S$ is not necessarily consuming.
+\end{proof}
+
+Let us now discuss some counterexamples.  As discussed in Sect.~\ref{sec:def-communication-prop}, a counterexample for the converse of implication 7 is the \AIOPN $\pnN_3$ in Fig.~\ref{fig:ex-aiopn} on page~\pageref{fig:ex-aiopn}.
+An obvious counterexample for the converse of the implications 2, 10, 11, 12, 13 is given by the \AIOPN $\pnN_4$ shown in Fig.~\ref{fig:counterex1}.
+$\pnN_4$ is also a counterexample for implication 6.
+The \AIOPN $\pnN_5$  in Fig.~\ref{fig:counterex2} with channels $a$ and $b$ is a counterexample for the converse of implication 15. The net can empty each single channel $a$ and $b$ but it can never have both channels empty at the same time
+(after the first message has been produced on a channel).
+A counterexample for the converse of implication 14 is shown by the net $\pnN_6$ in Fig.~\ref{fig:counterex14}. The net can put a token on the channel $a$, but afterwards the transition $\inact{a}$ is not necessarily always enabled which means there exists a weakly fair run such that there is always a token in $a$ and $\inact{a}$ is never fired.
+
+Counterexamples for the converse of implication 17 rely on the idea to produce twice while consuming once.
+A counterexample for the converse of implication 18 is provided by a net that first produces a finite number $n$ of messages on a channel, then it consumes less than $n$ of these messages and then it stops. Counterexamples for the remaining converse implications are straightforward to construct.
+
+ 
+\begin{figure}[ht]
+\centering
+% \subfloat[Counterexample 1.]{\label{fig:counterex1}\input{papers/petrinets/figures/counterex1} }
+\subfloat[$\pnN_4$]{\label{fig:counterex1}\input{papers/petrinets/figures/counterex2} }\quad
+% \subfloat[Counterexample 3.]{\label{fig:counterex1}\input{papers/petrinets/figures/counterex3} }\\
+% \subfloat[Counterexample 4.]{\label{fig:counterex1}\input{papers/petrinets/figures/counterex4} }
+\subfloat[$\pnN_5$]{\label{fig:counterex2}\input{papers/petrinets/figures/counterex5} }\\
+\subfloat[$\pnN_6$]{\label{fig:counterex14}\input{papers/petrinets/figures/counterex14}}
+\caption{Examples of AIOPNs.}%
+\label{fig:counterex}%
+\end{figure}

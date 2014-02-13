@@ -1,0 +1,45 @@
+%!TEX root = ../slides.tex
+\begin{tikzpicture}
+\tikzstyle{channel} = [circle,inner sep=0pt,minimum size=2mm,fill=white,draw=black]
+
+%%% boxes and text
+
+\draw[fill=lightlightblue] (0,-1) rectangle (6,-2) {};
+\node at (3,-1.5) (cont) {\textsf{Controller}};
+
+\draw[fill=lightlightblue] (1,0) rectangle (5,1) {};
+\node at (3,.5) (gifC) {\textsf{GifCompressor}};
+
+\draw[fill=lightlightblue] (1,-3) rectangle (5,-4) {};
+\node at (3,-3.5) (txtC) {\textsf{TxtCompressor}};
+
+%%%%%%%% channels gif
+\node [channel,label=left:$\trans{gif}$] at (2.3333,-.5) (gif) {};
+\node [channel,label=left:$\trans{jpg}$] at (3.6667,-.5) (jpg) {};
+\node [channel,label=right:$\trans{fail}$] at (4,-.5) (fail) {};
+
+\draw[arc] (2.3333,-1) to[] (gif) {};
+\draw[arc] (gif) to[] (2.333,0) {};
+
+\draw[arc] (3.6667,0) to[] (jpg) {};
+\draw[arc] (jpg) to[] (3.6667,-1) {};
+
+\draw[arc] (4,0) to[] (fail) {};
+\draw[arc] (fail) to[] (4,-1) {};
+
+%%%%%%%% channels txt
+\node [channel,label=left:$\trans{txt}$] at (2.3333,-2.5) (txt) {};
+\node [channel,label=right:$\trans{zip}$] at (4,-2.5) (zip) {};
+
+\draw[arc] (2.3333,-2) to[] (txt) {};
+\draw[arc] (txt) to[] (2.3333,-3) {};
+
+\draw[arc] (4,-3) to[] (zip) {};
+\draw[arc] (zip) to[] (4,-2) {};
+
+%%%%%%% open channels
+\draw[arc] (-2.6,-1.5) -- (0,-1.5) node[midway,above]{$\trans{file?}$};
+\draw[arc] (6,-1.3) -- (8.6,-1.3) node[midway,above]{$\trans{comprJpg!}$};
+\draw[arc] (6,-1.7) -- (8.6,-1.7) node[midway,below]{$\trans{comprZip!}$};
+
+\end{tikzpicture}

@@ -1,0 +1,80 @@
+
+%%%%% TIKZ setup
+\usepackage{tikz}
+\usetikzlibrary{shapes,automata,arrows,positioning,petri,patterns,fit,backgrounds,calc}
+
+%%% global arrow/arc setup
+\tikzset{shorten >=1pt,node distance=3cm and 3cm,>=stealth',}
+
+%%% LTS-MTS setup
+\tikzstyle{every state}=[draw=darkblue,very thick,fill=lightblue,minimum size=20pt]
+\tikzset{initial text=}
+\tikzstyle{may}=[->,dashed]
+\tikzstyle{must}=[->]
+
+
+%%% Petri Nets
+\tikzstyle{arc}=[->,>=stealth,thick]
+
+\tikzstyle{every place}=[draw=darkdarkblue,minimum size=6mm,thick,fill=white]
+\tikzstyle{every transition} = [fill=darkblue,draw=black,minimum width=2mm,minimum height=5mm]
+\tikzstyle{every token}=[fill=black,text=white,label distance=2mm]
+
+\tikzstyle{sharedplace}=[place,minimum size=7.5mm,dashed,thin]
+\tikzstyle{sharedtransition}=[transition, fill opacity=0, minimum width=3.5mm, minimum height=6.5mm,dashed]
+
+\tikzstyle{mayt}=[transition,fill=white]
+\tikzstyle{mustt}=[transition]
+
+\tikzstyle{enabled}=[preaction={fill, lightlightblue},pattern=north west lines]
+% \tikzstyle{enabledmust}=[preaction={fill, darkblue},pattern color=lightblue,pattern=north west lines]
+\tikzstyle{compBackground}=[fill=lightlightblue]
+
+
+% --- traffic light example---
+
+\newcommand{\red}{\ensuremath{\mathit{red}}\xspace}
+\newcommand{\green}{\ensuremath{\mathit{green}}\xspace}
+\newcommand{\yellow}{\ensuremath{\mathit{yellow}}\xspace}
+%\newcommand{\yellowRed}{\ensuremath{\mathit{yellowAndRed}}\xspace}
+\newcommand{\yellowRed}{\ensuremath{\mathit{yellowRed}}\xspace}
+\newcommand{\go}{\ensuremath{\mathit{go}}\xspace}
+\renewcommand{\stop}{\ensuremath{\mathit{stop}}\xspace}
+\newcommand{\getReady}{\ensuremath{\mathit{ready}}\xspace}
+\newcommand{\prepareToStop}{\ensuremath{\mathit{ready}}\xspace}
+%\newcommand{\mustGoYellow}{\ensuremath{\mathit{reqYellowFromGreen}}\xspace}
+%\newcommand{\mustGoYellowRed}{\ensuremath{\mathit{reqYellowFromRed}}\xspace}
+%\newcommand{\mustGoYellowBoth}{\ensuremath{\mathit{reqYellow}}\xspace}
+\newcommand{\mustGoYellow}{\ensuremath{\mathit{reqYfromG}}\xspace}
+\newcommand{\mustGoYellowRed}{\ensuremath{\mathit{reqYfromR}}\xspace}
+\newcommand{\mustGoYellowBoth}{\ensuremath{\mathit{reqY}}\xspace}
+
+\newcommand{\trafficlight}[5]{
+  \begin{scope}[xshift=#4cm,yshift=#5cm,scale=0.74,transform shape]
+    \draw [rounded corners=2pt,fill=gray!80,thick] (-.28,-.70) 
+    rectangle (.28,.70);
+    \draw [fill=#1] (0,.44) circle (6pt);
+    \draw [fill=#2] (0,0) circle (6pt);
+    \draw [fill=#3] (0,-.44) circle (6pt);
+  \end{scope}}
+
+\colorlet{yellow}{yellow!81!black}
+
+\tikzset{
+min/.style={diamond,draw=darkblue,inner sep=1,fill=lightlightblue},
+max/.style={draw=darkblue,inner sep=1.3,fill=lightlightblue},
+}
+
+\makeatletter
+\tikzset{
+  fitting node/.style={
+    inner sep=0pt,
+    fill=none,
+    draw=none,
+    reset transform,
+    fit={(\pgf@pathminx,\pgf@pathminy) (\pgf@pathmaxx,\pgf@pathmaxy)}
+  },
+  reset transform/.code={\pgftransformreset}
+}
+\makeatother
+

@@ -1,0 +1,367 @@
+%!TEX root = ../thesis.tex
+
+% names
+\newcommand{\mikaelhm}{Mikael Harkj{\ae}r M{\o}ller\xspace}
+\newcommand{\thesistitle}{Modal and Component-Based System Specifications\xspace}
+\newcommand{\university}{Aalborg University\xspace}
+\newcommand{\faculty}{The Faculty of Engineering and Science\xspace}
+\newcommand{\department}{Department of Computer Science\xspace}
+
+% writes the title with font as the chapter headings
+\newcommand{\bigtitle}{{\renewcommand*\rmdefault{cmss}\normalfont\bfseries\thesistitle}}
+
+% paper titles
+\newcommand{\atva}{Parametric Modal Transition Systems}
+\newcommand{\memics}{A Characterizing Logic for Boolean Modal Transition Systems}
+\newcommand{\lpar}{Dual-Priced Modal Transition Systems with Time Durations}
+\newcommand{\petrinets}{Channel Properties of Asynchronously Composed Petri Nets}
+\newcommand{\tgc}{Specification of Asynchronous Component Systems with Modal I/O-Petri Nets}
+
+% forfattere og affiliations til papers
+\newcommand{\mhm}{{\large Mikael H. M{\sc {\o}ller}\hspace{10mm}}}
+\newcommand{\kim}{{\large Kim G. L{\sc arsen}\hspace{10mm}}}
+\newcommand{\jiri}{{\large Ji{\v{r}}{\'\i} S{\sc rba}\hspace{10mm}}}
+\newcommand{\nikola}{{\large Nikola B{\sc ene\v{s}}\hspace{10mm}}}
+\newcommand{\jan}{{\large Jan K{\sc \v ret\'insk\'y}\hspace{10mm}}}
+\newcommand{\liu}{{\large Xinxin L{\sc iu}\hspace{10mm}}}
+\newcommand{\rolf}{{\large Rolf H{\sc ennicker}\hspace{10mm}}}
+\newcommand{\serge}{{\large Serge H{\sc addad}\hspace{10mm}}}
+
+
+
+%  uden space efter navnet og ikke stort efternavn
+\newcommand{\mhms}{{ Mikael H. M\o ller}}
+\newcommand{\kims}{{ Kim G. Larsen}}
+\newcommand{\jiris}{{ Ji{\v{r}}{\'\i} Srba}}
+\newcommand{\nikolas}{{ Nikola B{ene\v{s}}}}
+\newcommand{\jans}{{ Jan K{\v ret\'insk\'y}}}
+\newcommand{\lius}{{ Xinxin L{iu}}}
+\newcommand{\rolfs}{{ Rolf H{ennicker}}}
+\newcommand{\serges}{{ Serge H{addad}}}
+
+\newcommand{\aau}{\vspace{1mm}\\{ \emph{Aalborg University, Department of Computer Science, Denmark}}\\}
+\newcommand{\lmu}{\vspace{1mm}\\{ \emph{Institut f\"ur Informatik, Ludwig-Maximilians-Universit\"at M\"unchen, Germany}}\\ \vspace{0mm}}
+\newcommand{\masaryk}{\vspace{1mm}\\{ \emph{Masaryk University, Department of Computer Science, Czech Republic}}\\}
+\newcommand{\tum}{\vspace{1mm}\\{ \emph{Institut f\"ur Informatik, Technische Universit\"at M\"unchen, Germany}}\\}
+\newcommand{\iscas}{\vspace{1mm}\\{\emph{Institute of Software Chinese Academy of Sciences, China}}\\}
+\newcommand{\inria}{\vspace{1mm}\\{\emph{LSV, ENS Cachan \& CNRS \& INRIA, France}}\\}
+
+
+
+%%%%%%%%%%%%%%%  QED  %%%%%%%%%%%%%%%%%%%%%%
+\renewcommand{\qedsymbol}{$\blacksquare$}
+\newcommand{\QED}{\qed}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% --- Transition font style in fiures
+\newcommand{\transition}[1]{\ensuremath{\mathtt{#1}}\xspace}
+\newcommand{\channel}[1]{\ensuremath{\mathtt{#1}}\xspace}
+\newcommand{\parameter}[1]{\ensuremath{\mathsf{#1}}\xspace}
+
+% --- MTS arrows
+\input{mts-arrows.tex}
+
+% --- MTS tuples
+\newcommand{\MTStup}[1]{\ensuremath{(Q_#1,\Sigma_#1,\may{}_#1,\must{}_#1,q^0_#1)}\xspace}
+\newcommand{\MTStupmr}[1]{\ensuremath{(Q_#1,\Sigma,\may{}_#1,\must{}_#1,q^0_#1)}\xspace}
+
+
+%%%%%%%%% Letters/Symbols %%%%%%%%%%%%%%
+% --- specifications
+\renewcommand{\S}{\ensuremath{\mathcal{S}}}
+\newcommand{\T}{\ensuremath{\mathcal{T}}}
+
+% --- refinement
+\newcommand{\refinement}{\le}
+\newcommand{\mr}{\refinement_\mathrm m}
+\newcommand{\mrw}{\refinement^*_\mathrm m}
+
+%%% Logic %%%
+
+% --- boolean formulae ---
+\newcommand{\true}{\mathbf{tt}}
+\newcommand{\false}{\mathbf{ff}}
+\newcommand{\ldia}[1]{\ensuremath{\langle #1 \rangle}}
+\newcommand{\lbox}[1]{\ensuremath{[#1]}}
+\newcommand{\B}{\mathcal B}
+\newcommand{\satset}[1]{\ensuremath{\llbracket #1 \rrbracket}}
+\newcommand{\setsat}[1]{\satset{#1}}
+\newcommand{\Osat}[1]{\ensuremath{\mathcal{O}_{#1}}}
+
+\newcommand{\diad}[1]{\ensuremath{\langle \cdot #1 \cdot \rangle}}
+\newcommand{\boxd}[1]{\ensuremath{[ \cdot #1 \cdot ]}}
+\newcommand{\eqmax}{\ensuremath{\overset{\text{max}}{=}}}
+\newcommand{\eqmin}{\ensuremath{\overset{\text{min}}{=}}}
+\newcommand{\mrset}[1]{\ensuremath{[#1]_{\mr}}}
+
+\newcommand{\DecT}{\ensuremath{D_\mathcal{T}}}
+
+\newcommand{\val}{\mathrm{Tran}}
+
+\newcommand{\Valid}{\nu}%{V_{#1}}
+\newcommand{\modelsp}{\ensuremath{\models_P}}
+
+
+
+% --- composition\compatibility ---
+\newcommand{\corrEnv}{\ensuremath{\curvearrowright}\xspace}
+\newcommand{\corrEnvRev}{\ensuremath{\curvearrowleft}\xspace}
+\newcommand{\scorrEnv}{\ensuremath{\curvearrowright_s}\xspace}
+\newcommand{\wcorrEnv}{\ensuremath{\curvearrowright_w}\xspace}
+\newcommand{\scorrEnvRev}{\ensuremath{\curvearrowleft_s}\xspace}
+\newcommand{\wcorrEnvRev}{\ensuremath{\curvearrowleft_w}\xspace}
+
+\newcommand{\compos}{\ensuremath{\otimes}\xspace}
+\newcommand{\compospn}{\ensuremath{\compos_{pn}}\xspace}
+\newcommand{\sync}{\ensuremath{\compos_{s}}\xspace}
+\newcommand{\async}{\ensuremath{\compos_{as}}\xspace}
+\newcommand{\inact}[1]{%
+    \mathchoice{\raisebox{4.3pt}{$\scriptstyle\rhd$}}
+                {\raisebox{4.3pt}{$\scriptstyle\rhd$}}
+                {\raisebox{3.6pt}{$\scriptscriptstyle\rhd$}}
+                {\raisebox{2.9pt}{$\rhd$}}
+    \hspace{-1.5pt}#1
+    \xspace}
+\newcommand{\outact}[1]{
+    #1\hspace{-.3pt}
+    \mathchoice{\raisebox{4.3pt}{$\scriptstyle\rhd$}}
+                {\raisebox{4.3pt}{$\scriptstyle\rhd$}}
+                {\raisebox{3.6pt}{$\scriptscriptstyle\rhd$}}
+                {\raisebox{2.9pt}{$\rhd$}}
+    \xspace}
+
+%%% AIOPN stuff
+\newcommand{\M}{\ensuremath{\mathcal{M}}\xspace}
+\newcommand{\pnN}{\ensuremath{\mathcal{N}}\xspace}
+\newcommand{\goes}[1]{\ensuremath{\stackrel{#1}{\longrightarrow}}\xspace}
+\newcommand{\goesweak}[1]{\ensuremath{\stackrel{#1}{\longrightarrow}}^*\xspace}
+% --- AIOTS ---
+\newcommand{\LTS}{LTS\xspace}
+\newcommand{\AIOPN}{AIOPN\xspace}
+\newcommand{\AIOPNs}{AIOPNs\xspace}
+\newcommand{\MAIOPN}{MAIOPN\xspace}
+\newcommand{\MAIOPNs}{MAIOPNs\xspace}
+\newcommand{\chan}{\ensuremath{C}\xspace}
+\newcommand{\inset}{\ensuremath{\mathsf{in}}\xspace}
+\newcommand{\outset}{\ensuremath{\mathsf{out}}\xspace}
+\newcommand{\com}{\ensuremath{\mathsf{com}}\xspace}
+\newcommand{\lts}{\ensuremath{\mathsf{lts}}\xspace}
+\newcommand{\aiopn}{\ensuremath{\mathsf{aiopn}}\xspace}
+
+
+
+%%%%%%%%%%%%%%%%%%% ATVA %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% - match [N(M)]
+\newcommand{\match}{\mathrm{match}}
+
+% - upright greek symbols
+\newcommand{\UPhi}{\mathrm{\Phi}}
+\newcommand{\USigma}{\mathrm{\Sigma}}
+
+% --- complexity classes ---
+\newcommand{\PiP}{\ensuremath{\mathrm\Pi^\mathrm p}}
+\newcommand{\SigmaP}{\ensuremath{\mathrm\Sigma^\mathrm p}}
+\newcommand{\NP}{\textrm{NP}}
+\newcommand{\coNP}{\textrm{coNP}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%% MEMICS %%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\Coin}{\ensuremath{\text{Coin}}}
+\newcommand{\Coffee}{\ensuremath{\text{Water}}}
+\newcommand{\Tea}{\ensuremath{\text{Beer}}}
+\newcommand{\Choc}{\ensuremath{\text{Snack}}}
+\newcommand{\mustChoc}{\ensuremath{\text{MustSnack}}}
+\newcommand{\state}[1]{\tikz \node[state,minimum size=1,draw=none,fill=#1,scale=.9] {};}
+%if and only if
+\renewcommand{\iff}{\ensuremath{\text{ iff }}}
+\newcommand{\parset}{Y}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%% LPAR %%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\ci}[1]{\langle#1\rangle}
+\newcommand{\ui}[1]{[#1]}
+
+\newcommand{\ii}{\mathsf I}
+\newcommand{\un}{\mathsf u}
+\newcommand{\cn}{\mathsf c}
+
+% --- hardware/persistency/resource parameters ---
+\newcommand{\hwmust}{H_\square}
+\newcommand{\hwmay}{H_\diamond}
+
+% --- rates/durations MPG ---
+\newcommand{\cost}{\mathsf{c}}
+\newcommand{\ic}{\mathsf{ic}}
+\newcommand{\rc}{\mathsf{rc}}
+% --- hardware cost ---
+\newcommand{\hc}{i}%{\iota}
+\newcommand{\mayR}{\ensuremath{\dashrightarrow}}
+\newcommand{\mustR}{\ensuremath{\rightarrow}}
+
+\newcommand{\MTSfont}{\mathcal}
+\newcommand{\Ifont}{\mathfrak}
+
+\newcommand{\Impl}{\MTSfont I}
+\newcommand{\Spec}{\MTSfont S}
+\newcommand{\Intl}{\Ifont I}
+
+\newcommand{\modT}{T_*}
+\newcommand{\modS}{S_*}
+
+\newcommand{\bigO}{\mathcal O}
+
+\newcommand{\DMTS}{MTSD\xspace}
+
+
+\newcommand{\Wait}{\texttt{Wait}\xspace}
+\newcommand{\DriveBus}{\texttt{Drive}\xspace}
+\newcommand{\SkipClean}{\texttt{SkipCleanup}\xspace}
+\newcommand{\SmallClean}{\texttt{SmallCleanup}\xspace}
+\newcommand{\BigClean}{\texttt{BigCleanup}\xspace}
+\newcommand{\Sponge}{\texttt{Sponge}\xspace}
+\newcommand{\VacuumCleaner}{\texttt{VacuumCleaner}\xspace}
+
+\newcommand{\diadist}{.2}
+\newcommand{\myscale}{.8}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%% Petri Nets %%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% --- AIOTS ---
+\newcommand{\AIOTS}{AIOTS\xspace}
+\newcommand{\AIOTSs}{AIOTSs\xspace}
+
+\newcommand{\aiots}{\ensuremath{\mathsf{aiots}}\xspace}
+
+
+\newcommand{\Sigmat}{\ensuremath{\Sigma_\tau}\xspace}
+
+\newcommand{\ioalpha}[1]{\ensuremath{\Sigma_{#1} = \inset_{#1} \uplus \outset_{#1} \uplus \com_{#1}}\xspace}
+\newcommand{\maxtr}[1]{\ensuremath{\run{#1}}\xspace}
+\newcommand{\run}[1]{\ensuremath{\mathrm{run_{#1}}}\xspace}
+\newcommand{\frun}[1]{\ensuremath{\mathrm{wfrun_{#1}}}\xspace}
+\newcommand{\minr}[1]{\ensuremath{\mathrm{min_{#1}}}\xspace}
+
+\newcommand{\post}{\ensuremath{\mathrm{Post}}\xspace}
+
+\newcommand{\aiotstup}[1]{\ensuremath{
+    (\chan_{#1},\allowbreak 
+    \Sigma_{#1},\allowbreak 
+    Q_{#1}, \allowbreak
+    q^0_{#1}, \allowbreak
+    \goes{}_{#1}, \allowbreak
+    \val_{#1})}\xspace}
+
+% --- Mathematical operators ---
+
+\newcommand{\notimplies}{\ensuremath{\;\not \!\!\!\implies}}
+
+% --- Mathematical letters ---
+\newcommand{\N}{\ensuremath{\mathbb{N}}}
+\newcommand{\IS}{\ensuremath{\mathfrak{S}}} % interface specifications
+\renewcommand{\S}{\ensuremath{\mathcal{S}}}
+\newcommand{\U}{\ensuremath{\mathcal{U}}}
+
+\newcommand{\F}{\ensuremath{\mathcal{F}}}
+\newcommand{\E}{\ensuremath{\mathcal{E}}}
+\newcommand{\C}{\ensuremath{\mathcal{C}}}
+% \newcommand{\B}{\ensuremath{\mathcal{B}}}
+
+% --- Petri Net ---
+
+\newcommand{\mustmark}{must_{mk}\xspace}
+\newcommand{\maymark}{may_{mk}\xspace}
+
+% \newcommand{\pnN}{\ensuremath{\mathcal{N}}\xspace}
+\newcommand{\pndef}{\ensuremath{\pnN = \pntup{}}\xspace}
+\newcommand{\pntup}[1]{\ensuremath{
+    (P_{#1}, \allowbreak
+    T_{#1}, \allowbreak
+    \Sigma_{#1}, \allowbreak
+    W_{#1}^-, \allowbreak
+    W_{#1}^+, \allowbreak
+    \lambda_{#1}, \allowbreak
+    m^0_{#1})}\xspace}
+
+\newcommand{\mpntup}[1]{\ensuremath{(\mathcal{N}_{#1},T_{#1}^{\scriptscriptstyle\square})}\xspace}
+
+\newcommand{\apntup}[1]{\ensuremath{(\chan_{#1},\allowbreak
+    P_{#1},\allowbreak
+    T_{#1},\allowbreak
+    \Sigma_{#1},\allowbreak
+    W_{#1}^-,\allowbreak
+    W_{#1}^+,\allowbreak
+    \lambda_{#1},\allowbreak
+    m^0_{#1})}\xspace}
+
+% \newcommand{\ioalpha}[1]{\ensuremath{\Sigma_{#1} = in_{#1} \uplus out_{#1} \uplus int_{#1}}\xspace}
+
+\newcommand{\reach}{\ensuremath{\mathrm{Reach}}}
+\newcommand{\firable}{\ensuremath{\mathrm{Firable}}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%% TGC %%%%%%%%%%%%%%%%%%%%%%%%%%%
+% --- MAIOTS ---
+\newcommand{\MTS}{MTS\xspace}
+% \newcommand{\LTS}{LTS\xspace}
+\newcommand{\MAIOTS}{MAIOTS\xspace}
+\newcommand{\MAIOTSs}{MAIOTSs\xspace}
+\newcommand{\mts}{\ensuremath{\mathsf{mts}}\xspace}
+\newcommand{\maiots}{\ensuremath{\mathsf{maiots}}\xspace}
+%% Text style on transition names
+\newcommand{\trans}[1]{\ensuremath{\mathsf{#1}}}
+\newcommand{\hide}{\setminus}
+\newcommand{\hidepn}{\hide_{pn}}
+
+\newcommand{\wfrun}[1]{\ensuremath{\mathrm{owfrun_{#1}}}\xspace}
+\newcommand{\weakf}{observationally weakly fair}
+
+
+\newcommand{\mc}[1]{\ensuremath{\mathrm{mc}_{#1}}\xspace}
+\newcommand{\nmc}[1]{\ensuremath{\mathrm{nmc}_{#1}}\xspace}
+\newcommand{\tcs}[1]{\ensuremath{\mathrm{\tau cs}_{#1}}\xspace}
+
+\newcommand{\obsa}{{\ensuremath{\mathrm{obs}}\xspace}}
+\newcommand{\visiblea}{\obsa}
+
+
+\newcommand{\postm}{\ensuremath{\mathrm{Post}_{\scriptscriptstyle\square}}\xspace}
+
+\newcommand{\maiotstup}[1]{\ensuremath{
+    (\chan_{#1},\allowbreak 
+    \Sigma_{#1},\allowbreak 
+    Q_{#1}, \allowbreak
+    q^0_{#1}, \allowbreak
+    \may{}_{#1}, \allowbreak
+    \must{}_{#1}, \allowbreak
+    \val_{#1})}\xspace}
+
+\newcommand{\maiotstupmr}[1]{\ensuremath{
+    (\chan,\allowbreak 
+    \Sigma,\allowbreak 
+    Q_{#1}, \allowbreak
+    q^0_{#1}, \allowbreak
+    \may{}_{#1}, \allowbreak
+    \must{}_{#1}, \allowbreak
+    \val_{#1})}\xspace}
+
+
+\newcommand{\Tmust}{\ensuremath{T^{\scriptscriptstyle\square}}\xspace}
+
+
+\newcommand{\mpndef}{\ensuremath{\pnN = \mpntup{}}\xspace}
+
+
+\newcommand{\mapntup}[1]{\ensuremath{(\chan_{#1},\allowbreak
+    P_{#1},\allowbreak
+    T_{#1},\allowbreak
+    \Tmust_{#1}, \allowbreak
+    \Sigma_{#1},\allowbreak
+    W_{#1}^-,\allowbreak
+    W_{#1}^+,\allowbreak
+    \lambda_{#1},\allowbreak
+    m^0_{#1})}\xspace}
+
+\newcommand{\stateTGC}{\ensuremath{\;}}

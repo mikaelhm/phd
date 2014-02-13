@@ -1,0 +1,144 @@
+%!TEX root = ./main.tex
+\section{Introduction}
+\label{sec:introduction}
+
+
+{\bf (A)synchronous composition.} 
+The design of hardware and software systems
+is often component-based which has well-known advantages: management
+of complexity, reusability, separation of concerns, collaborative design, etc.
+One critical feature of such systems is the protocol
+supporting the communication between components and, in particular,
+the way they synchronise. Synchronous composition ensures
+that both parts are aware that communication has taken place
+and then simplifies the validation of the system.
+However in a large scale distributed environment synchronous
+composition may lead to redhibitory inefficiency during execution
+and thus asynchronous composition should be adopted.
+The FIFO requirement of communication channels is often not appropriate
+in this context.
+This is illustrated 
+by the concept of a software bus where applications push and pop messages
+in mailboxes. Also on the modelling level FIFO ordering is often not assumed,
+like for the composition of UML state machines which relies on event pools without specific
+requirements.
+
+
+\noindent
+{\bf Compositions of Petri nets.}
+In the context of Petri nets, composition has been studied both from
+theoretical and practical points of view. The process algebra approach
+has been investigated by several works leading to the Petri net 
+algebra~\cite{BDK01}. Such an approach is closely related to synchronous composition.
+In~\cite{Souissi90} and \cite{SM89} asynchronous composition of nets are performed
+via a set of places or, more generally, via a subnet modelling some medium. Then
+structural restrictions on the subnets are proposed in order to preserve
+global properties like liveness or deadlock-freeness.
+In~\cite{reisig09} a general composition operator is proposed and
+its associativity is established. A closely related concept to composition
+is the one of open Petri nets which has been used in different contexts
+like the analysis of web services~\cite{DK2009}.
+Numerous compositional approaches have been proposed for the modelling of complex applications
+but most of them are based on high-level Petri nets; see~\cite{GB05} for a detailed
+survey.
+
+
+\noindent
+{\bf Channel properties.} With the development of component-based
+applications, one is interested in verifying behavioural properties
+of the communication and, in the asynchronous
+case, in verifying the properties related to communication channels.
+Channel properties naturally occur when reasonning about distributed
+mechanisms, algorithms and applications (e.g. management of sockets in UNIX,
+maintaining unicity of a token in a ring based algorithm, recovery points
+with empty channels for fault management, guarantee of email reading, etc.).
+
+
+
+\noindent
+{\bf Our contributions.}
+In this work we are interested in general channel properties and not in specific
+system properties related to particular applications.
+The FIFO requirement for channels
+potentially can decrease the performance
+of large scale distributed systems. Thus we restrict ourselves to
+\emph{unordered} channels which can be naturally modelled
+by places of Petri nets. We propose asynchronously composed Petri nets (AIOPNs)
+by (1) explicitely representing channels for internal communication inside the net and (2) defining
+communication capabilities to the outside in terms of (open) input and output labels
+with appropriate transitions. 
+Then we define an asynchronous composition operator which introduces
+new channels for the communication between the composed nets.
+AIOPNs are equipped with a semantics in terms of
+asynchronously composed I/O- transition systems (AIOTS).
+We show that  this semantics is fully compositional, i.e.\  it commutes with asynchronous composition.
+
+In our study two kinds of channel properties are considered which are related to
+consumption requirements and to the termination of communication. Consumption
+properties deal with requirements that messages sent to a communication channel
+should also be consumed. They can be classified w.r.t.
+two criteria. The first criterion is the nature of the
+requirement: consuming messages, decreasing the number of messages on a channel,
+and emptying channels. The second criterion expresses the way the requirement
+is achieved: possibly immediately, possibly after some delay, or necessarily in each weakly fair run.
+Communication termination deals with (immediate or delayed) closing of communication channels
+when the receiver is not ready to consume any more.
+%Management
+%properties are related to implementation:
+%boundedness of some channel, communication termination, etc.
+We establish useful relations between the channel properties and prove
+that all channel properties considered here are compositional, i.e. preserved
+by asynchronous composition, which is an important prerequisite for incremental design.
+
+From a verification point of view, we study the decidability
+of properties in the framework of AIOPN. Thanks to several complementary
+works on decidability for Petri net problems, we show that all
+channel properties considered in this work are decidable, though with a high
+computational complexity.
+
+\noindent
+{\bf Related work.} To the best of our knowledge, no work has considered
+channels explicitely defined for communication inside composite components. However there have been several works 
+where channels are associated with asynchronous composition. They can be
+roughly classified depending whether their main feature is an 
+algorithmic or a semantic one.
+
+From an algorithmic point of view,
+in the seminal work of~\cite{Brand:1983:CFM:322374.322380}, the authors discus several properties
+like \emph{channel boundedness} and \emph{specified receptions} and propose
+methods to analyse them. In~\cite{Cece:2005:VPH:1124524.1709549}, a two-component based
+system is studied using a particular (decidable) channel property,
+the \emph{half-duplex property}: at any time at most one channel
+is not empty. 
+
+
+From a semantic point view, in~\cite{hennicker2010} 
+``connection-safe'' component 
+assemblies have been studied incorporating both synchronous and asynchronous communication.
+More recently in~\cite{BTO12} \emph{synchronisability},
+a property of asynchronous systems, is introduced such that when it holds
+the system can be safely abstracted by a synchronous one.
+In the framework of Petri nets, E. Kindler has defined Petri net components
+where the interface is composed by places and  composition consists in
+merging places with same identities~\cite{Kindler97}. He proposed a
+partial order semantics for such components and proved that the semantic
+is fully compositional. Furthermore, for a restricted linear temporal logic
+he established that properties of this logic are preserved by composition;
+however such a logic cannot express some of the channel properties
+we introduce here due to their branching kind.
+
+The Petri net based formalism of open nets  is the closest formalism to ours.
+Several works~\cite{Lohmann07},\cite{DK2009}, and \cite{Stahl12} address both the semantic point of view 
+and the algorithmic one but only when the nets are assumed to be bounded which is not required
+here. We postpone to Section~\ref{sec:aiopns-defs} a more detailed comparison with our formalism.
+
+\noindent
+{\bf Organisation.}
+In Section~\ref{sec:AIOPN}, we introduce AIOPNs and their asynchronous composition.
+Then, we provide a compositional semantic for AIOPNs in Section~\ref{sec:semantics} 
+in terms of AIOTSs.
+In Section~\ref{sec:communication}, we define the channel properties
+and study their relationships and their preservation under asynchronous composition.
+In Section~\ref{sec:decidability}, we establish that all channel properties
+are decidable for AIOPNs. Finally, in Section~\ref{sec:conclusion}, we conclude and give some
+perspectives for future work.

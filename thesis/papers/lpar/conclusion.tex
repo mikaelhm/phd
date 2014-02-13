@@ -1,0 +1,39 @@
+We have introduced a new extension of modal transition systems. The 
+extension consists in introducing (1) variable time durations of actions 
+and (2) pricing of actions, where we combine one-shot investment price 
+for the hardware and cost for running it per each time unit it is active. 
+We believe that this formalism is appropriate to modelling many types of 
+embedded systems, where safety comes along with economical requirements.
+
+We have solved the problem of finding the cheapest implementation w.r.t.~the
+running cost given a maximum hardware investment we can afford, and 
+we established
+the complexity of the decision problem in the general setting and 
+in a practically relevant subcase revealing a close connection with
+mean payoff games.
+
+% is summarized as follows.
+%
+%\begin{corollary}
+%The implementation problem is NP-complete except for the case with $\Phi$ positive and $\Psi$ in disjunctive normal form when it is polynomially equivalent to mean payoff games and there exists a pseudo-polynomial algorithm solving the problem. 
+%\end{corollary}
+
+%In the most practical subclass (positive $\Phi$ with $\Psi$ in DNF), the
+%cheapest implementation can be constructed using the current algorithms for
+%mean payoff games~\cite{Zwick96thecomplexity}
+%in time $\bigO(\lvert\Psi\rvert\cdot(\lvert T\rvert + \lvert\Phi\rvert)^5 \cdot W)$,
+%where $W$ is the largest number such that $W = r(a) \cdot n$ where $n \in D(s,a,t)$.
+%% \todo{Jan: fill in the time complexity of the mpg}
+
+As for the future work, apart from implementing the algorithm, one may consider two types of extensions. First, one can extend the formalism to cover the distinction between input, output and internal actions as it is usual in interface theories~\cite{DBLP:conf/emsoft/ChakrabartiAHS03}, 
+%cite Bauer MIO?
+and include even more time features, such as clocks in priced timed automata~\cite{DBLP:conf/fmco/BehrmannLR04,DBLP:journals/fmsd/BouyerBL08}.
+%cite DBLP:conf/fmco/BehrmannLR04
+%to get ``Modal input/output priced timed automata''. 
+Second, one may extend the criteria for synthesis of the cheapest implementation by an additional requirement that the partial sums stay within given 
+bounds as done in~\cite{DBLP:conf/formats/BouyerFLMS08}, 
+or requiring the satisfaction of a temporal property as suggested 
+in~\cite{DBLP:conf/emsoft/ChakrabartiAHS03,DBLP:conf/icalp/ChatterjeeD10}.
+
+%by the recent development
+%cite ,DBLP:conf/icalp/ChatterjeeD10,DBLP:conf/atva/BenesCK11

@@ -1,0 +1,114 @@
+%!TEX root = ../main.tex
+\begin{tikzpicture}[
+    background fill/.store in=\lightlightblue,
+    background fill=lightlightblue,   % Default value
+    fill background/.style={
+       local bounding box=bbox,
+       execute at end scope={
+         \begin{pgfonlayer}{background}
+           \coordinate[rectangle,fill=\lightlightblue,fit=(bbox)];
+         \end{pgfonlayer}} }]
+
+%%%%% Controller %%%%%
+\begin{scope}[fill background]
+
+\node[mustt,rotate=0,label={left:$\trans{file?}$}] at (-2,-1) (filein) {};
+\node[place,tokens=0] at (-1,-1) (p0) {};
+
+\node[mustt,rotate=0,label={below:$\trans{\outact{gif}}$}] at (0,0) (gifout) {};
+\node[mustt,rotate=0,label={above:$\trans{\outact{txt}}$}] at (0,-2) (txtout) {};
+
+\node[place,tokens=0] at (1,0) (p1) {};
+\node[place,tokens=0] at (1,-2) (p2) {};
+
+\node[mustt,rotate=0,label={below:$\trans{\inact{jpg}}$}] at (3,0) (jpgin) {};
+\node[mustt,rotate=0,label={right:$\trans{\inact{fail}}$}] at (1.8,-1) (failin) {};
+\node[mustt,rotate=0,label={above:$\trans{\inact{zip}}$}] at (3,-2) (zipin) {};
+
+\node[place,tokens=0] at (4,0) (p3) {};
+\node[mustt,rotate=0,label={right:$\trans{comprJpg?}$}] at (5,0) (comprjpg) {};
+
+\node[place,tokens=0] at (4,-2) (p4) {};
+\node[mustt,rotate=0,label={right:$\trans{comprZip?}$}] at (5,-2) (comprzip) {};
+
+\draw[arc] (filein) to[] (p0) {};
+
+\draw[arc] (p0) to[bend left] (gifout) {};
+\draw[arc] (p0) to[bend right] (txtout) {};
+
+\draw[arc] (gifout) to[] (p1) {};
+\draw[arc] (txtout) to[] (p2) {};
+
+\draw[arc] (p1) to[] (jpgin) {};
+\draw[arc] (p1) to[] (failin) {};
+\draw[arc] (p2) to[] (zipin) {};
+
+\draw[arc] (jpgin) to[] (p3) {};
+\draw[arc] (failin) to[] (p0) {};
+\draw[arc] (zipin) to[] (p4) {};
+
+\draw[arc] (p3) to[] (comprjpg) {};
+\draw[arc] (p4) to[] (comprzip) {};
+\end{scope}
+
+%%%%% TxtCompressor %%%%%
+\begin{scope}[fill background]
+
+
+\node[place,tokens=1] at (1.5,-4.8) (p5) {};
+
+\node[mustt,rotate=0,label={left:$\trans{\inact{txt}}$}] at (0,-4) (txtin) {};
+\node[place,tokens=0] at (1.5,-4) (p6) {};
+
+\node[mustt,rotate=0,label={right:$\trans{\outact{zip}}$}] at (3,-4) (zipout) {};
+
+\draw[arc] (p5) to[bend left] (txtin) {};
+\draw[arc] (txtin) to[] (p6) {};
+\draw[arc] (p6) to[] (zipout) {};
+\draw[arc] (zipout) to[bend left] (p5) {};
+\end{scope}
+
+
+%%%% Channels TXTCompressor %%%%%
+\node[place,tokens=0,label=left:$\trans{txt}$] at (0,-3) (txt) {};
+\node[place,tokens=0,label=right:$\trans{zip}$] at (3,-3) (zip) {};
+\draw[arc] (txtout) to[] (txt) {};
+\draw[arc] (txt) to[] (txtin) {};
+\draw[arc] (zipout) to[] (zip) {};
+\draw[arc] (zip) to[] (zipin) {};
+
+
+%%%% GifCompressor %%%%
+
+\begin{scope}[fill background]
+\node[place,tokens=1] at (1.5,3.2) (p7) {};
+
+\node[mustt,rotate=0,label={left:$\trans{\inact{gif}}$}] at (0,2.1) (gifin) {};
+\node[place,tokens=0] at (1,2.1) (p8) {};
+
+\node[mayt,rotate=0,label={right:$\trans{\outact{fail}}$}] at (1.8,2.1) (failout) {};
+\node[mustt,rotate=0,label={right:$\trans{\outact{jpg}}$}] at (3,2.1) (jpgout) {};
+
+
+\draw[arc] (p7) to[bend right] (gifin) {};
+\draw[arc] (gifin) to[] (p8) {};
+\draw[arc] (p8) to[bend right=35] (jpgout) {};
+\draw[arc] (p8) to[] (failout) {};
+\draw[arc] (jpgout) to[bend right] (p7) {};
+\draw[arc] (failout) to[bend right=15] (p7) {};
+\end{scope}
+
+
+%%%% Channels GifCompressor %%%%%
+\node[place,tokens=0,label=left:$\trans{gif}$] at (0,1) (gif) {};
+\node[place,tokens=0,label=left:$\trans{fail}$] at (1.8,1) (fail) {};
+\node[place,tokens=0,label=right:$\trans{jpg}$] at (3,1) (jpg) {};
+
+\draw[arc] (gifout) to[] (gif) {};
+\draw[arc] (gif) to[] (gifin) {};
+\draw[arc] (failout) to[] (fail) {};
+\draw[arc] (fail) to[] (failin) {};
+\draw[arc] (jpgout) to[] (jpg) {};
+\draw[arc] (jpg) to[] (jpgin) {};
+
+\end{tikzpicture}

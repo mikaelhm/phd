@@ -1,0 +1,25 @@
+%!TEX root = ../thesis.tex
+\chapter{Motivation}
+During the last decade, software has become a regular part in all types of products, both consumer- and industrial scale products. Twenty years ago software where generally regarded as programs running on personal computers. Today however, many products rely on software running inside it. For instance, all new cars contain a software system that triggers emergency functionality on the basis of inputs from sensors in the car. Furthermore, coffee machines, dishwashers, elevators, heating/cooling systems and medical monitors are all examples of products that rely on software-based control systems. Such applications are grouped under the common term \emph{embedded software}.
+
+\section{Safety-critical Systems}
+As with any other software application, embedded software can contain errors. Most people have experienced a computer program crashing, become unresponsive or doing something unexpected. Embedded software can have the same problems. As embedded software is not always directly visible, it can be hard to determine whether the system is running correctly. This can be extremely dangerous if the embedded software is responsible for triggering safety mechanisms in an emergency situation. We say that a system is \emph{safety critical} if an error in the system can result in a costly outcome, cause injury or even lead to death. Software errors can occur due to various reasons. One of these reasons is that the size of software systems can make them so complex that it is hard to avoid errors.
+
+Guaranteeing that a piece of software does not contain any errors and only behaves as intended is a non-trivial task. It is crucial to describe exactly how the system should function, but also specify the potential errors of the system. By formally defining the behaviour of the system, one can examine the system specification using mathematically-based techniques. Techniques building upon these concepts are known in software engineering as \emph{formal methods}.
+
+Formal methods rely on a precise system specification expressed in a well-defined mathematical formalism. Mathematical reasoning can then prove the absence of the specified errors. Formal method techniques can be applied in several stages of a design process in software development. A software design process is a tool that helps developers make better software. The design processes define a number steps that the development must go through, for instance requirement specification, system design, implementation etc. Model-based development is a design process centred around the model of a system. This central model can then be altered and refined throughout the first steps of the design process and used for comparison when testing the implemented software.
+
+By expressing this central model in a mathematical formalism, we can apply formal methods in the development process and avoid errors early in the design phase. In order to do this, there must be a formalism capable of expressing the behaviour and concepts of the system. If a system must have deadlines and timing constraints in order to meet its requirements, then the modelling framework must also be able to express such timing features. Further, if a system manages a resource of some kind, the models should also include such mechanisms. However, having complex modelling formalisms will also make the mathematical reasoning harder and often impossible.
+
+Complexity is a significant problem in the field of formal methods, but there are ``divide and conquer'' techniques that attempt to alleviate the problem. The idea is to split the system model into simpler components and then analyse them individually. When splitting a model into components, a new problem arises: how do one ensure that the composition of these components will meet the overall requirements? We need to make sure that they cooperate in a correct manner.
+
+Some systems are constructed by individual components communicating together. Such systems are known as distributed systems. For instance, an intelligent heating control for a house is a distributed system. It consists of heating regulators that open and close the radiators, thermometers that report the room temperature, window sensors telling if the window is open and a control unit. The components communicate on a wireless connection, so it is essential that the communication is reliable.
+
+The main subject of this thesis is to enhance the ability to use formal methods in system design of embedded systems. This is done by extending and improving existing techniques for system specification, in order make them more applicable in a development process of a real system. 
+
+
+
+
+
+
+

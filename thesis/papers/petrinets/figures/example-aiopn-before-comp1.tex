@@ -1,0 +1,12 @@
+%!TEX root = ../../thesis.tex
+\begin{tikzpicture}[scale=0.675, every node/.style={transform shape}]
+\node[place,tokens=1,label=above:$p_0$] at (0,0) (p0) {};
+\node[transition,rotate=90,label={[yshift=0,xshift=13]0:${msg!}$}] at (1,-1.5) (tmsg_out) {};
+\node[place,tokens=0,label=below:$p_1$] at (0,-3) (p1) {};
+\node[transition,rotate=90,label={[yshift=0,xshift=0]90:${in?}$}] at (-1,-1.5) (ta_in) {};
+% \node[place,label=above:$msg$] at (3,-1.5) (pa) {};
+\draw[arc] (p0) to[bend left] (tmsg_out) {};
+\draw[arc] (tmsg_out) to[bend left] (p1) {};
+\draw[arc] (p1) to[bend left] (ta_in) {};
+\draw[arc] (ta_in) to[bend left] (p0) {};
+\end{tikzpicture}

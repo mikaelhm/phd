@@ -1,0 +1,135 @@
+%!TEX root = ./main.tex
+\subsection{Compositionality of Channel Properties}\label{subsec:comp-prop}
+
+Modular verification of systems is an important goal in any development method.
+In our context this concerns the question whether channel properties are preserved in arbitrary environments
+or, more precisely, whether they are preserved under asynchronous composition.
+In this section we show that indeed all channel properties defined above are compositional.
+This can be utilised to get a method for incremental design.
+
+
+
+In order to relate channel properties of asynchronous compositions to channel properties
+of their constituent parts we need the next two lemmas.
+The first one shows that autonomous executions of constituent parts (not involving inputs)
+can be lifted to executions of compositions.
+This is the essence to prove compositionality of the
+properties of type (a) and type (b) in Def.~\ref{def:cp}.
+%\footnote{This also justifies 
+%why we did not allow inputs in the properties of type (a) and type (b) in Def.~\ref{def:cp}. In fact for any input action $a$ of a single AIOTS there is always an environment which will
+%not serve the input and therefore $a$ will not induce a transition with communication label $\inact{a}$ in \emph{any} composition.}
+
+\begin{lemma}\label{lem:reuse-sequence}
+    Let $\S = \aiotstup{\S},\T = \aiotstup{\T}$ be two composable \AIOTSs, and let $\S\compos\T = \aiotstup{}$. For all $(q_\S,q_\T,\vec{v}) \in \post^*(q^0)$ and $\sigma \in (\Sigma_\S \setminus \inset_\S)^*$ it holds that
+    \[
+        q_\S \goes{\sigma}_\S q'_\S \implies \exists \vec{v'}\ .\ (q_\S,q_\T,\vec{v}) \goes{\bar\sigma} (q'_\S,q_\T,\vec{v'}),
+    \]
+    with $\bar\sigma \in (\Sigma \setminus \inset)^*$ obtained from $\sigma$ by replacing any occurrence of a shared label $a \in \outset_\S \cap \inset_\T$ by the communication label $\outact{a}$.
+\end{lemma}
+\begin{proof}
+	Obviously it is sufficient to show the claim for an arbitrary $a \in (\Sigma_\S \setminus \inset_S)$. The general result then follows by induction on the length of $\sigma$.
+    \begin{enumerate}
+        \item$a \in \outset_\S \cap \inset_\T$: By rule \ref{def:trans:stots} in Def.~\ref{def:async-comp-aiots} it follows that there exists $\vec{v'}$ such that
+                    $q_\S \goes{a}_\S q'_\S \implies (q_\S,q_\T,\vec{v}) \goes{\outact{a}} (q'_\S,q_\T,\vec{v'}).$
+        \item$a \not\in \outset_\S \cap \inset_\T$: There are two subcases, either $a \in \com_\S$, or $a \in \outset_\S \setminus \inset_\T$. In both cases we get from rule \ref{def:trans:s} in Def.~\ref{def:async-comp-aiots}, \\
+            $q_\S \goes{a}_\S q'_\S \implies (q_\S,q_\T,\vec{v}) \goes{a} (q'_\S,q_\T,\vec{v}) .$  
+    \end{enumerate} 
+\end{proof}
+
+The next lemma is crucial to prove compositionality of the
+``necessarily'' properties of type (c) in Def.~\ref{def:cp} and the communication stopping properties in Def.~\ref{def:rp}.
+It shows that projections of weakly fair runs are weakly fair runs again.
+This result can only be achieved in the asynchronous context.
+%In a synchronous environment strongly fair runs would have to be considered.
+
+\begin{lemma}\label{lem:projection-run}
+    Let $\S$, $\T$ be two composable \AIOTSs, and $\S\compos\T = \aiotstup{}$. Let $q = (q_\S,q_\T,\vec{v}) \in Q$ and $\rho \in \frun{\S\compos\T}(q)$ be a weakly fair run. Then $\rho|_\S \in \frun{\S}(q_\S)$, is a weakly fair run.
+\end{lemma}
+\begin{proof}
+	Let $\rho \in \frun{\S\compos\T}(q)$. First we show that $\rho|_\S$ is weakly fair as well. If $\rho|_\S$ is finite it is weakly fair. 
+If $\rho|_\S$ is infinite, then assume that an autonomous action $a \in (\Sigma_\S \setminus in_\S)$ is always enabled in $\rho|_\S$ from a certain state on. Due to the asynchronous composition
+we get that $a$ is also always enabled in $\rho$ from a certain state on. Hence $a$ will be infinitely often executed in $\rho$ and therefore also in $\rho|_\S$.
+
+ It remains to prove that $\rho|_\S \in \run{\S}(q_\S)$. 
+    There are two main cases. Either $\rho$ is finite or infinite. 
+    Assume $\rho$ is finite with its last state being $q' = (q'_\S,q'_\T,\vec{v'})$. Clearly $q'_\S$ must be the last state of $\rho|_\S$. By definition of a run, $q'$ is a pure input state. Then $q'_\S$ must be a pure input state of $\S$, hence $\rho|_\S \in \run{\S}(q_\S)$.
+    
+    Now assume that $\rho$ is infinite and weakly fair. In this case there are two subcases. Either $\rho|_\S$ is finite or infinite. If $\rho|_\S$ is infinite, then $\rho|_\S \in \run{\S}(q_\S)$.
+
+    Assume $\rho|_\S$ is finite such that its last state is $q'_\S$, with $(q'_\S,q'_\T,\vec{v'}) \in \rho$. Since $\rho$ is weakly fair we can prove that $q'_\S$ is a pure input state as follows. Assume the contrary, that $q'_\S$ is not a pure input state, i.e. there exists $a \in (\Sigma \setminus \inset)$ such that $q'_\S \goes{a}$. As $\rho$ is infinite we get that $a$ is enabled always from $(q'_\S,q'_\T,\vec{v'}) \in \rho$, which is a contradiction, since $\rho$ is fair and $a$ is not occurring infinitely often after $(q'_\S,q'_\T,\vec{v'}) \in \rho$ as $\rho|_\S$ is finite. Now, knowing that $q'_\S$ is a pure input state, we get that $\rho|_\S \in \run{\S}(q_\S)$.
+\end{proof}
+
+\begin{proposition}[Compositionality of Channel Properties]\label{prop:cp:compos}
+   Let $\S$ and $\T$ be two composable \AIOTSs such that $\chan_\S$ is the set of channels of $\S$. Let $B \subseteq \chan_\S$ and let P be an arbitrary channel property as defined in Sec.~\ref{sec:def-communication-prop}.
+   If $\S$ has property P with respect to the channels $B$, then $\S \compos \T$ has property P with respect to the channels $B$.
+This holds analogously for asynchronous I/O-Petri nets (due to the compositional semantics of \AIOPNs; see Thm.~\ref{thm:comp-semantics}).
+\end{proposition}
+\begin{proof}
+	Let $\S = \aiotstup{\S}$, $\T = \aiotstup{\T}$, $\S\compos\T = \aiotstup{}$ with $\ioalpha{\S}$ and $\ioalpha{}$.
+    We split this proof into the following three parts: ``non-necessarily'' channel properties of types (a) and (b) in Def.~\ref{def:cp}, necessarily channel properties of type (c)  in Def.~\ref{def:cp}, and communication stopping properties in Def.~\ref{def:rp}.
+
+    \smallskip\noindent {\bf Non-necessarily channel properties:}
+    Before we prove each case we state two simple consequences of Lem.~\ref{lem:reuse-sequence}:
+    For all $(q_\S,q_\T,\vec{v}) \in \post^*(q^0)$ and $q'_\S \in Q_\S$, 
+    \begin{enumerate}[label=(\arabic*), ref=(\arabic*), leftmargin=*]
+        \item\label{eq:poststar} 
+        $q'_\S \in \post^*(q_\S,\Sigma_\S\!\setminus\inset_\S) \Rightarrow \exists \vec{v'}.(q'_\S,q_\T,\vec{v'}) \in \post^*((q_\S,q_\T,\vec{v}),\Sigma \setminus \inset)$
+        \item\label{eq:post}$q'_\S \in \post(q_\S,\Sigma_\S\!\setminus\inset_\S) \;\,\Rightarrow \exists \vec{v'}.(q'_\S,q_\T,\vec{v'}) \in \post((q_\S,q_\T,\vec{v}),\Sigma \setminus \inset)$
+    \end{enumerate}
+
+For the proof of the P1 - P3 properties let $(q_\S,q_\T,\vec{v}) \in \post^*(q^0)$ and $a \in B$ such that $\val((q_\S,q_\T,\vec{v}),a) > 0$. 
+    \begin{enumerate} [label=P1.\alph*:,leftmargin=2.7em]       
+        \item Assume that $\S$ is $B$-consuming. 
+        Obviously $q_\S \in \post^*(q^0_\S)$. By assumption there exists $q'_\S \in \post^*(q_\S,\Sigma_\S \setminus \inset_{\S})$ such that $q'_\S \goes{\inact{a}}_\S$. By \ref{eq:poststar} above  there exists $\vec{v'}$ such that $(q'_\S,q_\T,\vec{v'}) \in \post^*((q_\S,q_\T,\vec{v}),\Sigma \setminus \inset)$, and by definition of $\compos$ we get $(q'_\S,q_\T,\vec{v'})\goes{\inact{a}}$. 
+
+        \item If $\S$ is strongly $B$-consuming, we get by assumption that $q_\S \goes{\inact{a}}$. By definition of $\compos$ this means that $(q_\S,q_\T,\vec{v})\goes{\inact{a}}$.
+    \end{enumerate}
+    \begin{enumerate} [label=P2.\alph*:,leftmargin=2.7em]   
+        \item Assume that $\S$ is $B$-decreasing. 
+        Obviously $q_\S \in \post^*(q^0_\S)$. By assumption there exists $q'_\S \in \post^*(q_\S,\Sigma_\S \setminus \inset_{\S})$ such that $\val_\S(q'_\S,a) < \val_\S(q_\S,a)$. By \ref{eq:poststar} there exists $\vec{v'}$ such that $(q'_\S,q_\T,\vec{v'}) \in \post^*((q_\S,q_\T,\vec{v}),\Sigma \setminus \inset)$. Finally as $a \in\chan_\S$ and $\val_\S(q'_\S,a) < \val_\S(q_\S,a)$ we get, by definition of $val$, that $\val((q'_\S,q_\T,\vec{v'}),a) < \val((q_\S,q_\T,\vec{v}),a)$. 
+
+        \item If $\S$ is strongly $B$-decreasing the claim follows by the same reasoning using \ref{eq:post} from above.
+    \end{enumerate}
+    \begin{enumerate} [label=P3.\alph*:,leftmargin=2.7em]  
+        \item The proof is analogous to the case P2.a.
+        \item The proof is analogous to the case P2.b.
+    \end{enumerate}
+For the proof of P4  let $(q_\S,q_\T,\vec{v}) \in \post^*(q^0)$ such that $\val((q_\S,q_\T,\vec{v}),B) > 0$. 
+    \begin{enumerate} [label=P4.\alph*:,leftmargin=2.7em]  
+        \item Assume that $\S$ is $B$-wholly emptying.
+        Obviously $q_\S \in \post^*(q^0_\S)$. By assumption there exists $q'_\S \in \post^*(q_\S,\Sigma_\S \setminus \inset_{\S})$ such that $\val_\S(q'_\S,B) = 0$. By \ref{eq:poststar} there exists $\vec{v'}$ such that $(q'_\S,q_\T,\vec{v'}) \in \post^*((q_\S,q_\T,\vec{v}),\Sigma \setminus \inset)$. Finally as $B \subseteq \chan_\S$ we get, by definition of $val$, that $\val((q'_\S,q_\T,\vec{v'}),B) = \val_\S(q'_\S,B)=0$.
+
+        \item If $\S$ is strongly $B$-wholly emptying the claim follows by the same reasoning using \ref{eq:post} from above.
+    \end{enumerate}
+
+    \smallskip\noindent {\bf Necessarily channel properties:}
+    We will only prove the claim for property \ref{def:cp:nec-consuming}, as it can be proven analogously for the other necessarily properties.
+
+    Assume that $\S$ is necessarily $B$-consuming. Let $\S\compos\T = \aiotstup{}$, $(q_\S,q_\T,\vec{v}) \in \post^*(q^0)$ and $a \in B$, such that $\val((q_\S,q_\T,\vec{v}),a)>0$. Let \linebreak $\rho \in \frun{\S\compos\T}((q_\S,q_\T,\vec{v}))$ be weakly fair. 
+ By Lem.~\ref{lem:projection-run} we get that $\rho|_\S$ is a weakly fair run of $\S$. By assumption we know $\inact{a} \in \rho|_\S$ and hence it follows that $\inact{a} \in \rho$.
+
+    \smallskip\noindent {\bf Communication stopping properties:}
+    We will only prove the claim for property \ref{def:rp:bas-stopping}, it can be proven analogously for \ref{def:rp:str-stopping}.
+
+   Assume that $\S$ is $B$-communication stopping. Let $\S\compos\T = \aiotstup{}$, $(q_\S,q_\T,\vec{v}) \in \post^*(q^0)$, $a \in B$ and $\rho \in \frun{\S\compos\T}((q_\S,q_\T,\vec{v}))$, such that $\sharp_\rho(\inact{a}) = 0$. 
+ By Lem.~\ref{lem:projection-run} we get that $\rho|_\S \in \frun{\S}(q_\S)$. By assumption we know that $\sharp_{\rho|_\S}(\outact{a}) < \infty$. Since $\outact{a}$ is triggered by $\S$ in $\S\compos\T$, we get that $\sharp_\rho(\outact{a}) < \infty$.
+\end{proof}
+%As a consequence of the compositional semantics of \AIOPNs (Thm.~\ref{thm:comp-semantics}), Proposition~\ref{prop:cp:compos} holds analogously for \AIOPNs:
+%
+%\begin{corollary}[Compositionality of Channel Properties for AIOPNs]\label{cor:cp:compos}
+%   Let $\pnN$ and $\M$ be two composable \AIOPNs such that $\chan_\pnN$ is the set of channels of $\pnN$. Let $B \subseteq \chan_\pnN$ and let P be an arbitrary channel property as defined in Sec.~\ref{sec:def-communication-prop}.
+%If $\pnN$ has property P with respect to the channels $B$, then $\pnN \compospn \M$ has property P with respect to the channels $B$.
+%\end{corollary}
+
+Proposition~\ref{prop:cp:compos} leads to the desired modular verification result for all properties except
+wholly emptying~\ref{def:cp:wholly-emptying}:
+In order to check that a composition $\pnN \compospn \M$ of two \AIOPNs has a channel property $P$, i.e. $P$ holds for all channels of the composition,
+it is sufficient to know that $\pnN$ and $\M$ have property $P$ and to prove that
+$\pnN \compospn \M$ has property $P$ with respect to the new channels introduced by the asynchronous composition.
+
+\begin{theorem}[Incremental Design]\label{thm:inc-design}
+ Let $\pnN$ and $\M$ be two composable\linebreak \AIOPNs with shared actions  $\Sigma_\pnN \cap \Sigma_\M$
+and let  $P$ be an arbitrary channel property but~\ref{def:cp:wholly-emptying}.
+If both $\pnN$ and $\M$ have property $P$ and if $\pnN \compospn \M$ has property $P$ with respect to the new channels
+$\Sigma_\pnN \cap \Sigma_\M$, then $\pnN \compospn \M$ has property $P$.
+\end{theorem}

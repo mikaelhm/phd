@@ -1,0 +1,117 @@
+%!TEX root = main.tex
+
+\section{Modal Asynchronous I/O-Petri Nets}\label{sec:maiots}
+
+In this section we formalise the syntax of \MAIOPNs and we define their transition system semantics. 
+First we recall some basic definitions for modal Petri nets and modal transition systems.
+
+\subsection{Modal Petri Nets and Modal Transition Systems}\label{subsec:basics-modal}
+
+In the following we consider labelled Petri nets such that transitions are equipped
+with labels of an alphabet $\Sigma$ or with the symbol $\tau$ that models silent transitions.
+We write $\Sigmat$ for $\Sigma \uplus \{\tau\}$.
+We assume the reader to be familiar with the basic notions of labelled Petri nets consisting of a finite set
+$P$ of places, a finite set $T$ of transitions, a set of arcs between places and transitions (transitions and places resp.),
+formalised by incidence matrices $W^-$ and $W^+$,
+an initial marking $m^0$ and a labelling function $\lambda : T \rightarrow \Sigmat$. 
+In~\cite{EHH12} we have introduced \emph{modal Petri nets}
+$\mpndef$ such that $\Tmust \subseteq T$  is a distinguished subset  of must-transitions.
+We write $m \may{t} m'$ if a transition $t \in T$ is firable from a marking $m$ leading to a marking $m'$.
+If $t \in \Tmust$ we write $m \must{t} m'$. 
+If $\lambda (t) = a$ we write $m \may{a} m'$ and for $t \in \Tmust$ we write $m \must{a} m'$.
+The notation is extended as usual to firing sequences $m \may{\sigma} m'$ with $\sigma \in  T^{*}$
+and to $m \must{\sigma} m'$ with $\sigma \in  (\Tmust)^{*}$.
+A marking $m$ is reachable if there exists a firing sequence $\sigma \in  T^{*}$ such that  $m^{0} \may{\sigma} m$.
+
+\emph{Modal transition systems} have been introduced in~\cite{DBLP:conf/lics/LarsenT88}. We will use them
+to provide semantics for modal Petri nets.
+A modal transition system is a tuple $\S = (\Sigma, Q, q^0, \may{},\must{})$, such that
+$\Sigma$ is a set of labels, $Q$ is a set of states, $q^0 \in Q$ is the initial state,
+$\may{} \; \subseteq Q \times \Sigmat \times Q$ is a may--transition relation, and
+$\must{} \; \subseteq \; \may{}$ is a must--transition relation.
+We explicitely allow the state space $Q$ to be infinite which is needed to give interpretations
+to modal Petri nets that model infinite state systems.
+
+The semantics of a modal Petri net $\mpndef$ is given by the modal transition system
+$\mts(\pnN) =  (\Sigma, Q, q^0, \may{},\must{})$  representing the reachability graph of the net by taking into account modalities:
+\begin{itemize}
+	\item $Q \subseteq \N^P$ is the set of reachable markings of \pnN,
+	\item $\may{} \; = \{(m, a, m') \mid a \in \Sigmat \text{ and } m \may{a} m'\}$,
+	\item $\must{} \; = \{(m, a, m') \mid a \in \Sigmat \text{ and } m \must{a} m'\}$, and
+	\item $q^0 = m^0$.
+\end{itemize}
+
+In the sequel we will use the following notations for modal transition systems.
+We write may-transitions as $q \may{a} q'$ for $(q,a,q') \in \;\may{}$ and similarly must-transitions as $q \must{a} q'$. % for $(q,a,q') \in \;\must{}$.
+The notation is extended in the usual way to finite sequences  $\sigma \in \Sigmat^*$ by the notations
+$q \may{\sigma} q'$ and $q \must{\sigma} q'$.
+The set of reachable states of $\S$ is given by $\reach(\S) = \{q \mid \exists \sigma \in \Sigmat^* \;.\; q^0 \may{\sigma} q\}$.
+%A \emph{trace} of $\S$ starting in a state $q_1 \in Q$ is a finite or infinite sequence $\rho =q_1  \may{a_1} q_2 \may{a_2} q_3 \may{a_3} \cdots$,
+%such that $a_i \in \Sigmat$ and $q_i \in Q$ for all $i$.  
+%A \emph{must--trace} is a trace with must--transitions only.
+%For $a \in \Sigmat$ we write $a \in \rho$, if there exists $a_i$ in the trace $\rho$ such that $a_i = a$.
+%% , and $\sharp_\rho(a)$ denotes the (possibly infinite) number of occurrences of $a$ in $\rho$. 
+%For $q \in Q$ we write $q \in \rho$, if there exists $q_i$ in the trace $\rho$ such that $q_i = q$.
+%For $\sigma=a_1 a_2 \cdots a_n \in \Sigmat^*$ and $q,q'\in Q$ we write $q \may{\sigma} q'$ if there exists a (finite) trace
+%$q \may{a_1}  \cdots  \may{a_n} q'$ and likewise for must--transitions. 
+%The set of reachable states of $\S$ is given by $\reach(\S) = \{q \mid \exists \sigma \in \Sigmat^* \;.\; q^0 \may{\sigma} q\}$.
+For a sequence $\sigma \in \Sigmat^*$ the observable projection $\obsa(\sigma) \in \Sigma^*$ is obtained from $\sigma$ by removing
+all occurrences of $\tau$.   
+Let $a \in \Sigma$ be a visible action and $q,q' \in Q$.
+We write $q \mayw{a} q'$ if $q \may{\sigma} q'$ with  $\obsa(\sigma) = a$ and we call $q \mayw{a} q'$ a weak may-transition.
+Similarly we write $q \mustw{a} q'$ if all transitions are must-transitions and call $q \mustw{a} q'$ a weak must-transition.
+The notation is extended as expected to finite sequences $\sigma \in \Sigma^*$ of visible actions
+by the notations $q \mayw{\sigma} q'$ and $q \mustw{\sigma} q'$.
+In particular, $q \mayw{\epsilon} q'$ means that there is a (possibly empty) sequence of silent may-transitions from $q$ to $q'$
+and  similarly $q\mustw{\epsilon}q'$ expresses a finite sequence of silent must-transitions.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%5
+
+\subsection{Modal Asynchronous I/O--Petri Nets, Composition and Hiding}\label{sec:MAIOPN}
+
+In this paper we consider systems which may be open for communication with other systems and may be composed to larger systems.
+The open actions are modelled by input labels (for the reception of messages from the environment) and output labels (for sending messages to the environment)
+while communication inside an asynchronously composed system takes place by removing or putting messages to distinguished communication channels.
+Given a finite set $\chan$ of channels, an \emph{I/O-alphabet over $\chan$} is the disjoint union $\ioalpha{}$ of pairwise disjoint sets of input labels, output labels and communication labels, such that $\com = \{\inact{a},\outact{a} \mid a \in \chan\}$.
+For each channel $a \in \chan$, the label $\inact{a}$ represents consumption of a message from $a$ and $\outact{a}$ represents putting a message on $a$.
+A \emph{modal asynchronous I/O-Petri net} (\MAIOPN) $\pnN = \mapntup{}$ is a modal Petri net such that
+$\chan \subseteq P$ is a set of channel places which are initially empty, $\ioalpha{}$ is an I/O-alphabet over $\chan$, and
+for all $a \in \chan$ and $t \in T$, there exists an (unweighted) arc from $a$ to $t$ iff $\lambda(t) = \inact{a}$ and 
+ there exists an  (unweighted) arc from $t$ to $a$ iff $\lambda(t) = \outact{a}$. 
+
+The \emph{asynchronous composition} of \MAIOPNs works as for asynchronous\linebreak I/O--Petri nets considered in~\cite{haddad-et-al-2013}
+by introducing new channel places and appropropriate transitions for shared input/output labels.
+%Every transition with shared output label $a$ becomes a transition with the communication label $\outact{a}$
+%that produces a token on the (new) channel place $a$ and, similarly,  any transition with shared input label $a$ becomes a transition with the communication label $\inact{a}$
+%that consumes a token from the (new) channel place $a$.
+The non-shared  input and output labels remain open in the composition. 
+Moreover, we require that the must-transitions of the composition are the union of the must-transitions of the single components. 
+The asynchronous composition of two \MAIOPNs $\pnN$ and $\M$ is denoted by $\pnN \compospn \M$.
+It is commutative and also associative under appropriate syntactic restrictions on the underlying alphabets.
+An example of a composition of three \MAIOPNs is given in Fig.~\ref{fig:ex-async-comp}.
+%Fig.~\ref{fig:ex-maiopns} shows three \MAIOPNs.
+%The nets $\pnN_1$ and $\pnN_2$ model primitive
+%components (without channels) and the $\pnN_3$ is obtained by their composition;
+%it shows the new channel place $msg$.
+%
+%
+%\begin{figure}%
+%\centering
+%\subfloat[$\pnN_1$.]{\label{fig:ex-aiopn1}\input{papers/tgc/figures/example-maiopn-before-comp.tex} }
+%\subfloat[$\pnN_2$.]{\label{fig:ex-aiopn2}\input{papers/tgc/figures/example-maiopn-before-comp2.tex} }
+%\subfloat[$\pnN_3$.]{\label{fig:ex-aiopn}\input{papers/tgc/figures/example-maiopn-after-comp.tex} }
+%\caption{Modal asynchronous I/O-Petri nets.}%
+%\label{fig:ex-maiopns}%
+%\end{figure}
+
+We introduce a \emph{hiding operator} on \MAIOPNs which allows us to hide communication channels.
+In particular, it allows us to compute the black-box behaviour of an assembly when all channels are hidden.
+    Let $\pnN$ be a \MAIOPN with I/O-alphabet \ioalpha{\pnN}, and let $H \subseteq \chan_\pnN$ be a subset of its channels. The \emph{channel hiding of $H$ in $\pnN$} is the \MAIOPN $\pnN \hidepn H$ with channels $\chan = \chan_\pnN \setminus H$, with I/O-alphabet $\Sigma = \inset_\pnN \uplus \outset_\pnN \uplus \com$ such that $\com = \{\inact{a},\outact{a} \mid a \in \chan\}$, and with the labelling function:
+
+ \begin{itemize}
+         \item[~] $\lambda(t) = \begin{cases}
+            \tau &\text{ if } \exists a \in H \;.\; \lambda_\pnN(t)= \inact{a} \text{ or } \lambda_\pnN(t)= \outact{a},\\
+            \lambda_\pnN(a) & \text{ otherwise. }
+        \end{cases}$
+    \end{itemize}

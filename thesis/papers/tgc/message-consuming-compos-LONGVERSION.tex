@@ -1,0 +1,121 @@
+%!TEX root = main.tex
+
+\subsection{Composition of Message Consuming Systems}\label{subsec:message-consuming-compos}
+
+In order to prove that message consuming properties are preserved when systems are put into larger
+contexts we need the next two lemmas.
+%In order to derive message consuming properties of asynchronously composed systems from
+%their constituent parts we need the next two lemmas.
+The first one shows that autonomous executions of constituent parts (not involving inputs)
+can be lifted to executions of compositions.
+This is the essence to get compositionality of the message consuming property~\ref{def:cp-tgc-tgc:bas-consuming}.
+
+
+\begin{lemma}\label{lem:reuse-sequence-tgc}
+    Let $\S = \maiotstup{\S}, \T = \maiotstup{\T}$ be two composable \MAIOTSs, and let $\S\compos\T = \maiotstup{}$. For all $(q_\S,q_\T,\vec{v}) \in Q$  and $\sigma \in (\Sigma_\S \setminus \inset_\S)^*$ it holds:
+    \\\centerline{$
+        q_\S \mustw{\sigma}_\S q'_\S \implies \exists \vec{v'}\ .\ (q_\S,q_\T,\vec{v}) \mustw{\bar\sigma} (q'_\S,q_\T,\vec{v'}),
+    $}\\[2mm]
+    with $\bar\sigma \in (\Sigma \setminus \inset)^*$ obtained from $\sigma$ by replacing any occurrence of a shared label $a \in \outset_\S \cap \inset_\T$ by the communication label $\outact{a}$.
+\end{lemma}
+The proof of this lemma is ommited as is almost identical to the proof given in \cite{TechReportVersion}.
+% The next lemma is crucial to prove compositionality of the
+% ``necessarily'' properties of type (c) in Def.~\ref{def:cp-tgc-tgc} and the communication stopping properties in Def.~\ref{def:rp}.
+% It shows that projections of weakly fair runs are weakly fair runs again.
+% This result can only be achieved in the asynchronous context.
+%In a synchronous environment strongly fair runs would have to be considered.
+
+The second lemma is crucial to prove compositionality of the
+necessarily consuming property~\ref{def:cp-tgc-tgc:nec-consuming}.
+It shows that projections of observationally weakly fair runs to constituent parts of a composition are again observationally weakly fair runs.
+Formally, let $\rho$ be a trace of $\S\compos\T$ starting from a state $q = (q_\S,q_\T,\vec{v}) \in Q$. The \emph{projection} of $\rho$ to $\S$, denoted by $\rho|_\S$, is the sequence of transitions of $\S$, starting from $q_\S$, which have triggered corresponding transitions in $\rho$.
+
+
+\begin{lemma}\label{lem:projection-run-tgc}
+    Let $\S$, $\T$ be two composable \MAIOTSs and $\S\compos\T = \maiotstup{}$. Let $q = (q_\S,q_\T,\vec{v}) \in Q$ and $\rho \in \frun{\S\compos\T}(q)$. Then $\rho|_\S \in \frun{\S}(q_\S)$ is an observationally weakly fair run of $\S$.
+\end{lemma}
+The following proof is a generalisation of the proof of the corresponding lemma in \cite{TechReportVersion}.
+
+\begin{proof}
+    Let $\rho \in \frun{\S\compos\T}(q)$. First we show that $\rho|_\S$ is observationally weakly fair as well. If $\rho|_\S$ is finite we are done. 
+If $\rho|_\S$ is infinite, then assume that  from a certain state of $\rho|_\S$ on a visible autonomous action $a \in (\Sigma_\S \setminus in_\S)$ is always enabled by  a weak must-transition. Due to the asynchronous composition
+we get that also in $\rho$ from a certain state on the action triggered by $a$ (i.e.\ $a$ or $\outact{a}$) is always enabled  by a weak must-transition. Hence the action triggered by $a$ will be infinitely often executed in $\rho$ and therefore $a$ will be infinitely often executed in $\rho|_\S$.
+
+ It remains to prove that $\rho|_\S$ is a run of $\S$. 
+    There are two main cases. Either $\rho$ is finite or infinite. 
+    Assume $\rho$ is finite with its last state being $q' = (q'_\S,q'_\T,\vec{v'})$. Clearly $q'_\S$ must be the last state of $\rho|_\S$. By definition of a run, $q'$ is a potential deadlock state of $\S\compos\T$. Then $q'_\S$ must be a potential deadlock state of $\S$, hence $\rho|_\S$ is a run of $\S$.
+    
+    Now assume that $\rho$ is infinite and observationally weakly fair. In this case there are two subcases. Either $\rho|_\S$ is finite or infinite. If $\rho|_\S$ is infinite, then $\rho|_\S$  is a run of $\S$ and we are done.
+Assume $\rho|_\S$ is finite such that its last state is $q'_\S$, with $(q'_\S,q'_\T,\vec{v'}) \in \rho$. Since $\rho$ is observationally weakly fair we can prove that $q'_\S$ is a potential deadlock state of $\S$ as follows: Assume the contrary, that $q'_\S$ is not a potential deadlock state, i.e. there exists $a \in (\Sigma_\S \setminus \inset_\S)$ such that $q \mustw{a} \stateTGC$.
+As $\rho$ is infinite we get that from $(q'_\S,q'_\T,\vec{v'}) \in \rho$ on $a$ (or $\outact{a}$) is  always enabled by a weak must-transition.
+This is a contradiction, since $\rho$ is observationally weakly fair and $a$ ($\outact{a}$ resp.) does not occur infinitely often after $(q'_\S,q'_\T,\vec{v'}) \in \rho$ since $\rho|_\S$ is finite. Now, knowing that $q'_\S$ is a potential deadlock state of $\S$, we get that $\rho|_\S$ is a run of $\S$. 
+\end{proof}
+
+
+\begin{proposition}\label{prop:cp:compos-tgc}
+   Let $\S$ and $\T$ be two composable \MAIOTSs such that $\chan_\S$ is the set of channels of $\S$. Let $B \subseteq \chan_\S$.
+   If $\S$ is (necessarily) consuming w.r.t.\ $B$, then $\S \compos \T$  is (necessarily) consuming w.r.t.\ $B$.
+\end{proposition}
+\begin{proof}
+	This proof follows the same shape as the proof of the corresponding proposition in \cite{TechReportVersion}
+but using Lemma~\ref{lem:reuse-sequence-tgc} and Lemma~\ref{lem:projection-run-tgc}.
+
+
+      Let $\S =  \maiotstup{\S}$, $\T =  \maiotstup{\T}$ and $\S \compos \T = \maiotstup{}$.
+    Let $a \in B$ and $(q_\S,q_\T,\vec{v}) \in \reach(\S\compos\T)$ such that $\val((q_\S,q_\T,\vec{v}),a)>0$.
+    \begin{enumerate}      
+        \item Assume that $\S$ is $B$-consuming. Obviously $q_\S \in \reach(\S)$. 
+Then there exist $q'_\S,q''_\S \in Q_\S$ and $\sigma \in (\Sigma \setminus \inset)^*$
+such that $q_\S \mustw{\sigma}_\S q'_\S \must{\inact{a}}_\S q''_\S$.
+As a direct consequence of Lem.~\ref{lem:reuse-sequence-tgc}, we get that there exist $\vec{v'}, \vec{v''}$ such that
+$(q_\S,q_\T,\vec{v}) \mustw{\bar\sigma}  (q'_\S,q_\T,\vec{v'}) \must{\inact{a}}  (q''_\S,q_\T,\vec{v''})$.
+Hence, $\S \compos \T$ is $B$-consuming.
+
+        \item Assume that $\S$ is necessarily $B$-comsuming.  Let $\rho \in \frun{\S\compos\T}((q_\S,q_\T,\vec{v}))$
+ be an observationally weakly fair run. 
+        By Lem.~\ref{lem:projection-run-tgc} we get that $\rho|_\S$ is an observationally weakly fair run of $\S$. By assumption $\inact{a} \in \rho|_\S$, hence it follows that $\inact{a} \in \rho$. 
+    \end{enumerate}
+\end{proof}
+
+Proposition~\ref{prop:cp:compos-tgc} leads to the desired modular verification result
+which allows us to check consuming properties in an incremental manner:
+To show that a composed system $\S \compos \T$ is (necessarily) message consuming
+it is sufficient to know that both constituent parts $\S$ and $\T$ have this property
+and to check that $\S \compos \T$ is (necessarily) message consuming w.r.t.\ the
+new channels established for the communication between $\S$ and $\T$, i.e.\ that $\S$ and $\T$
+are compatible.
+%starting
+%from primitive components and proving step by step that successively added new components are
+%compatible to the already given system.
+
+%Proposition~\ref{prop:cp:compos-tgc} leads to the desired modular verification result
+%which allows us to check the (necessarily) consuming properties of \MAIOPNs in an incremental manner starting
+%from primitive components without communication channels and adding successively new components and communication channels
+%by asynchronous composition.
+
+\begin{definition}[Compatibility]\label{def:compatibility}
+Two composable \MAIOTSs $\S$ and $\T$ with shared actions  $\Sigma_\S \cap \Sigma_\T$ are \emph{(necessarily) message consuming compatible} if $\S \compos \T$  is (necessarily) message consuming w.r.t.\ $\Sigma_\pnN \cap \Sigma_\M$.
+\end{definition}
+
+\begin{theorem}[Incremental Design]\label{thm:inc-design-tgc}
+Let $\S$ and $\T$ be (necessarily) message consuming compatible. 
+If both $\S$ and $\T$ are (necessarily) message consuming, then $\S \compos \T$ is (necessarily) message consuming.
+\end{theorem}
+
+%\begin{theorem}[Incremental Design]\label{thm:inc-design-tgc}
+%Two composable \MAIOTSs $\S$ and $\T$ with shared actions  $\Sigma_\S \cap \Sigma_\T$ are called \emph{(necessarily) message consuming compatible} if $\S \compos \T$  is (necessarily) message consuming w.r.t.\ $\Sigma_\pnN \cap \Sigma_\M$.
+%If both $\S$ and $\T$ are (necessarily) message consuming and and if they are  (necessarily) message consuming compatible, then $\S \compos \T$ is (necessarily) message consuming.
+%\end{theorem}
+
+All results holds analogously for asynchronous I/O-Petri nets due to the compositional semantics of \MAIOPNs;
+see Thm.~\ref{thm:comp-hide-semantics}.\ref{item:comp-semantics}
+An application of incremental design has been discussed in Sect.~\ref{sec:example}. 
+
+
+%\vspace{3mm}
+%\textbf{From Rolf:}
+%Something on Hiding here as well?\\
+%No! The interesting case would be:\\
+% if $(\S \setminus \chan_\S) \compos (\T \setminus \chan_\T)$  is necessarily message consuming, then
+%$\S \compos \T$  is necessarily message consuming w.r.t.\ $\Sigma_\pnN \cap \Sigma_\M$.\\
+%But this does (unfortunately) not hold! Would probably need strong fairness!

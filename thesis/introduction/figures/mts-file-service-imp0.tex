@@ -1,0 +1,17 @@
+%!TEX root = ../../thesis.tex
+
+\begin{tikzpicture}
+
+    % \node[diamond,draw] {figure of simple file service};
+
+    \node[state,initial] (q0) {$q_0$};
+    \node[state,below right=1.8 of q0] (q2) {$q_2$};
+    \node[state,right=of q0] (q1) {$q_1$};
+
+    % \path (q0) edge[must] node[below,midway] {\transition{request}} (q1) {};
+    \path (q0) edge[must] node[sloped,below] {\transition{request}} (q2) {};
+    
+    \path (q2) edge[must] node[sloped,below] {\transition{validate}} (q1) {};
+    \path (q1) edge[must,bend right] node[above,midway] {\transition{response}} (q0) {};
+
+\end{tikzpicture}

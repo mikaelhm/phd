@@ -1,0 +1,38 @@
+\begin{tikzpicture}
+ % \tikzstyle{every state}=[draw=none,minimum size=1, node distance=3cm];
+  \node[initial left,state] (A)  {$s_0$};
+  \node[state,right of=A]	(B)  {$s_1$};
+
+  \path (A) edge [must]		 node [auto, above] {\Coin}	(B);
+
+  \path (B) edge [may, bend left=40] node [auto,below] {\Choc}   	(A);
+
+  \path (B) edge [may, bend right=40] node[auto,above] {\Coffee}   	(A);
+  \path (B) edge [may, bend right=90] node[auto,above] {\Tea}   	(A);
+	
+	\node[node distance=1.5cm] (phi) [right=of B] {
+	\begin{minipage}{200pt}
+			{\bfseries Parameters:}\\
+			$\{\mustChoc\}$\\
+			{\bfseries Obligation function:}\\
+			$\UPhi(s_0) = (\Coin,s_1)$\\
+			$\UPhi(s_1) = (\mustChoc \Leftrightarrow (\Choc, s_0) ) \wedge $\\
+			$~~\qquad\quad \left ( \right. \left( (\Choc, s_0) \wedge (\Coffee,s_0) \right)$ \\
+			$~~\qquad\qquad \vee \left( (\Choc, s_0) \wedge (\Tea,s_0) \right)$\\
+			$~~\qquad\qquad \vee \left( (\Coffee, s_0) \wedge (\Tea,s_0) \right)\left.\right)$\\
+
+	\end{minipage}};
+
+	% \node[node distance=1.5cm] (phi) [below of=A] {
+	% \begin{minipage}{100pt}
+	% 	\begin{align*}
+	% 		\UPhi(s_0) = &(\Coin,s_1)\\
+	% 		\UPhi(s_1) = &(\mustChoc \Leftrightarrow (\Choc, s_0) ) \wedge \\
+	% 			( 
+	% 			&\left(  (\Choc, s_0) \wedge (\Coffee,s_0) \right) \vee \\
+	% 			&\left( (\Choc, s_0) \wedge (\Tea,s_0) \right) \vee \\
+	% 			&\left( (\Coffee, s_0) \wedge (\Tea,s_0) \right) 
+	% 			)
+	% 	\end{align*}
+	% \end{minipage}};
+\end{tikzpicture}

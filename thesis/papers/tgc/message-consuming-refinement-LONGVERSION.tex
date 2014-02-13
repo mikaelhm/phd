@@ -1,0 +1,123 @@
+%!TEX root = main.tex
+
+\subsection{Refinement of Message Consuming Systems}\label{subsec:message-consuming-ref}
+
+
+An important issue concerns the preservation of the message consuming properties by refinement.
+We can show that this is indeed the case for modal refinement. For this purpose we need the following two lemmas.
+The first lemma shows  that for any ``concrete'' reachable state there is a related ``abstract'' state with the same number of messages on each channel.
+To prove the preservation of the necessarily consuming property the essential point is to show that
+for any observationally weakly fair run of a concrete \MAIOTS there is a corresponding observationally weakly fair run of the abstract \MAIOTS with the same visible actions. 
+
+% The first is a direct consequence of the modal refinement (def.~\ref{def:wmr} rule 3. and 4.).
+% \begin{lemma}\label{lem:weak_step}
+%     Let $\S = \maiotstupmr{\S}$ and $\T = \maiotstupmr{\T}$ be two \MAIOTS, such that $\S \mrw \T$. Let $q_\S \in \post^*(q_\S^0)$ and $q_\T \in \post^*(q_\T^0)$  such that $q_\S \mrw q_\T$, then for all $a \in \Sigmat$ the following two equations hold:
+%     \begin{align}
+%         q_\T \mustw{a} q'_\T \implies \exists q'_\S \;.\; q_\S \mustw{a} q'_\S\\
+%         q_\S \mayw{a} q'_\S \implies \exists q'_\T \;.\; q_\T \mayw{a} q'_\T 
+%     \end{align}
+%     such that $q'_\S \mrw q'_\T$ in both cases.
+% \end{lemma}
+
+\begin{lemma}\label{lem:mr-implies-equal-val}
+    Let $\S$ and $\T$ be two \MAIOTSs with channels $\chan$ such that $\S \mrw \T$. Then for all $q_\S \in \reach(\S)$ there exists $q_\T \in \reach(\T)$ such that $q_\S \mrw q_\T$ and $\val_\S(q_\S,a) = \val_\T(q_\T,a)$, for all $a \in \chan$.
+\end{lemma}
+
+\begin{proof}
+    Let $q_\S \in \reach(\S)$. This implies there exists $\sigma \in \Sigmat^*$ such that $q_\S^0 \may{\sigma} q_\S$. As $\S \mrw \T$ we know that $q_\S^0 \mrw q_\T^0$. Then by rule \ref{def:wmr:may:a-tgc} and \ref{def:wmr:may:tau} in Def.~\ref{def:wmr} we get that there exists $q_\T \in \reach(\T)$ such that $q_\T^0 \lmayw{\obsa(\sigma)} q_\T$. 
+
+    Now let $a \in \chan$. Note that $q_\S$ and $q_\T$ are both reached by the same sequence of observable actions $\obsa(\sigma)$. By the fact that silent $\tau$-transitions cannot modify the number of messages on channels we get that $\val(q_\S,a) = \val(q_\T,a)$.     
+\end{proof}
+
+The next lemma shows that for any observationally weakly fair run of a concrete \MAIOTS specification there is a corresponding observationally weakly fair run of the abstract \MAIOTS with the same visible actions. This fact is crucial to prove that the necessarily consuming property is preserved by modal refinement.
+Formally, for a run $\rho$, we denote by $\visiblea(\rho)$ the sequence of visible actions occurring in $\rho$. 
+
+\begin{lemma}\label{lem:corr_run}
+Let $\S$ and $\T$ be two \MAIOTSs such that $\S \mrw \T$.
+% Let $\S = \maiotstupmr{\S}$ and $\T = \maiotstupmr{\T}$ be two \MAIOTS, such that $\S \mrw \T$.
+Let $q_\S \in Q_\S$ and $q_\T \in Q_\T$  such that $q_\S \mrw q_\T$.
+    Then for all $\rho_\S \in \wfrun{\S}(q_\S)$ there exists $\rho_\T \in \wfrun{\T}(q_\T)$ such that 
+    $\visiblea(\rho_\S) = \visiblea(\rho_\T)$.
+\end{lemma}
+\begin{proof}
+    Let $\rho_\S = q_\S \may{a_1}_\S q^2_\S \may{a_2}_\S q^3_\S \may{a_3}_\S \cdots \in \wfrun{\S}(q_\S)$ with $a_i \in \Sigmat$. Then by \ref{def:wmr:may:a-tgc} and \ref{def:wmr:may:tau} in Def.~\ref{def:wmr} there exists a trace $\rho_\T$ of $\T$ and states $q^i_\T \in \rho_\T$ for $i \geq 2$ such that $q_\T \mayw{\overline{a_1}} q^2_\T \mayw{\overline{a_2}} q^3_\T \mayw{\overline{a_3}} \cdots$ with $q^i_\S \mrw q^i_\T$ and 
+    \[
+        \overline{a_i} = \begin{cases}
+                        a_i &\text{if } a_i \in \Sigma\\ 
+                        \epsilon &\text{if } a_i = \tau
+                    \end{cases}
+    \]
+        Obviously $\obsa(\rho_\S) = \obsa(\rho_\T)$. We have to show that $\rho_\T$ is an observationally weakly fair run of $\T$. We distinguish the following cases:
+
+        \paragraph{Case 1:} Assume $\rho_\S$ is finite with last state $q^n_\S$. Then $\rho_\T$ is finite with last state $q^n_\T$, and therefore $ \rho_\T$ is observationally weakly fair.
+        It remains to show that $\rho_\T$ is a run of $\T$, i.e. $q^n_\T$ is a potential deadlock state. Assume that $q^n_\T$ is not a potential deadlock state. Then there exists $a \in (\Sigma \setminus \inset)$ such that $q^n_\T \mustw{a} \stateTGC$. From \ref{def:wmr:must:a-tgc} and \ref{def:wmr:must:tau} of Def.~\ref{def:wmr} it follows that $q^n_\S \mustw{a} \stateTGC$. Then $q^n_\S$ is not a potential deadlock state of $\S$ and hence $\rho_\S$ is not a run of $\S$, which is a contradiction.
+
+        \paragraph{Case 2:} Assume $\rho_\S$ is infinite. 
+        Then $\rho_\T$ can be infinite, but also finite as explained in case~\ref{proof:rhot:finite}.
+        \begin{enumerate}[label=2.\arabic*:, ref=(2.\arabic*), leftmargin=*,start=1]
+            \item\label{proof:rhot:finite} Assume $\rho_\T$ is finite. Then $\rho_\T$ is observationally weakly fair and it remains to show that $\rho_\T$ is a run of $\T$.
+            Since $\rho_\T$ is finite there exists $n \geq 2$ such that for all $j \geq n$ we have $q^j_\T = q^n_\T$ and hence $q^j_\S \mrw q^n_\T$ and $q^j_\S \may{\tau}_\S q^{j+1}_\S$ for all $j \geq n$.
+            
+            We show that $q^n_\T$, which is the last state of $\rho_\T$, is a potential deadlock state, and then $\rho_\T$ is a run of $\T$. 
+            Assume that $q^n_\T$ is not at potential deadlock state of $\T$. Then there exists $a \in (\Sigma \setminus \inset)$ such that $q^n_\T \mustw{a} \stateTGC$. Since $q^j_\S \mrw q^n_\T$ for all $j \geq n$ we get, by \ref{def:wmr:must:a-tgc} and \ref{def:wmr:must:tau} in Def.~\ref{def:wmr}, that $q^j_\S \mustw{a}\stateTGC$ for all $j \geq n$. On the other hand $q^j_\S \may{\tau}_\S q^{j+1}_\S$ for all $j \geq n$. Then $\rho_\S$ is not observational weakly fair which is a contradiction.
+
+            \item Assume $\rho_\T$ is infinite. 
+            Then $\rho_\T$ is a run of $\T$ and it remains to prove that $\rho_\T$ is observationally weakly fair.
+            
+            Let $a \in (\Sigma \setminus \inset)$ and $k \geq 2$ such that for all states $q'_\T \in \rho_\T$ occurring after $q^k_\T$ in $\rho_\T$ we have $q'_\T \mustw{a} \stateTGC$.
+                For each state $q'_\S \in \rho_\S$ occurring after $q^k_\S$ in $\rho_\S$ there exists a state $q'_\T \in \rho_\T$ as above such that $q'_\S \mrw q'_\T$. Hence, by \ref{def:wmr:must:a-tgc} and \ref{def:wmr:must:tau} in Def.~\ref{def:wmr}, $q'_\S \mustw{a} \stateTGC$. Since $\rho_\S$ is observationally weakly fair $a$ occurs infinitely often in $\rho_\S$ and hence also in $\rho_\T$ since $\obsa(\rho_\S) = \obsa(\rho_\T)$. Therefore $\rho_\T$ is observationally weakly fair.
+        \end{enumerate}    
+\end{proof}
+
+\begin{theorem}\label{thm:wmr-properties}
+    Let $\S$ and $\T$ be two \MAIOTSs with channels $\chan$  such that $\S \mrw \T$.
+Let $B \subseteq \chan$. 
+If $\T$ is (necessarily) message consuming w.r.t.\ $B$, then $\S$ is (necessarily) message consuming w.r.t.\ $B$.
+By definition, the theorem propagates to \MAIOPNs.
+\end{theorem}
+\begin{proof}
+	Let $a \in B$ and $q_\S \in \reach(\S)$ such that $\val_\S(q_\S,a) > 0$.
+ By Lem.~\ref{lem:mr-implies-equal-val} it follows that there exists $q_\T \in \reach(\T)$ such that $q_\S \mrw q_\T$
+and $\val_\T(q_\T,a) = \val_\S(q_\S,a) > 0$.
+\begin{enumerate}
+\item We assume that $\T$ is message consuming w.r.t.\ $B$.
+   Then there exist $q'_\T,q''_\T \in Q_\T$ and $\sigma \in (\Sigma \setminus \inset)^*$ such that $q_\T \mustw{\sigma}_\T q'_\T \must{\inact{a}}_\T q''_\T$. From \ref{def:wmr:must:a-tgc} and \ref{def:wmr:must:tau} in Def.~\ref{def:wmr} it follows that
+ there exist $q'_\S,q''_\S \in Q_\S$ such that $q_\S \mustw{\sigma}_\S q'_\S \must{\inact{a}}_\S q''_\S$. Hence $\S$ is message consuming w.r.t. $B$.
+\item We assume that $\T$ is necessarily message consuming w.r.t.\ $B$.\\
+   Let $\rho_\S \in \wfrun{\S}(q_\S)$.
+    By Lem.~\ref{lem:corr_run} we get that there exists $\rho_\T \in \wfrun{\S}(q_\T)$ with $\obsa(\rho_\T)=\obsa(\rho_\S)$. By assumption we know that $\inact{a} \in \rho_\T$. Since $\obsa(\rho_\T)=\obsa(\rho_\S)$ we get that $\inact{a} \in \rho_\S$.
+\end{enumerate}
+\end{proof}
+
+\begin{figure}[ht]
+\centering
+\subfloat[Abstract \MAIOPN $\pnN$]{\label{fig:obsFairness-abs}\input{papers/tgc/figures/ex-obsfairness-abs}}\quad
+\subfloat[Concrete \MAIOPN $\M$]{\label{fig:obsFairness-con}\input{papers/tgc/figures/ex-obsfairness-con}}
+\caption{Necessarily consuming and modal refinement}
+\label{fig:ref}%
+\end{figure}
+
+\begin{example}
+The nets in Fig.~\ref{fig:ref} show an abstract \MAIOPN $\pnN$ and a concrete \MAIOPN $\M$ with silent $\tau$-transitions.
+Both nets have a single channel place $a$.
+Obviously, $\M \mrw \pnN$ is a modal refinement. It is also clear that $\pnN$ is necessarily message consuming.
+By Thm.~\ref{thm:wmr-properties}, $\M$ is necessarily message consuming as well.
+Indeed a diverging run of $\M$ which always executes $\tau$ from a certain state on
+is not observationally weakly fair (since $\inact{a}$ is then always observationally enabled by must-transitions but never taken)
+and therefore needs not to be considered. 
+This shows also why
+weakly fair runs are not appropriate here since a diverging run of $\M$ is weakly fair (it always visits
+a state in which $\inact{a}$ is not immediately enabled) but would not consume.   
+\end{example}
+
+As a consequence of Thm.~\ref{thm:wmr}.\ref{thm:wmr} and Thm.~\ref{thm:wmr-properties} our theory supports
+the principle of independent implementability in the sense of~\cite{alfaroHenzinger2005}.
+This fact is applied in Sect.~\ref{sec:example} to obtain the global refinement (3)  in Fig.~\ref{fig:ex-method}
+from the local refinement (2).
+
+\begin{corollary}[Independent Implementability]\label{cor:independent}
+Let $\S, \T, \E$ and $\F$ be\linebreak \MAIOTSs. If $\T$ and $\F$ are (necessarily) message consuming compatible and
+$\S \mrw \T$ and $\E \mrw \F$, then $\S$ and $\E$ are (necessarily) message consuming compatible and
+$\S \compos \E \mrw \T \compos \F$. This holds analogously for \MAIOPNs.
+\end{corollary}
+

@@ -1,0 +1,31 @@
+%!TEX root = /Users/mikaelhm/projects/PNInterfaceTheory/main.tex
+
+\begin{tikzpicture}[scale=0.8, every node/.style={transform shape}]
+\node[place,tokens=1] at (0,0) (p0) {};
+\node[mayt,rotate=90,label={[label distance=2mm,yshift=3]180:$\outact{a}$}] at (0,-1.5) (ta_out) {};
+
+
+
+\node[place,tokens=1] at (6,3) (p3) {};
+\node[mustt,rotate=90,label={[label distance=2mm,yshift=-3]0:$i$}] at (6,1.5) (tau) {};
+\node[place] at (6,0) (p2) {};
+\node[mustt,rotate=90,label={[label distance=2mm,yshift=-3]0:$\inact{a}$}] at (6,-1.5) (ta_in) {};
+\node[place,label=above:$p_a$] at (3,-1.5) (pa) {};
+
+\draw[arc] (p0) -- (ta_out) {};
+
+\draw[arc] (ta_out) -- (pa) {};
+\draw[arc] (pa) -- (ta_in) {};
+
+\draw[arc] (p2) -- (ta_in) {};
+\draw[arc] (tau) -- (p2) {};
+\draw[arc] (p3) -- (tau) {};
+
+% \node[above of=p0] {$\mathcal M_3$};
+% \node[above of=p3] {$\mathcal M_4$};
+
+\begin{pgfonlayer}{background}
+\node [fill=white,inner sep=8mm,fit=(p0) (ta_out)] {};
+\node [fill=white,inner sep=8mm,fit=(p2) (ta_in) (p3) (tau)] {};
+\end{pgfonlayer}
+\end{tikzpicture}

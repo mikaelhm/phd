@@ -1,0 +1,14 @@
+%!TEX root = ../../thesis.tex
+
+\begin{tikzpicture}[node distance=1cm]
+    \node[state,minimum size=4em,initial] (q0) {Ready};
+    \node[state,minimum size=4em,above=of q0] (q1) {Wait};
+    \node[state,minimum size=4em,below=of q0] (q2) {Reset};
+
+    \path (q0) edge[->,bend right] node[right,midway] {\transition{getTemp!}} (q1) {};
+	\path (q1) edge[->,bend right] node[left,midway] {\transition{temp?}} (q0) {};
+    
+    \path (q0) edge[->,bend left] node[midway,right] {\transition{alarm?}} (q2) {};
+
+    \path (q2) edge[->,bend left] node[midway,left] {\transition{reset!}} (q0) {};
+\end{tikzpicture}

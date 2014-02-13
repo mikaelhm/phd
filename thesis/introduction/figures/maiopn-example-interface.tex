@@ -1,0 +1,13 @@
+%!TEX root = ../../thesis.tex
+
+\begin{tikzpicture}[node distance=.3cm and 1cm]
+    \node[mustt,label=above:$\transition{Request?}$] (req) {};
+    
+    \node[place, right=of req] (p) {};
+    \node[mustt,label=above:$\transition{Response!}$,above right=of p] (res) {};
+    \node[mayt,label=below:$\transition{Denied!}$,below right=of p] (denied) {};
+    
+    \draw[arc] (req) -- (p) {};
+    \draw[arc] (p) -- (res) {};
+    \draw[arc] (p) -- (denied) {};
+\end{tikzpicture}

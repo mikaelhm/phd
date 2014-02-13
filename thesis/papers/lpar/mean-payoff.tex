@@ -1,0 +1,81 @@
+We extend the standard model of mean payoff games (MPG)~\cite{em79mpg} with time durations. Not only is this extension needed for our algorithm, but it is also useful for modelling by itself. Consider, for instance, energy consumption of 2kW for 10 hours and 10kW for 2 hour, both followed by 10 hours of inactivity. Obviously, although both consumptions are 20kWh per cycle, the average consumption differs: 1kW in the former case and 20/12kW in the latter one. 
+We also allow zero durations in order to model e.g. discrete changes of states,
+an essential part of our algorithm.
+Another extension of MPGs with dual-cost was studied in~\cite{BloemGHJ09}.
+%\todo{Jan: is this understandable?\\MHM:yes its good.}
+
+\begin{definition}
+A~\emph{weighted mean payoff game} is $G = (V, V_{min}, V_{max}, E, r, d)$
+where $V$ is a~set of vertices partitioned into $V_{min}$ and $V_{max}$, $E
+\subseteq V \times V$ is a~set of edges, $r : E \to \mathbb Z$ is a~rate
+function, $d : E \to \mathbb N_0$ is a~duration function. 
+\end{definition}
+It is assumed that there are no deadlocks (vertices with out-degree 0) and that
+there are no zero-duration cycles.  The game is played by two players, $min$
+and $max$.  The play is an~infinite path such that each player picks successors in his/her vertices. The value of a play $v_0v_1v_2\cdots$ is defined as:
+\[ \nu(v_0v_1v_2\cdots) = \limsup_{n\to\infty} \frac{\sum_{i = 0}^{n} 
+  	r(v_i,v_{i+1}) \cdot d(v_i,v_{i+1})}
+       {\sum_{i = 0}^{n} d(v_i,v_{i+1})} \ .
+       \tag{$*$} 
+\]
+Player $min$ tries to minimize this value, while $max$ aims at the opposite. Let $v(s)$ denote the infimum of the values $min$ can guarantee if the play begins in the vertex $s$, no matter what the player $max$ does.
+
+Note that the standard MPGs where edges are assigned only integer weights  
+can be seen as weighted MPGs with rates equal to weights and
+durations equal to $1$ on all edges.
+
+
+
+We now show how to solve weighted MPGs by reduction to standard MPGs.
+We first focus on the problem whether $v(s) \ge 0$ for a given
+vertex $s$. As the durations are nonnegative and there are no
+zero-duration cycles, the denominator of the fraction in $(*)$ will 
+be positive starting from some $n$. 
+Therefore, the following holds for every play
+$v_0v_1v_2\ldots$ and every (large enough) $n$:
+\[
+ \frac{\sum_{i = 0}^{n} 
+  	r(v_i,v_{i+1}) \cdot d(v_i,v_{i+1})}
+       {\sum_{i = 0}^{n} d(v_i,v_{i+1})}
+       \ge 0
+\Leftrightarrow
+ \frac{1}{n}\sum_{i = 0}^{n} 
+  	r(v_i,v_{i+1}) \cdot d(v_i,v_{i+1})\ge 0 \ .
+\]
+We may thus solve the question whether $v(s) \ge 0$ by transforming the
+weighted MPG into a~standard MPG, leaving the set of vertices and edges the
+same and taking $w(u,v) = r(u,v) \cdot d(u,v)$ as the edge weight function.
+Although the value $v(s)$ may change in this reduction, its (non)negativeness
+does not.
+
+Further, we may transform any problem of the form $v(s) \ge \lambda$ for any fixed
+constant $\lambda$ into the above problem. Let us modify the weighted MPG as
+follows. Let $r'(u,v) = r(u,v) - \lambda$ and leave everything else the same.
+The value of a~play $v_0v_1v_2\cdots$ is thus changed as follows.
+\begin{align*}
+\nu'(v_0v_1v_2\cdots) &= \limsup_{n\to\infty} \frac{\sum_{i = 0}^{n} 
+        (r(v_i,v_{i+1}) - \lambda) \cdot d(v_i,v_{i+1})}
+       {\sum_{i = 0}^{n} d(v_i,v_{i+1})} = \nu(v_0v_1v_2\cdots) - \lambda
+%       \\ 
+%	&= \limsup_{n\to\infty} \frac{\left(\sum_{i = 0}^{n} 
+%        r(v_i,v_{i+1}) \cdot d(v_i,v_{i+1})\right) - 
+%	\left(\lambda \cdot \sum_{i = 0}^{n} d(v_i,v_{i+1})
+%	\right)}
+%       {\sum_{i = 0}^{n} d(v_i,v_{i+1})}
+%	\\
+%	&=\left(
+%	\limsup_{n\to\infty} \frac{\sum_{i = 0}^{n} 
+%       r(v_i,v_{i+1}) \cdot d(v_i,v_{i+1})}
+%        {\sum_{i = 0}^{n} d(v_i,v_{i+1})}
+%	\right) - \lambda
+\end{align*}
+It is now clear that $v(s) \ge \lambda$ in the original game if and only if $v'(s) \ge 0$ in the modified game. 
+
+Furthermore, there is a one-to-one correspondence between the strategies in the original weighted MPG and the constructed MPG. Due to the two equivalences above, this correspondence preserves optimality. Therefore, there are optimal positional strategies in weighted MPGs since the same holds for standard MPGs~\cite{em79mpg}. (A strategy is positional if its decision does not depend on the current history of the play but only on the current vertex, i.e.~can be described as a function $V\to V$.)
+
+
+%Observation 3: The exact value $v(s)$ can be computed using a~bisection of intervals algorithm.
+
+% \todo{MHM: I don't understand this sentence. What is supposed to be here?}Standard result (MPG without durations): positional strategies, determinacy.
+
+%\todo{MHM: Define what a positional strategy is.}

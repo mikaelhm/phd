@@ -1,0 +1,44 @@
+%!TEX root = ../main.tex
+\begin{tikzpicture}
+% \node[place,tokens=0,label=above:$p_0$] at  (0,0) (p0) {};
+\node[transition,label={[yshift=0,xshift=0]90:$\outact{a}$}] at (1.5,0) (ta_out) {};
+% \node[place,tokens=1,label=below:$p_1$] at (0,-2) (p1) {};
+% \node[transition,rotate=90,label={[yshift=3,xshift=-6.5]180:$in?$}] at (-1,-1) (t_in) {};
+% \node[transition,label={[yshift=0,xshift=0]-90:$\outact{b}$}] at (1.5,-2) (tb_out) {};
+
+\node[transition,label={[yshift=0,xshift=0]90:$\inact{a}$}] at (6.5,0) (ta_in) {};
+\node[place,tokens=1,label=below:$p_0$] at (8,0) (p2) {};
+\node[transition,label={[yshift=0,xshift=1]90:$out!$}] at (9,.5) (t_out) {};
+\node[transition,label={[yshift=0,xshift=1]-90:$out!$}] at (9,-.5) (t_out2) {};
+\node[place,tokens=0,label=below:$p_1$] at (10,0) (p3) {};
+
+\node[place,label=below:$a$] at (4,0) (pa) {};
+% \node[place,label=below:$b$] at (4,-2) (pb) {};
+
+% \draw[arc] (p0) to (ta_out) {};
+% \draw[arc] (ta_out) to (p1) {};
+% \draw[arc] (p1) to[bend left] (t_in) {};
+% \draw[arc] (t_in) to[bend left] (p0) {};
+% \draw[arc] (p1) to[bend left] (tb_out) {};
+% \draw[arc] (tb_out) to[bend left] (p1) {};
+
+\draw[arc] (ta_out) -- (pa) {};
+\draw[arc] (pa) -- (ta_in) {};
+% \draw[arc] (tb_out) -- (pb) {};
+% \draw[arc] (pb) -- (tb_in) {};
+
+\draw[arc] (ta_in) to[bend left] (p2) {};
+\draw[arc] (p2) to[bend left] (ta_in) {};
+\draw[arc] (p2) to (t_out2) {};
+\draw[arc] (t_out2) to (p3) {};
+\draw[arc] (p3) to (t_out) {};
+\draw[arc] (t_out) to (p2) {};
+\node at (1.55,0) (tmsg_outl) {};
+\node at (5.05,0) (tmsg_inl) {};
+\node at (7.95,0) (ta_outl) {};
+\node at (-1.45,0) (ta_inl) {};
+\begin{pgfonlayer}{background}
+\node [compBackground,inner sep=6mm,fit=(ta_out)] {};
+\node [compBackground,inner sep=6mm,fit=(ta_in)(t_out)(t_out2)(p3)] {};
+\end{pgfonlayer}
+\end{tikzpicture}

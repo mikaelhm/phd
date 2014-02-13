@@ -1,0 +1,20 @@
+\documentclass[12pt,a4paper,twoside,draft=false]{scrbook}
+
+\include{latex-stuff/preamble}
+\include{latex-stuff/macros}
+
+\addbibresource{bibliography.bib}
+
+\begin{document}
+
+	\include{formalstuff}
+
+	\pagenumbering{arabic}
+	\setcounter{page}{1}
+
+	\include{introduction}
+
+	\include{papers}
+    
+    \printbibliography
+\end{document}

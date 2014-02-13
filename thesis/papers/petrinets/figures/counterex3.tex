@@ -1,0 +1,21 @@
+%!TEX root = /Users/mikaelhm/projects/PNInterfaceTheory/main.tex
+\begin{tikzpicture}[scale=0.675, every node/.style={transform shape}]
+% \node[place,tokens=0] at (-2,0) (p0) {};
+\node[transition,rotate=0,label={above:$\outact{a}$}] at (0,0) (toa) {};
+\node[place,tokens=0,label=above:$a$] at (2,0) (pa) {};
+\node[transition,rotate=0,label={above:$\inact{a}$}] at (4,0) (tia) {};
+
+% \draw[arc] (p0) to (toa) {};
+\draw[arc] (toa) to[] (pa) {};
+\draw[arc] (pa) to[] (tia) {};
+
+\node[place,tokens=1] at (4,-1) (p0) {};
+\node[transition,rotate=0,label={right:$\tau$}] at (5,-1) (ttau) {};
+\node[place,tokens=0] at (5,0) (p1) {};
+
+\draw[arc] (tia) to[] (p0) {};
+\draw[arc] (p0) to[] (ttau) {};
+\draw[arc] (ttau) to[] (p1) {};
+\draw[arc] (p1) to[] (tia) {};
+
+\end{tikzpicture}

@@ -1,0 +1,97 @@
+\section{Parametric Modal Transition System}
+In this section we will apply our logic from last section on a more general class of MTS. In \cite{BKLMS:ATVA:11} Parametric MTS and modal refinement for such specifications were defined. A PMTS is a BMTS with an additional set of parameters that can be used in the obligation formulas. The parameters of a PMTS can not be altered when they have been instantiated, thus a PMTS represents a set of BMTSs, one for each truth assignment of the parameters. 
+
+The modal refinement can be used to check whether a given truth assignment of the parameters is a refinement of a specification. However it has not been investigated how one should choose these parameters in order to satisfy a given requirement. To do this we use our logic to specify the system requirements and define a new semantic of the logic on PMTS. 
+
+First, we formally define the parametric MTS formalism.
+
+\begin{definition}
+A~\emph{parametric MTS} (PMTS) over an action alphabet $\USigma$ is 
+a~tuple $(S,T,P,\UPhi,s_0)$ such that,
+\begin{itemize}
+ 	\item $S$ is a~set of \emph{states},
+ 	\item $T \subseteq S \times \USigma \times S$ is a~\emph{transition relation}, 
+ 	\item $P$ is a~finite set of \emph{parameters}, 
+ 	\item $\UPhi : S \to \mathcal B((\USigma \times S) \cup P)$ is a satisfyable \emph{obligation function} over the atomic propositions containing outgoing transitions and parameters, and
+ 	\item $s_0 \in S$ is the initial state. 
+ \end{itemize} 
+\end{definition}
+
+One can see a PMTS as a function of the parameters, that for a given valuation returns a BMTS. 
+We shall sometimes use the notation $s(\Valid)$ for a state $s$ in a BMTS that is derived from a PMTS with the parameter valuation $\Valid \subseteq P$.
+
+Like with BMTS, the obligation formulas might be satisfied by several different sets of outgoing transitions. Again we introduce the handy notation of the set of all admissible sets of transitions from $s$ under a fixed valuation of the parameters. Let $(S,T,P,\UPhi,s_0)$ be a~PMTS and $\Valid \subseteq P$ be 
+a truth assignment. For $s \in S$, we define 
+ $\val_{\Valid}(s) = \{ N \subseteq T(s) \mid N \cup \Valid 
+\models \UPhi(s)\}$. 
+
+\begin{figure}[ht]
+	\begin{center}	
+		\input{papers/memics/figures/vending_machine_spec3}
+	\end{center}
+	\caption{PMTS Specification $\mathcal{S}_3$ of a vending machine.}\label{fig:bmts_vends3}
+\end{figure}
+
+\begin{example}
+	In Figure~\ref{fig:bmts_vends3}, $\mathcal{S}_3$ is a PMTS specification of the running example of the vending machine. We have added the parameter 
+	\mustChoc, which is used to model a persistent choice of having \Choc ~as an option or not. We have modeled this by the bi-implication in $\UPhi(s_1)$. In this way we only allow implementations that always can do \Choc~or never does 
+	\Choc. Note that this is something we could not model in BMTS, as there is no notion of persistency in BMTS.
+\end{example}
+
+We will now define the semantics, on PMTS, of our logic defined in last section.
+As a PMTS can be seen as a set of BMTSs, the PMTS should only satisfy a formula if there is a truth assignment of the parameters such that the resulting BMTS satisfies the formula. Formally this means that given a PMTS $(S,T,P,\UPhi, s_0)$,
+\[
+	s \modelsp F \iff \exists \Valid \in P \text{ such that } s(\Valid) \models F,
+\]
+where $s$ is a state in the given PMTS.
+
+In order to decide whether such truth assignment exists, we will again use a mutually recursive equation system. 
+
+We will evaluate the expression $s \modelsp F$ as the set of truth assignments that yields a BMTS that satisfy the formula $F$, that is $\satset{s \modelsp F} = \{ \Valid \mid s(\Valid) \models F\}$. If the set is empty, then $s$ does not satisfy the formula.
+
+Given a PMTS $(S,T,P,\UPhi, s_0)$, a state $s \in S$ and a formula $F$ of our logic defined in last section, we build an equation system of the following rules.
+
+\begin{align*}
+\satset{s \modelsp X } &= \satset{ s \modelsp F_X}\; , \text{ where } X=F_X \\
+\satset{s \modelsp \true} &= 2^P \\
+\satset{s \modelsp \false} &= \emptyset \\
+\satset{s \modelsp F \wedge G} &= \satset{ s \modelsp F} \cap \satset{s\modelsp G} \\
+\satset{s \modelsp F \vee G} &= \satset{ s \modelsp F} \cup \satset{s\modelsp G} \\
+\satset{s \modelsp \ldia{a}F } &= \left \{ \Valid \in P  \mid \forall M \in \val_\Valid(s) \; \exists (a,s') \in M \;.\; \Valid \in \satset{s' \modelsp F} \right \} \\
+\satset{s\modelsp \lbox{a}F} &= \{ \Valid \in P \mid \forall M \in \val_\Valid (s)\; \forall (a,s') \in M \;.\; \Valid \in \satset{s' \modelsp F}\}
+\end{align*}
+
+It is important to note that as the PMTS model and the formula are both finite, we will only get a finite number of equations.
+
+The equations are each reasoning about subsets of parameters for which a state $s$ satisfies a formula $F$. Thus the equation system is interpreted over $n$-vectors of subsets of parameters, where $n$ is the number of equations.
+With the partial order $\sqsubseteq$ defined component wise as
+\[
+	(\parset_1,\parset_2,\ldots,\parset_n) \sqsubseteq 	(\parset_1',\parset_2',\ldots,\parset_n') \text{  if  } \forall \; 1\leq i \leq n \;\; \parset_i \subseteq \parset_i'\;,
+\] 
+we have the complete lattice $((2^P)^n,\sqsubseteq)$.
+
+From an equation system build with the rules above we can define a semantic function $f:(2^P)^n \goes{} (2^P)^n$, where the input is candidate sets of truth assignments for each equation, and the result is sets of truth assignments given that these candidate sets were right. 
+
+One can easily show that $f$ is monotonic on the complete lattice, thus we know from Tarski's fixed-point theroem, that $f$ has a unique maximal fixed-point. 
+
+We can now prove that from the maximal fix-point of $f$, we get the set of truth assignments that will result in a BMTS that satisfies the formula. 
+
+\begin{theorem}
+	Let $s$ be a state of a PMTS and $F$ a formula of our logic. Assume for $k \in N$ that 
+	\[
+	f^k(2^P,2^P,\ldots,2^P)=(\parset_1,\parset_2,\ldots,\parset_n)\; 
+	\]
+	is the maximal fix-point for the semantic function $f$,
+	then it holds 
+	\[
+		s(\Valid) \models F \iff \Valid \in \parset_i\;,
+	\]where $i$ is the index of the equation $s \modelsp F$ in the equation system.
+\end{theorem}
+\begin{proof}
+This theorem is proved by inspecting each of the rules for building the equation system. 
+
+Actually we only need to prove that $\val (s(\Valid)) = \val_\Valid(s)$. 
+This follows since it by this fact is trivial to prove that the rules for building the equation system, are directly derived from the semantics of the logic on BMTS.
+
+Note that $\val (s(\Valid))$ is the set of all admissible sets of outgoing transitions from state $s$ in the BMTS given by a PMTS with parameters assigned to $\Valid$. Furthermore $\val_\Valid(s)$ is the set of all admissible sets of outgoing transitions from state $s$ in a PMTS given that the parameters are evaluated as $\Valid$.
+\end{proof}

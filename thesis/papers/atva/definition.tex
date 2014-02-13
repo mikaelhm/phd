@@ -1,0 +1,404 @@
+\subsection{Definition of Parametric Modal Transition System}
+
+We shall now formally capture the intuition behind parametric MTS 
+introduced above.
+%in the previous section. 
+First, we recall the standard
+propositional logic.
+ 
+%We start with a description of the formulae used for the specification of 
+%the required behaviour.
+
+%\begin{definition}
+A~Boolean formula over a set $X$ of atomic propositions is given by
+the following abstract syntax 
+\[ 
+\varphi ::= \true \mid x \mid \neg \varphi \mid \varphi \wedge \psi 
+\mid \varphi \vee \psi \]
+where $x$ ranges over $X$. 
+The set of all Boolean formulae over the set $X$
+is denoted by $\B(X)$. 
+%The satisfaction relation is given as follows.
+Let $\Valid \subseteq X$ be a truth assignment, 
+i.e.~a~set of variables with value true, then the satisfaction relation
+$\Valid \models \varphi$ is given by
+%\begin{align*}
+$\Valid \models \true$, $\Valid \models x$ iff $x \in \Valid $,
+and the satisfaction of the remaining Boolean connectives is defined in the standard way.
+%$\Valid X \models \neg \varphi$ if $\Valid X \not\models \varphi$,
+%$\Valid X \models \varphi \wedge \psi$ if $\Valid X \models \varphi$
+%and
+%$\Valid X \models \psi$, and 
+%$\Valid X \models \varphi \vee \psi$ if $\Valid X \models \varphi$
+%or $\Valid X \models \psi$.
+%\end{align*}
+We also use the standard derived operators like
+exclusive-or  
+$\varphi \oplus \psi = (\varphi \wedge \neg \psi) \vee (\neg \varphi 
+\wedge \psi)$, implication
+$\varphi \Rightarrow \psi = \neg \varphi \vee \psi$ and equivalence $\varphi \Leftrightarrow \psi = (\neg \varphi \vee \psi)\wedge(\varphi \vee \neg \psi)$.
+%\end{definition}
+
+We can now proceed with the definition of parametric MTS.
+
+\begin{definition}
+A~\emph{parametric MTS} (PMTS) over an action alphabet $\USigma$ is 
+a~tuple $(S,T,P,\UPhi)$ such that
+	\begin{itemize}
+	\item 
+$S$ is a~set of \emph{states},
+\item 
+$T \subseteq S \times \USigma \times S$ is 
+a~\emph{transition relation}, 
+\item 
+$P$ is a~finite set of \emph{parameters}, and
+\item 
+$\UPhi : S \to \mathcal B((\USigma \times S) \cup P)$ is a satisfiable
+\emph{obligation function} over the atomic propositions containing 
+outgoing transitions and parameters. 
+\end{itemize}
+We implicitly assume that whenever $(a,t) \in \UPhi(s)$ then 
+$(s,a,t) \in T$.
+By $T(s) = \{(a,t) \mid (s,a,t) \in T\}$ we denote the set of 
+all outgoing transitions of $s$.
+\end{definition}
+
+% In what follows, 
+We recall the agreement that whenever the obligation function for some node 
+is not listed in the system description then it is implicitly understood as 
+$\UPhi(s) = \bigwedge T(s)$, with the empty conjunction being $\true$.
+
+We call a~PMTS \emph{positive} if, for all $s \in S$, any negation 
+occurring in $\UPhi(s)$ is applied only to a parameter. 
+A~PMTS is called \emph{parameter-free} if $P = \emptyset$.
+We can now instantiate the previously studied specification formalisms
+as subclasses of PMTS.
+
+\begin{definition}
+A PMTS is called
+\begin{itemize}
+\item \emph{transition system with obligation} (OTS)
+if it is parameter-free and positive,
+\item
+\emph{disjunctive modal transition system} (DMTS)
+if it is an OTS and $\UPhi(s)$ is in the 
+conjunctive normal form for all $s \in S$,
+% (conjunction of clauses, each of them being a disjunction of literals),
+\item 
+\emph{modal transition system} (MTS)
+if it is a~DMTS and $\UPhi(s)$ is a~conjunction of positive literals 
+(transitions) for all $s \in S$, and
+\item \emph{implementation} (or simply a labelled
+transition system) if it is an MTS and 
+$\UPhi(s) = \bigwedge T(s)$ for all $s \in S$. 
+\end{itemize}
+\end{definition}
+
+%In the case of DMTS and OTS, this definition yields the so 
+%called \emph{syntactically consistent} variants.
+%Further, 
+
+Note that positive PMTS, despite the absence of a general negation and the
+impossibility to define for example exclusive-or, can still express 
+useful requirements like 
+$\UPhi(s)=p\Rightarrow (a,t) \wedge \neg p \Rightarrow (b,u)$
+requiring in a state $s$ a conditional presence of certain transitions.
+Even more interestingly, %referring to our traffic light example, the
+%positive formulae $\UPhi(\red)=p\Rightarrow (\prepareToStop,\yellowRed)$ 
+%together with
+%$\UPhi(\green)=p\Rightarrow (\getReady,\yellow)$ guarantee 
+we can enforce binding of actions in different states, 
+thus ensuring certain functionality. Take a~simple two state-example:
+$\UPhi(s) = p \Rightarrow (\mathit{request},t)$ and
+$\UPhi(t) = p \Rightarrow (\mathit{response},s)$.
+%Setting $p$ to true 
+%enforces 
+%e.g.~the temporal property ``whenever in \yellowRed, \yellow is reachable''.
+%\todo{JS: I still dont understand this temporal property. Why it looks assymetric
+%while the definition of the formulae is symmetric ...???}
+We shall further study OTS with formulae in the disjunctive normal form
+that are dual to DMTS and whose complexity of parallel composition 
+is lower~\cite{benes_et_al:OASIcs:2011:3070} while still being 
+as expressive as DMTS.
+%able to specify interesting
+%properties including those given by MTS.
+
+\subsection{Modal Refinement}\label{ss:ref}
+
+A fundamental advantage of MTS-based formalisms is the presence of 
+\emph{modal refinement} 
+that allows for a step-wise system design (see e.g.~\cite{AHLNW:EATCS:08}).
+We shall now provide such a refinement notion for
+our general PMTS model so that it will specialize to the well-studied
+refinement notions on its subclasses. In the definition,
+the parameters are fixed first (persistence) followed by 
+all valid choices modulo the fixed parameters that now behave as
+constants. % are analysed mimicking the ideas of the refinement process.
+
+First we set the following notation.
+%\begin{definition}\label{def:pers-val}
+Let $(S,T,P,\UPhi)$ be a~PMTS and $\Valid \subseteq P$ be 
+a truth assignment. For $s \in S$, we denote 
+by $\val_{\Valid}(s) = \{ E \subseteq T(s) \mid E \cup \Valid 
+\models \UPhi(s)\}$ the set of all admissible sets of transitions from $s$
+under the fixed truth values of the parameters.
+%\end{definition}
+
+We can now define the notion of modal refinement between PMTS.
+%As the semantics is two-stage, this is also reflected in the refinement using two alternations.
+
+\begin{definition}[Modal Refinement]\label{def:pers-mr}
+Let $(S_1,T_1,P_1,\UPhi_1)$ and $(S_2,T_2,P_2,\UPhi_2)$ be two PMTSs. 
+A binary relation
+$R \subseteq S_1 \times S_2$ is a~\emph{modal refinement} if 
+for each $\mu \subseteq P_1$ there exists $\Valid \subseteq P_2$
+such that for every $(s,t) \in R$ holds %the following holds
+\begin{align*}  
+ \forall M \in \val_{\mu}(s) \exists N \in \val_{\Valid}(t) : 
+        & \ \forall (a,s') \in M : \exists (a,t') \in N : (s',t') \in R \ \ \wedge \\
+                &\ \forall (a,t') \in N : \exists (a,s') \in M : (s',t') \in R\;.
+\end{align*}
+We say that $s$ modally refines $t$, denoted by $s \mr t$, if there
+exists a~modal refinement $R$ such that $(s,t) \in R$.
+\end{definition}
+
+\begin{figure}[b!]
+\centering
+\begin{tikzpicture}[->,>=stealth',initial text=,xscale=0.8,yscale=0.8,transform shape]
+    \tikzstyle{every node}=[font=\large] \tikzstyle{every
+      state}=[fill=black,shape=rectangle,inner sep=.5mm,minimum height=12mm, minimum width=6mm]
+    
+%%%%  Most general specification %%%%%
+   % nodes with traffic lights
+    \node[initial,state,draw=white,fill=white] (green3) at (8,0) {};
+    \trafficlight{white}{white}{green}{8}{0}
+    
+    \node[state,draw=white,fill=white] (red3) at (12,0) {};
+    \trafficlight{red}{white}{white}{12}{0}
+    
+    \node[state,draw=white,fill=white] (yellow3) at (10,-2) {};
+    \trafficlight{white}{yellow}{white}{10}{-2}
+    
+    \node[state,draw=white,fill=white] (yellowred3) at (10,2) {};
+    \trafficlight{red}{yellow}{white}{10}{2}
+    
+    \path (red3) edge [bend right=10] node [above] {\go} (green3);
+    \path (green3) edge [bend right=10] node [below] {\stop} (red3);
+    \path (red3.north) edge [bend right] node [above,sloped] {\getReady} (yellowred3.east);
+    \path (yellowred3.west) edge [bend right] node [above,sloped] {\go} (green3.north);
+    \path (green3.south) edge [bend right] node [below,sloped] {\prepareToStop} (yellow3.west);
+    \path (yellow3.east) edge [bend right] node [below,sloped] {\stop} (red3.south);
+    
+    \node [right,font=\footnotesize] at (6.6,3.7) {\bfseries Parameters:};
+    \node [right,font=\footnotesize] at (6.6,3.2) {$\{\mustGoYellowRed,\mustGoYellow\}$};
+    \node [right,font=\footnotesize] at (6.6,-3) {\bfseries Obligation function:};
+    \node [right,font=\footnotesize] at (6.6,-3.5) {$\UPhi(\green) = ((\stop,\red) \oplus (\prepareToStop,\yellow))$};
+    \node [right,font=\footnotesize] at (7.2,-4) {$\wedge ( \mustGoYellow \Leftrightarrow (\prepareToStop,\yellow)) $};
+    \node [right,font=\footnotesize] at (6.6,-4.5) {$ \UPhi(\red) = ((\go,\green) \oplus (\getReady,\yellowRed))$};
+    \node [right,font=\footnotesize] at (7.2,-5) {$ \wedge ( \mustGoYellowRed \Leftrightarrow (\getReady,\yellowRed))$};
+
+
+%%%% Refined Specification %%%%    
+    % nodes with traffic lights
+    \node[initial,state,draw=white,fill=white] (green2) at (1,0) {};
+    \trafficlight{white}{white}{green}{1}{0}
+    
+    \node[state,draw=white,fill=white] (red2) at (5,0) {};
+    \trafficlight{red}{white}{white}{5}{0}
+    
+    \node[state,draw=white,fill=white] (yellow2) at (3,-2) {};
+    \trafficlight{white}{yellow}{white}{3}{-2}
+    
+    \node[state,draw=white,fill=white] (yellowred2) at (3,2) {};
+    \trafficlight{red}{yellow}{white}{3}{2}
+    
+    \path (red2) edge [bend right=10] node [above] {\go} (green2);
+    \path (green2) edge [bend right=10] node [below] {\stop} (red2);
+    \path (red2.north) edge [bend right] node [above,sloped] {\getReady} (yellowred2.east);
+    \path (yellowred2.west) edge [bend right] node [above,sloped] {\go} (green2.north);
+    \path (green2.south) edge [bend right] node [below,sloped] {\prepareToStop} (yellow2.west);
+    \path (yellow2.east) edge [bend right] node [below,sloped] {\stop} (red2.south);
+    
+    \node [right,font=\footnotesize] at (1.0,3.7) {\bfseries Parameters:};
+    \node [right,font=\footnotesize] at (1.0,3.2) {$\{\mustGoYellowBoth\}$};
+    \node [right,font=\footnotesize] at (-1.0,-3) {\bfseries Obligation function:};
+    \node [right,font=\footnotesize] at (-1.0,-3.5) {$\UPhi(\green) = ((\stop,\red) \oplus (\prepareToStop,\yellow))$};
+    \node [right,font=\footnotesize] at (-.4,-4) {$\wedge ( \mustGoYellowBoth \Leftrightarrow (\prepareToStop,\yellow)) $};
+    \node [right,font=\footnotesize] at (-1.0,-4.5) {$ \UPhi(\red) = ((\go,\green) \oplus (\getReady,\yellowRed))$};
+    \node [right,font=\footnotesize] at (-.4,-5) {$ \wedge ( \mustGoYellowBoth \Leftrightarrow (\getReady,\yellowRed))$};
+
+%%%% Small implementation with no yellow light %%%%%
+    % nodes with traffic lights
+    \node[initial,state,draw=white,fill=white] (green0) at (-5,3) {};
+    \trafficlight{white}{white}{green}{-5}{3}
+    
+    \node[state,draw=white,fill=white] (red0) at (-2,3) {};
+    \trafficlight{red}{white}{white}{-2}{3}
+    
+       
+    \path (red0) edge [bend right=10] node [above] {\go} (green0);
+    \path (green0) edge [bend right=10] node [below] {\stop} (red0);
+
+%%%% Implementation with yellow light. %%%%-
+ % nodes with traffic lights
+    \node[initial,state,draw=white,fill=white] (green) at (-5,-2) {};
+    \trafficlight{white}{white}{green}{-5}{-2}
+    
+    \node[state,draw=white,fill=white] (red) at (-2,-2) {};
+    \trafficlight{red}{white}{white}{-2}{-2}
+    
+    \node[state,draw=white,fill=white] (yellow) at (-3.5,-3.5) {};
+    \trafficlight{white}{yellow}{white}{-3.5}{-3.5}
+    
+    \node[state,draw=white,fill=white] (yellowred) at (-3.5,-.5) {};
+    \trafficlight{red}{yellow}{white}{-3.5}{-.5}
+    
+   
+    \path (red.north) edge [bend right] node [above,sloped] {\getReady} (yellowred.east);
+    \path (yellowred.west) edge [bend right] node [above,sloped] {\go} (green.north);
+    \path (green.south) edge [bend right] node [below,sloped] {\prepareToStop} (yellow.west);
+    \path (yellow.east) edge [bend right] node [below,sloped] {\stop} (red.south);
+
+%%%% Modal Refinements %%%%
+\node[font=\LARGE] at (6.4,0) {$\mr$} ;
+\node[font=\LARGE, rotate=-20] at (-0.6,1.9) {$\mr$} ;    
+\node[font=\LARGE, rotate=20] at (-0.6,-1.5) {$\mr$} ;
+\end{tikzpicture}
+\caption{Example of modal refinement.}\label{fig:mr-ex}
+\end{figure}
+
+
+
+\begin{example}
+Consider the rightmost PMTS in Figure~\ref{fig:mr-ex}.
+% (the one already presented in Figure~\ref{fig:TL-PMTS}). 
+It has two parameters
+\mustGoYellow and \mustGoYellowRed whose values can be set independently
+and it can be refined by the system in the middle of the figure having
+only one parameter \mustGoYellowBoth. This single parameter simply binds 
+the two original parameters to the same value. The PMTS in the middle
+can be further refined into the implementations where either 
+\yellow is always used in both cases, or never at all.
+%Recall the agreement that we omit the obligation function when describing 
+%implementations because it is uniquely determined as a conjunction 
+%of all outgoing transitions.  
+Notice that there are in principle infinitely many implementations
+of the system in the middle, however, they are all %strongly 
+bisimilar to
+either of the two implementations depicted in the left of Figure~\ref{fig:mr-ex}.
+\end{example}
+
+In the next section, we shall investigate the complexity of positive subclasses of PMTS.
+For this reason we prove the following lemma showing how the definition of
+modal refinement can be simplified in this particular case.
+
+We shall first realize that in positive PMTS and for any truth assignment $\Valid$, 
+$\val_{\Valid}(s)$ is \emph{upward closed},
+meaning that if $M \in \val_{\Valid}(s)$ and
+$M \subseteq  M' \subseteq T(s)$ then $M' \in \val_{\Valid}(s)$. 
+
+
+\begin{lemma} \label{lem:ref-positive}
+Consider Definition~\ref{def:pers-mr} where the right-hand side PMTS
+is positive.
+Now the condition in Definition~\ref{def:pers-mr} can be equivalently 
+rewritten %as two conditions
+as a \nopagebreak conjunction of conditions~\eqref{eqn:three} and \eqref{eqn:four}
+\begin{align}
+       &\forall M \in \val_{\mu}(s) : \forall (a,s') \in M : \exists
+        (a,t') \in T(t) : (s',t') \in R \label{eqn:three} \\
+     &\forall M \in \val_{\mu}(s) : \match_t(M) \in \val_{\nu}(t) \label{eqn:four}
+\end{align}
+where $\match_t(M)$ denotes the set $\{ (a,t') \in T(t) \mid \exists (a,s') \in M :
+(s',t') \in R\}$.
+If the left-hand side PMTS is moreover positive too, 
+Condition~\eqref{eqn:three} is equivalent to
+\begin{align}
+\forall (a,s') \in T(s) : \exists (a,t') \in T(t) : (s',t') \in R \ .\label{eqn:five}
+\end{align}
+\end{lemma}
+\begin{proof}
+We shall first argue that the condition of modal refinement is equivalent to
+the conjunction of Conditions 
+\eqref{eqn:one} and \eqref{eqn:two}.
+\begin{align}
+        \forall M \in \val_{\mu}(s) : \exists N \in \val_{\Valid}(t) :
+          \forall (a,s') \in M : \exists (a,t') \in N : (s',t') \in R \label{eqn:one}\\
+     \forall M \in \val_{\mu}(s) : \exists N \in \val_{\Valid}(t) :
+       \forall (a,t') \in N : \exists (a,s') \in M : (s',t') \in R \label{eqn:two}
+\end{align}
+
+Let $\mu$, $\nu$, $R$, $s$ and $t$ be fixed. 
+Definition~\ref{def:pers-mr} 
+trivially implies both Conditions~\eqref{eqn:one} and \eqref{eqn:two}.
+We now prove that \eqref{eqn:one} and \eqref{eqn:two} imply  the condition in
+Definition~\ref{def:pers-mr}.
+
+Let $M \in \val_{\mu}(s)$ be arbitrary.
+There is some $N_1 \in \val_{\Valid}(t)$ satisfying \eqref{eqn:one} and
+some $N_2 \in \val_{\Valid}(t)$ satisfying \eqref{eqn:two}.
+Let now $N'_1 = \{(a,t') \in N_1 \mid \exists (a,s') \in M : (s',t') \in R \}$.
+Consider $N = N'_1 \cup N_2$. Clearly, as $\val_{\Valid}(t)$ is upward closed, 
+$N \in \val_{\Valid}(t)$.
+%Let now $(a,m) \in M$ be arbitrary. 
+Moreover, due to Condition \eqref{eqn:one} we have some $(a,t') \in N_1$
+such that $(s',t') \in R$. Clearly, $(a,t') \in N'_1$ and thus also in $N$.
+
+Now let $(a,t') \in N$ be arbitrary. If $(a,t') \in N_2$, due to Condition~\eqref{eqn:two}
+we have some $(a,s') \in M$ such that $(s',t') \in R$.
+  If $(a,t') \not\in N_2$ then $(a,t') \in N'_1$.
+  The existence of $(a,s') \in M$ such that $(s',t') \in R$ is then
+  guaranteed by the definition of~$N'_1$.
+
+Let us now proceed with proving the claims of the lemma.
+Condition \eqref{eqn:one} is trivially equivalent 
+to \eqref{eqn:three} since $\val_{\Valid}(t)$ is upward closed.
+Condition \eqref{eqn:two} is equivalent to \eqref{eqn:four}. 
+Indeed, \eqref{eqn:four} clearly implies \eqref{eqn:two} and
+we show that also \eqref{eqn:two} implies \eqref{eqn:four}. 
+Let $M$ be arbitrary. We then have some $N$ satisfying \eqref{eqn:two}.
+Clearly, $N \subseteq \match_t(M)$. Since $\val_{\Valid}(t)$ is upward closed,
+$N \in \val_{\Valid}(t)$ implies $\match_t(M) \in \val_\nu(t)$.
+Due to the upward closeness of both $\val_{\mu}(s)$ and $\val_{\Valid}(t)$
+in the case of a~positive left-hand side, 
+the equivalence of \eqref{eqn:three} and \eqref{eqn:five} follows.
+\end{proof}
+
+\begin{theorem}\label{thm:ref-coincide}
+Modal refinement as defined on PMTS coincides with the standard
+modal refinement notions on MTS, DMTS and OTS.
+On implementations it coincides with %strong 
+bisimulation.
+\end{theorem}
+\begin{proof}%[for MTS; for the rest, see Appendix.]
+The fact that Definition~\ref{def:pers-mr} coincides with modal refinement
+on OTS as defined in~\cite{benes_et_al:OASIcs:2011:3070} is a~straightforward
+corollary of Lemma~\ref{lem:ref-positive} and its proof. 
+Indeed, the two conditions given
+in~\cite{benes_et_al:OASIcs:2011:3070} are exactly conditions~\eqref{eqn:five}
+and~\eqref{eqn:two}. As the definition of modal refinement on OTS
+coincides with modal refinement on DMTS (as shown in~\cite{benes_et_al:OASIcs:2011:3070}) and thus also on MTS, the proof 
+is done.
+
+However, for the reader's convenience, we present a~direct proof
+that Definition~\ref{def:pers-mr} coincides with modal refinement
+on MTS.
+Assume a parameter-free PMTS $(S,T,P,\UPhi)$ where
+$\UPhi(s)$ is a conjunction of transitions for all $s \in S$, in
+other words it is a standard MTS where the must transitions
+are listed in the conjunction and the may transitions are simply
+present in the underlying transition system but not a part of
+the conjunction.
+Observe that %$P = \emptyset$, and 
+every transition $(s,a,t) \in T$ is contained in some 
+$M \in \val_\emptyset(s)$. 
+Further, each must transition $(s,a,t) \in T$  is contained in all 
+$M \in \val_\emptyset(s)$. Therefore, the first conjunct in 
+Definition~\ref{def:pers-mr} requires that for all may transition from $s$ 
+there be a corresponding one from $t$ with the successors in the refinement 
+relation. Similarly, the second conjunct now requires that for all must 
+transitions from $t$ there be a corresponding must transition from $s$.
+This is exactly the standard notion of modal refinement as introduced
+in~\cite{DBLP:conf/lics/LarsenT88}.  
+\end{proof}
+ 

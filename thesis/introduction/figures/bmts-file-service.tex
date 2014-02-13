@@ -1,0 +1,18 @@
+%!TEX root = ../../thesis.tex
+
+\begin{tikzpicture}
+
+    \node[state,initial above] (q0) {$q_0$};
+    \node[state,below right=1.8 of q0] (q2) {$q_2$};
+    \node[state,right=of q0] (q1) {$q_1$};
+
+    \path (q0) edge[may] node[below,midway] {\transition{request}} (q1) {};
+    \path (q0) edge[may] node[sloped,below] {\transition{request}} (q2) {};
+    
+    \path (q2) edge[must] node[sloped,below] {\transition{validate}} (q1) {};
+    \path (q1) edge[must,bend right] node[above,midway] {\transition{response}} (q0) {};
+
+    \node[left=0.2 of q0, anchor=east] (formula1) {$(\transition{request},q_2) \oplus (\transition{request},q_1)$ };
+    \node[right=0.2 of q1, anchor=west] (formula2) {$(\transition{response},q_0)$ };
+    \node[below=0.08 of q2,anchor=north] {$(\transition{validate},q_1)$ };
+\end{tikzpicture}

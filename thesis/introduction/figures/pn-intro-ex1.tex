@@ -1,0 +1,22 @@
+%!TEX root = ../../thesis.tex
+
+\begin{tikzpicture}[node distance=1cm and 1.5cm]
+    \node[place,tokens=2,label=above:$p_0$] (p0) {};
+    \node[place,tokens=1,label=above:$p_1$,below=of p0] (p1) {};
+
+    \node[transition,label=above:$\transition{a}$, right=of p0, enabled] (t0) {};
+    
+    \node[place,label=above:$p_2$, right=of t0] (p2) {};
+    \node[transition,label=above:$\transition{b}$, right=of p1, enabled] (t1) {};
+    \node[transition,label=above:$\transition{c}$, below=of t1] (t2) {};
+    \node[place,label=above:$p_3$, right=of t1] (p3) {};
+
+    \draw[arc] (p0) -- (t0) {};
+    \draw[arc] (t0) -- (p2) {};
+    \draw[arc] (p1) to[bend left=21] (t0) {};
+    \draw[arc] (t0) to[bend left=21] (p1) {};
+    \draw[arc] (p1) -- (t1) {};
+    \draw[arc] (t1) -- (p3) {};
+    \draw[arc] (p3) -- (t2) {};
+    \draw[arc] (t2) -- (p1) {};
+\end{tikzpicture}

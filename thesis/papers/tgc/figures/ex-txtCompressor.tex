@@ -1,0 +1,15 @@
+%!TEX root = ../main.tex
+\begin{tikzpicture}
+
+\node[place,tokens=1] at (-2,-2) (p0) {};
+
+\node[mustt,rotate=0,label={left:$\trans{txt?}$}] at (-3,-1) (txtin) {};
+\node[place,tokens=0] at (-2,-1) (p1) {};
+
+\node[mustt,rotate=0,label={right:$\trans{zip!}$}] at (-1,-1) (zipout) {};
+
+\draw[arc] (p0) to[bend left] (txtin) {};
+\draw[arc] (txtin) to[] (p1) {};
+\draw[arc] (p1) to[] (zipout) {};
+\draw[arc] (zipout) to[bend left] (p0) {};
+\end{tikzpicture}

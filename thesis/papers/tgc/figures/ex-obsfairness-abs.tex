@@ -1,0 +1,15 @@
+%!TEX root = ../main.tex
+\begin{tikzpicture}
+
+\node[place,tokens=1,label=below:$p$] at (-2,-1.5) (p) {};
+
+\node[mustt,rotate=0,label={above:$\outact{a}$}] at (-3,-1) (aout) {};
+\node[place,tokens=0,label=above:$a$] at (-2,-.5) (a) {};
+
+\node[mustt,rotate=0,label={above:$\inact{a}$}] at (-1,-1) (ain) {};
+
+\draw[arc] (p) to[bend left=15] (aout) {};
+\draw[arc] (aout) to[bend left=15] (a) {};
+\draw[arc] (a) to[bend left=15] (ain) {};
+\draw[arc] (ain) to[bend left=15] (p) {};
+\end{tikzpicture}

@@ -1,0 +1,38 @@
+	% no headers on title and preface
+	\pagestyle{empty}
+	\pagenumbering{roman}
+
+	\input{formalstuff/frontpage}
+	\cleardoublepage
+
+
+	% abstract
+	\input{formalstuff/abstract}
+	\thispagestyle{plain} % ensure empty pagestyle
+	\cleardoublepage
+
+	% danish abstract
+	\input{formalstuff/danishabstract}
+	\thispagestyle{plain} % ensure empty pagestyle
+	\cleardoublepage
+
+	%acknowledgements
+	\input{formalstuff/acknowledgements}
+	\thispagestyle{plain} % ensure empty pagestyle
+	\cleardoublepage
+
+
+	\input{formalstuff/mandatorypage}
+	\cleardoublepage
+	
+	% style for thesis
+	\pagestyle{headings}
+
+	% thesis introductionary chapter toc settings
+	%\setcounter{secnumdepth}{2}
+	\settocdepth{subsection}
+	%\setcounter{tocdepth}{2}
+
+	\tableofcontents
+	\clearpage{\pagestyle{empty}\cleardoublepage}
+	%\cleardoublepage

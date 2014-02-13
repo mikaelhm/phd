@@ -1,0 +1,132 @@
+%!TEX root = main.tex
+
+\section{Modal Refinement}\label{sec:wmr}
+
+The refinement relation between \MAIOPNs will be defined by considering their semantics, i.e.\ \MAIOTSs.
+For this purpose we adapt the weak modal refinement relation for modal transition systems introduced in~\cite{DBLP:conf/ershov/HuttelL89}
+which is based on a simulation relation in both directions.
+It says that must-transitions of an abstract specification must be preserved by the refinement while 
+may-transitions of a concrete specification must be allowed by the abstract one.
+In any case silent transitions labelled with $\tau$ can be inserted, similarly to weak bisimulation,
+but respecting modalities.
+Observational abstraction from silent transitions is indeed important in many examples; e.g.\ when relating the encapsulated behaviour
+of an assembly to a requirements specification as discussed in Sect.~\ref{sec:example}.
+If all transitions of the abstract specification are must-transitions, modal refinement coincides
+with weak bisimulation. Obviously, the modal refinement relation defined as follows is reflexive and transitive.
+
+\begin{definition}[Modal refinement]\label{def:wmr}
+   Let $\S = \maiotstupmr{\S}$ and $\T = \maiotstupmr{\T}$ be two \MAIOTSs with the same I/O-alphabet $\Sigma$ over channels $\chan$. 
+    A relation $R \subseteq Q_\S \times Q_\T$ is a \emph{modal refinement relation} between $\S$ and $\T$ if for all $(q_\S,q_\T) \in R$ and $ a \in \Sigma$:% the following holds: 
+    \begin{enumerate}[label=\arabic*:, ref=(\arabic*), leftmargin=*,start=1]
+        \item\label{def:wmr:must:a-tgc} $ q_\T \must{a}_\T q_\T' \implies \,\exists q_\S' \in Q_\S \;.\; q_\S \mustw{a}_\S q_\S' \wedge (q_\S',q_\T') \in R$,
+        \item\label{def:wmr:must:tau} $ q_\T \must{\tau}_\T q_\T' \implies \, \exists q_\S' \in Q_\S \;.\; q_\S \mustw{\epsilon}_\S q_\S' \wedge (q_\S',q_\T') \in R$,
+        \item\label{def:wmr:may:a-tgc} $ q_\S \may{a}_\S q_\S'\, \implies \exists q_\T' \in Q_\T \;.\; q_\T \mayw{a}_\T q_\T' \wedge (q_\S',q_\T') \in R$,
+        \item\label{def:wmr:may:tau} $ q_\S \may{\tau}_\S q_\S'\, \implies \exists q_\T' \in Q_\T \;.\; q_\T \mayw{\epsilon}_\T q_\T' \wedge (q_\S',q_\T') \in R$.
+    \end{enumerate}
+ We say that $\S$ is a \emph{modal refinement} of $\T$, written $\S \mrw \T$, if there exists a modal refinement relation $R$ between $\S$ and $\T$ such that $(q^0_{\S},q^0_{\T}) \in R$. We write $q_\S \mrw q_\T$ when $(q_{\S},q_{\T}) \in R$ for a modal refinement relation $R$. 
+\end{definition}
+
+The next theorem shows that modal refinement is preserved by asynchronous composition and by channel hiding.
+The compositionality result stems in principle from~\cite{DBLP:conf/ershov/HuttelL89}. The second result is similarly to a result in~\cite{hennicker_knapp_2011} for hiding in synchronous systems.
+
+\begin{theorem}\label{thm:wmr}
+    Let $\S, \T, \E$ and $\F$ be \MAIOTSs such that $\chan$ is the set of channels of $\S$ and of $\T$ and let $H \subseteq \chan$.
+\begin{enumerate}
+\item\label{thm:copos-wmr}
+If $\S \mrw \T$, $\E \mrw \F$ and $\S$ and $\E$ are composable, then $\T$ and $\F$ are composable and $\S \compos \E \mrw \T \compos \F$.
+\item\label{thm:wmr-hiding}
+If $\S \mrw \T$ then $\S \setminus H \mrw \T \setminus H$.
+ \end{enumerate}
+\end{theorem}
+\begin{proof}[Proof of \ref{thm:wmr}.\ref{thm:copos-wmr}]
+	% {\bf Proof :}
+    We need to prove that there exists a modal refinement relation between $\S \compos \E $ and $ \T \compos \F$ containing the initial states. We do this by defining a relation $R$, and proving that this particular relation is a modal refinement relation.
+
+    First let $R_1$ be the modal refinement relation between $\S$ and $\T$, and $R_2$ the modal refinement relation between $\E$ and $\F$. We can now define $R$ as follows:
+    \[
+        R = \{ ((q_\S,q_\E, \vec{v}_{\S\E}),(q_\T,q_\F, \vec{v}_{\T\F})) \mid (q_\S, q_\T) \in R_1 \wedge (q_\E, q_\F) \in R_2 \wedge \vec{v}_{\S\E} = \vec{v}_{\T\F} \}.
+    \]
+    Obviously $R$ contains the initial states of $\S \compos \E$ and $\T \compos \F$.
+
+    We will now prove that $R$ is a modal refinement relation between $\S \compos \E $ and $ \T \compos \F$. We do this by going through each of the four rules of Def.~\ref{def:wmr}.
+    Let $\Sigma$ be the alphabet composition of $\ioalpha{\T}$ and $\ioalpha{\F}$ and let $\chan_{\T\F} = \Sigma_\T \cap \Sigma_\F$. Assume that $((q_\S,q_\E, \vec{v}_{\S\E}),(q_\T,q_\F, \vec{v}_{\T\F})) \in R$.
+    \begin{enumerate}
+        \item Let $a \in \Sigma$ such that $(q_\T,q_\F,\vec{v}_{\T\F}) \must{a} (q_\T',q_\F',\vec{v}'_{\T\F})$. 
+        By definition of asynchronous composition~\cite{haddad-et-al-2013} if follows that
+        % By rule \ref{def:must:s},\ref{def:must:t},\ref{def:must:stots}, \ref{def:must:stott},\ref{def:must:ttoss},\ref{def:must:ttost} of Def.~\ref{def:async-comp-maiots}, 
+        this transition could be triggered in six different ways.
+        \begin{enumerate}
+            \item[(1)] Assume that $a \in (\Sigma_\T \setminus \chan_{\T\F})$, $q_\T \must{a}_\T q'_\T$, $q_\F = q'_\F$ and $\vec{v}_{\T\F} = \vec{v}'_{\T\F}$. By definition of $R$ we know that $q_\S \mrw q_\T$, which by \ref{def:wmr:must:a-tgc} in Def.~\ref{def:wmr} gives us that $q_\S \mustw{a} q'_\S$ such that $q'_\S \mrw q'_\T$. 
+            By definition of asynchronous composition
+            %From rule \ref{def:must:s} in Def.~\ref{def:async-comp-maiots} 
+            it follows that $(q_\S,q_\E, \vec{v}_{\S\E}) \mustw{a} (q_\S',q_\E, \vec{v}_{\S\E})$, and by definition of $R$, $((q_\S',q_\E, \vec{v}_{\S\E}),(q_\T',q_\F,\vec{v}_{\T\F})) \in R$.
+            \vspace{1mm}
+            \item[(2)] Assume that $a \in (\Sigma_\F \setminus \chan_{\T\F})$, $q_\F \must{a}_\F q'_\F$, $q_\T = q'_\T$,  and $\vec{v}_{\T\F} = \vec{v}'_{\T\F}$. This case can be proven analogously.
+            \vspace{1mm}
+            \item[(3.1)] Assume that $a \in \inset_\T \cap \outset_\F$, $\vec{v}_{\T\F}(a) > 0$,  $q_\T \must{a}_\T q'_\T$, $q_\F = q'_\F$ and $\vec{v}'_{\T\F} = \vec{v}_{\T\F}[a--]$. By definition of $R$ we know that $q_\S \mrw q_\T$, which by \ref{def:wmr:must:a-tgc} in Def.~\ref{def:wmr} gives us that $q_\S \mustw{a} q'_\S$ such that $q'_\S \mrw q'_\T$. By definition of $R$ we know that $\vec{v}_{\S\E}(a) = \vec{v}_{\T\F} > 0$. 
+            By definition of asynchronous composition
+            % Then from rule \ref{def:must:stots} of Def.~\ref{def:async-comp-maiots} 
+            it follows that $(q_\S,q_\E, \vec{v}_{\S\E}) \mustw{\inact{a}} (q_\S',q_\E, \vec{v}_{\S\E}[a--])$ taking into account that $\tau$-transitons do not change the valuation of channels. Finally by definition of $R$, $((q_\S',q_\E, \vec{v}_{\S\E}[a--]),(q_\T',q_\F,\vec{v}_{\T\F}[a--])) \in R$.
+            \vspace{1mm}
+            \item[(3.2)] Assume that $a \in \inset_\T \cap \outset_\F$, $q_\T = q'_\T$, $q_\F \must{a}_\F q'_\F$ and $\vec{v}'_{\T\F} = \vec{v}_{\T\F}[a++]$. By definition of $R$ we know that $q_\E \mrw q_\F$, which by \ref{def:wmr:must:a-tgc} in Def.~\ref{def:wmr} gives us that $q_\E \mustw{a} q'_\E$ such that $q'_\E \mrw q'_\F$. 
+            By definition of asynchronous composition
+            %By rule \ref{def:must:stott} of Def.~\ref{def:async-comp-maiots} 
+            we get that $(q_\S,q_\E, \vec{v}_{\S\E}) \mustw{\outact{a}} (q_\S,q_\E', \vec{v}_{\S\E}[a++])$. Since silent transitions do not change the channel valuation. Finally by definition of $R$, $((q_\S, q_\E', \vec{v}_{\S\E}[a++]),(q_\T,q_\F',\vec{v}_{\T\F}[a++])) \in R$.
+            \vspace{1mm}
+            \item[(4.1)] Assume that $a \in \inset_\F \cap \outset_\T$, $\vec{v}_{\T\F}(a) > 0$,  $q_\T = q'_\T$, $q_\F \must{a}_\F q'_\F$ and $\vec{v}'_{\T\F} = \vec{v}_{\T\F}[a--]$. This case can be proven analogously to (3.1).
+            \vspace{1mm}
+            \item[(4.2)] Assume that $a \in \inset_\F \cap \outset_\T$, $q_\T \must{a}_\T q'_\T$, $q_\F = q'_\F$ and $\vec{v}'_{\T\F} = \vec{v}_{\T\F}[a++]$. This case can be proven analogously to (3.2).
+        \end{enumerate}
+        \item Assume $(q_\T,q_\F,\vec{v}_{\T\F}) \must{\tau} (q_\T',q_\F',\vec{v}'_{\T\F})$.
+        By definition of asynchronous composition if follows that
+        % By rule \ref{def:must:s},\ref{def:must:t} of Def.~\ref{def:async-comp-maiots}, 
+        this transition could be triggered in two different ways, either by $q_\T \must{\tau}_\T q'_\T$ or $q_\F \must{\tau}_\F q'_\F$. Both cases can be proven analogously to case (1) and (2) above, using \ref{def:wmr:must:tau} of Def.~\ref{def:wmr}.
+        \item Let $a \in \Sigma$ such that $(q_\S,q_\E,\vec{v}_{\S\E}) \may{a} (q_\S',q_\E',\vec{v}'_{\S\E})$. 
+        By definition of asynchronous composition if follows that
+        % By rule \ref{def:may:s},\ref{def:may:t},\ref{def:may:stots}, \ref{def:may:stott},\ref{def:may:ttoss},\ref{def:may:ttost} of Def.~\ref{def:async-comp-maiots}, 
+        this transition could be triggered in six different ways. Each of the six cases can be proven analogously to case (1), (2), (3.1) ,(3.2) ,(4.1) , and (4.2) above, using \ref{def:wmr:may:a-tgc} of Def.~\ref{def:wmr}.
+        \item Assume $(q_\S,q_\E,\vec{v}_{\S\E}) \may{\tau} (q_\S',q_\E',\vec{v}'_{\S\E})$. 
+        By definition of asynchronous composition if follows that
+        % By rule \ref{def:may:s},\ref{def:may:t} of Def.~\ref{def:async-comp-maiots}, 
+        this transition could be triggered in two different ways, either by $q_\T \may{\tau}_\T q'_\T$ or $q_\F \may{\tau}_\F q'_\F$. Both cases can be proven analogously to case (1) and (2) above using \ref{def:wmr:may:tau} of Def.~\ref{def:wmr}. 
+    \end{enumerate}
+    \end{proof}
+
+    \begin{proof}[Proof of \ref{thm:wmr}.\ref{thm:wmr-hiding}]
+    First let $\S \setminus H = (\chan_{\setminus H},\Sigma_{\setminus H},Q_\S,q^0_\S, \may{}_{(\S\setminus H)},\must{}_{(\S\setminus H)},\val_{(\S\setminus H)})$ and $\T \setminus H = (\chan_{\setminus H},\Sigma_{\setminus H},Q_\T,q^0_\T, \may{}_{(\T\setminus H)},\must{}_{(\T\setminus H)},\val_{(\T\setminus H)})$.
+    
+    As $\S \mrw \T$ we know that there exists a modal refinement relation $R \subseteq Q_\S \times Q_\T$. We will prove that $R$ is also a modal refinement relation for $\S \setminus H$ and $\T \setminus H$. $R$ is a good candidate as the set of states does not change when hiding a subset of the channels. We will prove this by going through the four requirements of Def.~\ref{def:wmr}. However, we will only provide the proof of the two first cases, as the last two can be proven in the same manner.
+	Let $(q_\S,q_\T) \in R$.
+    \begin{enumerate}
+        \item Let $a \in \Sigma_{\setminus H}$. Assume that $q_\T \must{a}_{(\T\setminus H)} q_\T'$. By definition of hiding it follows that $q_\T \must{a}_{\T} q_\T'$. By modal refinement we get that there exists $ q_\S' \in Q_\S \;.\; q_\S \mustw{a}_{\T} q_\S' \wedge (q_\S',q_\T') \in R$. Again by hiding we get that $q_\S \mustw{a}_{(\S \setminus H)} q_\S'$.
+         \item Assume that $q_\T \must{\tau}_{(\T\setminus H)} q_\T'$. By definition of hiding there can be two cases. Either $\tau$ stems from $\T$ directly, or it stems from channel hiding.
+         \begin{itemize}
+             \item Assume $q_\T \must{\tau}_{\T} q_\T'$. Then the argumentation follows as as in item 1.
+             \item Assume that $a \in H$ and $q_\T \must{\outact{a}}_{\T} q_\T'$ By modal refinement we get that there exists $ q_\S' \in Q_\S \;.\; q_\S \mustw{\outact{a}}_\T q_\S' \wedge (q_\S',q_\T') \in R$. Now by hiding and the fact that $a \in H$ we get that $q_\S \mustw{\epsilon}_{(\S \setminus H)}q_\S'$. 
+         \end{itemize}
+    \end{enumerate}
+
+\end{proof}
+
+
+
+The refinement definition and results are propagated to modal asynchronous I/O-Petri nets in the obvious way:
+A \MAIOPN $\M$ is a \emph{modal refinement of} a  \MAIOPN $\pnN$, also denoted by $\M \mrw \pnN$, if
+$\maiots(\M) \mrw \maiots(\pnN)$. The counterparts of Thm.~\ref{thm:wmr}.\ref{thm:copos-wmr} and~\ref{thm:wmr}.\ref{thm:wmr-hiding} for \MAIOPNs
+are consequences of the semantic compatibility results in Thm.~\ref{thm:comp-hide-semantics}.\ref{item:comp-semantics}. 
+Examples for modal refinements of \MAIOPNs and applications of the theorem are pointed out in Sect.~\ref{sec:example}.
+
+The decidability status of the modal refinement problem for {\MAIOPN}s
+depends on the kind of Petri nets one considers. Observing that there is
+a simple reduction from the bisimilarity problem to the modal refinement
+problem and that the former problem is undecidable for Petri nets~\cite{Jancar95},
+one gets that the latter problem is also undecidable; for an evolved discussion see~\cite{BK12}. However when one restricts
+Petri nets to be modally weakly deterministic, the modal refinement problem becomes
+decidable. The modal weak determinism of Petri nets is a behavioural property
+which can also be decided (see~\cite{EHH12} for both proofs). In addition, determinism is
+a desirable feature for a specification (when possible). For instance modal language specification
+is an alternative to modal transition systems that presents such a behaviour~\cite{Raclet2007b}.
+
+
+
+

@@ -1,0 +1,374 @@
+%!TEX root = ../thesis.tex
+\chapter{Component-Based Development}
+
+Component-based development is a popular method when designing software systems, as it is a method that has many advantages. The system design is split into individual modules such that the system is a composition of loosely connected components. This means that each component is isolated and responsible for a specific functionality of the system. 
+The component-based development method is interesting also from a formal verification point of view. There is a significant benefit when it is possible to draw a conclusion for a composed system on the basis of an analysis of the individual components. However, it is very important that the composition of these components is done properly, especially the communication as this is the way they synchronise. 
+
+\section{Synchronous and Asynchronous Composition}
+
+There are mainly two types of composition: synchronous and asynchronous composition. Synchronous composition is a composition where all participating components are aware of the actual communication at the same time, this can simplify verification of the communication. On the other hand, synchronous communication is not very suitable for larger and more complex systems, as components can block until the all participants of a synchronisation are ready. This blocking problem can be avoided by using asynchronous composition instead. In asynchronous composition a component can leave a message on a channel which can later be consumed by another component. However, when using asynchronous composition, the sending component can generally not know if the receiving component will ever take the message from the channel.
+
+Formal verification can also be applied in a component-based development setting. In order to do this it is important that there is a suitable modelling formalism that can express the composition needed, and distinguish between internal behaviour of a component and the behaviour related to communication between the components. One way is to use the previously introduced LTS, but with each transition labelled by a label from a special I/O-alphabet~\cite{alfaroHenzinger2005}. An I/O alphabet is disjoint union of \emph{input} labels, \emph{output} labels and \emph{internal} labels. The input and output labels define the interface of the component, whereas internal labels are used on transitions that are not supposed to be visible outside of the component, but are needed to model the actual behaviour of the component. In our examples we will identify input labels by an appended ``\transition{?}'' and output by an appended ``\transition{!}''. In Figure~\ref{fig:intro:lts-comp1} we show a simple component with two transitions. It can send a \transition{msg} message and then receive a \transition{pre} message.
+
+\begin{figure}[ht]         
+\centering
+    \subfloat[$\S_4$\label{fig:intro:lts-comp1}]{\input{introduction/figures/lts-sync-comp1}}
+    \subfloat[$\S_5$\label{fig:intro:lts-comp2}]{\input{introduction/figures/lts-sync-comp2}}
+    \subfloat[$\S_4 \sync \S_5$\label{fig:intro:lts-comp}]{\input{introduction/figures/lts-sync-comp}}
+    \caption{Example of synchronously composed LTSs.}
+    \label{fig:lts-file-comp}
+\end{figure} 
+
+The composition of two LTS components is also an LTS, but with each state being a pair of states, one from each component. The outgoing transitions of such state, is a union of the possible outgoing transitions in each component. However, in case of a synchronous composition, if a state has an input and an output transitions with the same label, then such two transitions are merged into one transition. As an example consider the LTS in Figure~\ref{fig:intro:lts-comp}, this is a synchronous composition of $\S_4$ and $\S_5$ in Figure~\ref{fig:intro:lts-comp1} and~\ref{fig:intro:lts-comp2}, denoted $\S_4 \sync \S_5$. 
+The initial state is the pair $(q_0,r_0)$ as these are the initial states of $\S_4$ and $\S_5$ respectively. Further, as the two states have matching input and output transitions labelled \transition{msg}, they are merged into an internal 
+\transition{msg} transition which goes to the state pair ${q_1,r_1}$, as these states are reached in the original component. 
+The other transitions are interleaving, as they do not match any transitions in the opposite component. The example also shows one of the main problems with synchronous composition, namely that the communication is blocking. This is the case when $\S_5$ is in $r_1$ and not ready to receive a \transition{msg} input, then  $\S_4$ will be stuck in $q_0$ until $\S_5$ is ready to synchronise. Note that the composition $\S_4 \sync \S_5$ is also an LTS component with I/O-alphabet $\{\transition{pre},\transition{post},\transition{msg}\}$, where \transition{pre} is an input label, \transition{post} is an output label and \transition{msg} is an internal label. 
+
+In an asynchronous composition of two LTS components no transitions are merged. Instead, a new \emph{channel} is created for each matching input and output label pair in the two components. Such channel can be seen as a counter that counts the number of messages on a communication channel in the composition. Each output transition that has a new channel is converted to an internal transition and will increase the counter of the corresponding channel and likewise the input transitions are converted to internal transitions and decrease the counter. However, an input transition is only available if the corresponding channel is not empty. In order to distinguish the internal transitions that were previously input transitions and output transitions, the labels are renamed by pre-pending an $\inact{~}$ on inputs and appending an $\inact{~}$ on outputs.
+
+\begin{figure}[ht]
+    \centering
+    \input{introduction/figures/lts-async-comp}
+    \caption{Example of an asynchronously composed LTS, $\S_4 \async \S_5$.}
+    \label{fig:lts-file-acomp}
+\end{figure}
+
+As an example consider the LTS in Figure~\ref{fig:lts-file-acomp}, this is an asynchronous composition of $\S_4$ and $\S_5$, denoted $\S_4\async\S_5$. As \transition{msg} is an output transition of $\S_4$ and an input of $\S_5$. The two components will communicate on a new channel $\channel{msg}$, and the output transition label is renamed to \transition{\outact{msg}} and converted to an internal label. 
+Likewise, the input transition label is renamed to \transition{\inact{msg}} and converted to an internal label. As in the synchronous composition each state contains a state pair, one from each of the two components. Additionally each state carries a counter representing the number of messages on the the channel \channel{msg}. Thus, the initial state is $q_0,r_0,\channel{0}$ as channels are initially empty. From the initial state only $\S_4$ can move as $\S_5$ is waiting for a message on the channel \channel{msg}. Note that the composition is drawn so the horizontal transitions change the state of $\S_4$ and the vertical and diagonal transitions change the state of $\S_5$. This asynchronous composition is also an LTS component in it self, with I/O-alphabet $\{\transition{\outact{msg}},\transition{\inact{msg}},\transition{pre},\transition{post}\}$. Unlike synchronous compositions, an asynchronous composition is not necessarily finite even if both components are finite. This happens because the channel is unbounded, i.e. it can hold infinitely many messages. 
+
+An unbounded and {unordered} channel is not the only way to model a communication channel. Alternatively, a channel can be modelled as a FIFO-buffer, but such channel requires more resources and might decrease the performance in larger systems. Furthermore, a finite LTS and a single infinite FIFO channel has full Turing power, as the FIFO-buffer can simulate the infinite tape of a Turing machine. This means that we cannot hope for any decidable results when using FIFO channels. Another alternative are \emph{lossy channel systems}, with a FIFO channel that can loose messages. Surprisingly, some properties of the lossy channel become decidable~\cite{Abdulla199691}, however reachability and termination have a non-primitive recursive complexity~\cite{Schnoebelen2002251}. 
+
+\section{Channel Properties}
+When using component-based approach to system design it is important that the components are interacting and communicating correctly. Thus, it is interesting to verify certain properties of the communication. For synchronous communication these are properties like the blocking issue mentioned above and for asynchronous composition this means considering properties related to the communication channels. Overall these communication properties can be considered as general system properties which are not related to a particular system design or application. 
+
+In~\cite{Brand:1983:CFM:322374.322380} the authors consider a property called 
+\emph{specified reception}. The concept of the property is that a component must know how to handle an incoming message, i.e. the action taken on reception of a message must be specified. Consider the two components in Figure~\ref{fig:intro:brand}, they model a temperature service and a user that can request the current temperature. Furthermore, the temperature service can send an alarm to the user in case it reaches a certain limit. After an alarm the service must receive a reset message in order to go back to its idle state. In~\cite{Brand:1983:CFM:322374.322380} they consider finite components and compose them asynchronously with two FIFO channels, one for each direction, opposed to the unordered channels introduced earlier. Just by looking at the two components in Figure~\ref{fig:intro:brand}, such composition might seem fine. However, as the communication is asynchronous it can happen that the user sends a \transition{getTemp} at the same time as the temperature service send out an \transition{alarm}. Assuming that the channels were both empty prior to this, we have a situation with an \transition{alarm} on the channel for the user and an \transition{getTemp} on the channel for the temperature service. This is problematic as it is not specified how the user should deal with an alarm when he is waiting for a temperature from the service. This problem is characterized by the \emph{specified reception} property, meaning that this particular composition does not have this property. Such property is interesting, but unfortunately the authors only consider finite components and they stick to FIFO channels. Furthermore, they do not allow the components to perform any internal behaviour before reception. This means that the property can be a too strong requirement for more complex systems.
+
+\begin{figure}[ht]         
+\centering
+    \subfloat[Thermometer Client\label{fig:intro:brand-comp1}]{\input{introduction/figures/brand-specified-reception-example-comp1}}
+    \subfloat[Thermometer Service$\S_5$\label{fig:intro:brand-comp2}]{\input{introduction/figures/brand-specified-reception-example-comp2}}
+    \caption{Example of two LTSs modelling a client and a thermometer service.}
+    \label{fig:intro:brand}
+\end{figure} 
+
+Similarly,~\cite{alfaroHenzinger2005} studies the \emph{compatibility} of components, stating whether two components fit together in a given environment. 
+For synchronous systems this means that when one component is ready so send a message $\transition{a}$ then the other component must be in a state where it is ready to receive an $\transition{a}$. Note that this is very related to the blocking mentioned earlier, nevertheless two components can be non-blocking but not compatible. This is the case if the sending component has a choice between two actions, where one of them can synchronise properly. 
+For asynchronously composed systems such requirement must be adapted as messages do not arrive immediately at the receiving component. Instead, the authors of \cite{hennicker2010} suggest that any message put on a channel must eventually be taken by the receiver, they call this the \emph{buffered compatibility} property. Note that the two components in Figure~\ref{fig:intro:brand} are neither compatible nor buffered compatible for the same reason as their composition does not have the specified reception property. This notion of compatibility is also interesting, but is only considered for finite components. % and with FIFO-Channels in the asynchronous setting. 
+
+In~\cite{Cece:2005:VPH:1124524.1709549} the authors focus on a different channel property, the \emph{half-duplex} property. This is a property of two finite systems composed asynchronously with two unbounded channels (one for each direction of the communication). A composition has the half-duplex property if there is no state where there is a message on both channels at the same time. This property is mainly interesting as problems like reachability and boundedness, that in general are undecidable for FIFO-channels, are decidable for a half-duplex composition.
+
+\section{Asynchronous I/O Petri Nets}
+
+Labelled Transition Systems are simple and straightforward as formal system models, however they tend to be very large when the system complexity rises. Furthermore, we cannot use LTSs directly to reason formally about infinite systems, as we need a finite representation of the system. In order to do so we use the \emph{labelled Petri net} (PN) formalism in our study. Petri nets were introduced by C. A. \citeauthor{phd-petri} in his dissertation~\cite{phd-petri}.
+Petri nets are a popular formal model for specification and analysis, and the advantage is that PN systems specifications are more compact than LTSs, in fact the size of a LTS corresponding to a finite PN specification can be exponentially larger. Additionally, many verification problems are decidable for PNs, for a survey see~\cite{DBLP:journals/eatcs/EsparzaN94}.
+
+A labelled Petri net is a finite graph with two types of nodes; \emph{places} and \emph{transitions}, and with directed arcs between the nodes. The arcs are only allowed to go from places to transitions (\emph{input-arcs}) or from transitions to places (\emph{output-arcs}). These input- and output-arcs defines the \emph{input-places} and \emph{output-places} of a transition. The transitions of a PN model the actions that a system can perform, as it was the case for LTSs, i.e. firing a transition can change the state of the system. Each place can contain a number of \emph{tokens}, and a state of a PN, referred to as a \emph{marking}, is a distribution of tokens in the places of the PN. In general the places are unbounded, which means that a PN can have infinitely many markings.  
+The input-arcs model the precondition of a transition, so a transition is \emph{enabled} if there is a token in each of the {input-places} of that transition. An enabled transition can be \emph{fired}, and when a it is fired, a token is consumed from each input place, and a new token is produced into each output place. Formally a Petri net is defined as follows.
+\begin{definition}[Labelled Petri Net]\label{def:intro:pn}
+A \emph{labelled Petri net} is a tuple \pndef, such that
+\begin{itemize}
+    \item $P$ is a finite set of places,
+    \item $T$ is a finite set of transitions with $P \cap T = \emptyset$,
+    \item $\Sigma$ is a finite alphabet,
+    \item $W^-$ (resp. $W^+$) is a matrix indexed by $P\times T$ with values in \N;\\ it is called the \emph{backward} (resp. \emph{forward}) \emph{incidence matrix},
+    \item $\lambda : T \rightarrow \Sigmat$ is a transition labelling function, and
+%    \item $m^0 : P \mapsto \N$ is the initial marking.
+    \item $m^0$ is a vector of natural numbers, indexed by $P$ and called the initial marking.
+\end{itemize}     
+\end{definition}
+
+
+\begin{figure}[htb]
+\centering
+    \input{introduction/figures/pn-intro-ex}
+    \caption{Example of a Petri Net $\pnN_1$.\label{fig:intro:pn}}
+\end{figure}
+
+Figure~\ref{fig:intro:pn} shows an example of a Petri net $\pnN_1$. The circular nodes $p_0, p_1, p_2, p_3$ are places and the squared nodes are transitions, each labelled with a label from an action alphabet. Note that no arcs are going directly between two places or two transitions as this in not allowed in a PN. In Figure~\ref{fig:intro:pn1} $\pnN_1$ is shown with a marking $m$. The marking $m$ specifies that there are two tokens in $p_0$ and one in $p_1$. In the following markings of $\pnN_1$ are represented by a 4-tuples with a natural number for each place, for instance $m = (2,1,0,0)$. As there is at least one token in $p_0$ and $p_1$ in marking $m$, which are the input-places of the transition \transition{a}, then \transition{a} is enabled and can be fired from $m$. Likewise \transition{b} is enabled in marking $m$, but \transition{c} is not as there are no tokens in $p_3$. Enabled transitions are striped in all examples. Since \transition{b} is enabled in $m$, we can fire it. By firing \transition{b} we consume one token from $p_1$, and produce a new token in $p_3$. This results in a new marking $m^1 = (2,0,0,1)$, shown in Figure~\ref{fig:intro:pn2}. We write $m \goes{\transition{b}} m^1$, when \transition{b} is enabled in $m$ and $m^1$ is reached by firing it. Note that \transition{a} is disabled in $m^1$, since the firing of \transition{b} removed the required token from $p_1$. When analysing the behaviour of a PN we consider \emph{traces}. A trace is an execution of a PN denoted as a sequence of transitions and the visited markings. For instance, $(2,1,0,0) \goes{\transition{b}} (2,0,0,1) \goes{\transition{c}} (2,1,0,0) \goes{\transition{a}} (1,1,1,0) \goes{\transition{a}} (0,1,2,0)$ is a trace of $\pnN_1$. 
+
+\begin{figure}[ht]         
+\centering
+    \subfloat[$(\pnN_1,m)$.\label{fig:intro:pn1}]{\input{introduction/figures/pn-intro-ex1}}\qquad
+    \subfloat[$(\pnN_1,m^1)$.\label{fig:intro:pn2}]{\input{introduction/figures/pn-intro-ex2}}
+    \caption{Examples of marked Petri nets.}
+    \label{fig:intro:pn-group}
+\end{figure}
+
+We study general properties of asynchronous communication over unbounded and unordered channels and consider both primitive components with an open interface for communication with other components as well as larger composed systems. Therefore, we define \emph{Asynchronous I/O-Petri nets} (\AIOPNs) as a simple extension of the PNs briefly described above. In addition to a basic PN, \AIOPNs have a finite set of channels, which is a subset of the places, and the transitions are labelled with labels from an special I/O-alphabet. In a primitive component there are no channels, as channels are introduced during composition of components. The I/O-alphabet is very similar to the I/O-alphabet we introduced for LTSs, however now we have a distinct set of communication labels. For a given \AIOPN with channels $\chan$ the set of communication labels is $\com = \{\inact{a},\outact{a} \mid a \in \chan\}$. For a primitive component the set of communication labels is empty, as there are no channels. Formally an \AIOPN is defined as follows.
+
+\begin{definition}[Asynchronous I/O-Petri net]
+An \emph{asynchronous I/O-Petri net} (\AIOPN) is a tuple $\pnN = \apntup{}$, such that 
+\begin{itemize}
+    \item $\pntup{}$ is a labelled Petri net,  
+    \item $\chan$ is a finite set of channels, 
+    \item $\chan \subseteq P$, i.e. each channel is a place, 
+    \item $\ioalpha{}$ is an I/O-alphabet over $\chan$, 
+    \item for all $a \in \chan$ and $t \in T$,\\
+            $W^-(a,t) = \begin{cases}
+                    1 &\text{ if } \lambda(t) = \inact{a},\\
+                    0 &\text{ otherwise }
+                \end{cases}$\qquad
+            $W^+(a,t) = \begin{cases}
+                    1 &\text{ if } \lambda(t) = \outact{a},\\
+                    0 & \text{ otherwise}
+                \end{cases}$
+    \item for all $a \in \chan$, $m^0(a) = 0$.
+    \end{itemize}
+\end{definition}
+
+
+
+\begin{figure}[ht]         
+\centering
+    \subfloat[Example of a primitive \AIOPN component $\pnN_2$.\label{fig:intro:aiopn-comp1}]{\input{introduction/figures/example-aiopn-before-comp1}} \qquad\qquad
+    \subfloat[Example of a primitive \AIOPN component $\pnN_3$.\label{fig:intro:aiopn-comp2}]{\input{introduction/figures/example-aiopn-before-comp2}} \qquad
+    \subfloat[Example of a composed \AIOPN component $\pnN_2 \async \pnN_3$.\label{fig:intro:aiopn-composed}]{\input{introduction/figures/example-aiopn}}
+    
+    \caption{Example of asynchronous I/O Perti nets.}
+    \label{fig:intro:aiopn-group}
+\end{figure}
+
+As an example consider the two primitive \AIOPN components $\pnN_2$ and $\pnN_3$ in Figure~\ref{fig:intro:aiopn-comp1} and Figure~\ref{fig:intro:aiopn-comp2}. It should be clear that these two components correspond to the two previously described LTS components $\S_4$ and $\S_5$ in Figure~\ref{fig:intro:lts-comp1} and Figure~\ref{fig:intro:lts-comp2}. 
+Even though the components are very similar to the LTS components, the asynchronous composition of \AIOPNs is somewhat different. When composing two \AIOPNs asynchronously, the two \AIOPNs are basically unioned into one \AIOPN and for every matching input- and output-label a new channel-place is created with an arc from the output-labelled transition and an arc to the input-labelled transition. A token in such channel-place models a message on that channel. Note that this means there is a communication channel for each type of message exchanged between the composed components.
+Figure~\ref{fig:intro:aiopn-composed} shows the asynchronous composition of $\pnN_2$ and $\pnN_3$, we show the original primitive components by drawing them in frames. It is important to observe that this composition is a regular PN opposed to the corresponding LTS composition in Figure~\ref{fig:intro:lts-comp}, which is infinite even though it is a composition of two finite components. Nevertheless, the behaviour of this composed \AIOPN is infinite, since the \channel{msg} channel can hold unboundedly many messages. It should be easy to see the correspondence between a state of the composed LTS (Figure~\ref{fig:intro:lts-comp}) and a marking of the composed \AIOPN(Figure~\ref{fig:intro:aiopn-composed}). The counter in the LTS state corresponds to the number of tokens in the \channel{msg} place of the \AIOPN composition and the state-pair in the LTS state corresponds to the marking of the places $q_0, q_1, r_0$ and $ r_1$ of the \AIOPN. For each new channel, the input- and output-transitions are renamed as it was done for the composed LTS.
+
+Our \AIOPN formalism is very similar to open Petri nets introduced by \citeauthor{openPN} in~\cite{openPN}. They also use places as interfaces between components for asynchronous composition. However, there are two main difference. We explicitly distinguish the channel-places, this allows us to reason about communication properties of the channels. Furthermore, in open Petri nets interface places are already present in the components before composition, matching interface places are then collapsed during composition. Therefore, open Petri nets are bound to use asynchronous composition, whereas we could define a synchronous composition of \AIOPNs or even a mix of both asynchronous and synchronous composition. This means that the designer of a component does not have to consider whether the component will be used in an asynchronous or synchronous environment, which we believe is an advantage as it gives a better separation of concerns.
+
+\section{Channel Properties of Asynchronous I/O Petri Nets}
+With \AIOPN as a tool for modelling asynchronously composed systems we consider two classes of properties concerning the asynchronous communication via unbounded and unordered channels: \emph{consuming properties} and \emph{communication stopping properties}. The first class of properties considers situations where a message is already sent from one component on a channel and we set requirements for how and when this message should be consumed by the receiving component. The second class of properties identify systems, where the components can reach consensus about terminating communication. 
+
+Our goal is to define a set of properties that are compositional, in the sense that if a composed system has some property, then this property should not be broken if this composed system is composed with a new component. Note that a composed system might have open input- and output-transitions, which can be matched in a future composition with another component. Hence, the communication properties must take into account that a composed system must have a given property in any possible environment. This means that a property must hold even though a ``future'' component in the final system might not provide a required input to this particular part of the system. We say that a component must be able to do something \emph{autonomously} if we cannot rely on input from an environment. Open output-transitions are not a problem as we are dealing with asynchronous communication, so an output can never be blocking. We identify markings of an \AIOPN where only open input-labelled transitions are enabled and call them \emph{pure input states}. A pure input state is a possible deadlock in composed systems, as there are no guaranties that there will ever be any messages for these open inputs when needed. 
+
+We study four main properties within the class of consuming properties;
+% \begin{enumerate}[label=\textbf{P\arabic*:}, ref=(P\arabic*), leftmargin=*]
+    % \item 
+    \emph{Consuming},
+    % \item 
+    \emph{Decreasing},
+    % \item 
+    \emph{Emptying}, and
+    % \item 
+    \emph{Wholly Emptying}.
+% \end{enumerate}
+Each property has a successively stronger requirement than its predecessor. Furthermore, we study each of these four basic properties in two additional variations; a \emph{strong} and a \emph{necessarily} variant. We start by going through the consuming property in its basic form and the strong and necessarily variations.
+
+The \emph{consuming} property is one of the simplest asynchronous communication requirements. It requires that whenever there is a message on a channel then the receiving component must be able to take it. More precisely for our \AIOPNs.
+
+\begin{definition}[Consuming]
+    An \AIOPN is \emph{consuming} on a channel $\channel{c}$ if for any reachable marking $m$ with some messages on \channel{c}, the \AIOPN can from $m$ autonomously reach a marking $m'$ such that $ m' \goes{\inact{\transition{c}}} m''$. 
+\end{definition}
+
+We say that an \AIOPN is \emph{consuming} if it is consuming on all its channels.
+
+As an example, consider the marked PN $(\pnN_2\async\pnN_3, m)$ in Figure~\ref{fig:intro:aiopn-consuming}. In order for $\pnN_2\async\pnN_3$ to be \emph{consuming}, we must prove that we can always take a token from the \channel{msg}, whenever there are tokens present. This is clearly the case as $\pnN_3$ can always fire $\transition{\inact{msg}}$ followed by \transition{out!} when there is a message in \channel{msg}. 
+
+As mentioned above we also consider a \emph{strong consuming} property. This property is stronger in the sense that the system must immediately be able to consume a message from a channel, whenever a message is present on a channel. 
+\begin{definition}[Strong Consuming]
+    An \AIOPN is \emph{strong consuming} on a channel $\channel{c}$ if for any reachable marking $m$ with some messages on \channel{c}, it is the case that $ m \goes{\inact{\transition{c}}} m'$. 
+\end{definition}
+Clearly, the $\pnN_2\async\pnN_3$ shown in Figure~\ref{fig:intro:aiopn-consuming} is not \emph{strongly consuming} as this would have required $\inact{\transition{msg}}$ to be enabled in any marking where the channel \channel{msg} is not empty.
+
+
+\begin{figure}[ht]
+    \centering
+    \input{introduction/figures/example-aiopn-consuming}
+    \caption{$(\pnN_2 \async \pnN_3,m)$.}
+    \label{fig:intro:aiopn-consuming}
+\end{figure}
+
+Both the consuming and strong consuming property require that a system must be able to consume a message whenever a message is present on a channel, but there is no guarantee that this will happen. In some situation such guarantee is important. In order to make such guarantee an \AIOPN must be consuming in all possible \emph{runs} of the system. A run of an \AIOPNs is either an infinite trace or a finite trace ending in a pure input state, i.e. a possible deadlock. Furthermore, we must assume that the systems we consider are running in an environment with a fair task-scheduler. If we do not assume fairness the consuming guarantees might not be compositional. The problem is illustrated by the \AIOPN component $\pnN_4$ shown in Figure~\ref{fig:intro:aiopn-prob-nec-consuming}. It is a composed component with two channels \channel{msg} and \channel{gsm} and a single open input $\transition{in}$. Note that there can be at most one message in transit at a time, as it must consume a message on a channel in order to progress. Thus, any run of $\pnN_4$ will be a firing of the following sequence of transitions reapeatingly; 
+\[
+    \outact{\transition{msg}}, \inact{\transition{msg}}, \outact{\transition{gsm}}, \inact{\transition{gsm}}, \transition{in?}\;.
+\]
+
+\begin{figure}[ht]
+    \centering
+    \input{introduction/figures/example-aiopn-problem-nec-consuming}
+    \caption{The composed \AIOPN $\pnN_4$.}
+    \label{fig:intro:aiopn-prob-nec-consuming}
+\end{figure}
+
+\begin{figure}[ht]
+    \centering
+    \input{introduction/figures/example-aiopn-problem-nec-consuming-w-in}
+    \caption{The composed \AIOPN $\pnN_4\async\pnN_5$.}
+    \label{fig:intro:aiopn-prob-nec-consuming-w-in}
+\end{figure}
+
+Furthermore, a run of $\pnN_4$ will either be infinite or finite and ending a pure input state, i.e. the marking with a single token in $q_2$ and all other places empty. Hence, it will eventually take a message from a channel if there is a message on that channel. Thus, $\pnN_4$ is consuming in all possible runs. However, if we compose $\pnN_4$ with a simple component, $\pnN_5$ that can always send an \transition{in} message, shown in Figure~\ref{fig:intro:aiopn-prob-nec-consuming-w-in}, we no longer have a system that is consuming in all possible runs. This is the case as we by firing $\outact{\transition{msg}}$ reach a marking with a token on the channel $\channel{msg}$, from this marking, there is a valid run that is just firing $\outact{\transition{in}}$ to infinity, i.e. the token in the channel \channel{msg} will never be consumed in this run. Thus we have a composition that broke a property of one of the components. This is undesirable and as mentioned above we only want to consider properties that are compositional. 
+
+In order to fix this issue we assume weak fairness. By this assumption we can omit runs that are not weakly fair runs. A run is a \emph{weakly fair run} if any transition that is always enabled in a run is also infinitely often taken. With this we can define our necessarily consuming property.
+
+\begin{definition}[Necessarily Consuming]
+    An \AIOPN is \emph{necessarily consuming} on a channel $\channel{c}$ if for any reachable marking $m$ with some messages on \channel{c}, the \AIOPN will do a $\inact{\transition{c}}$ action on any weakly fair run from $m$. 
+\end{definition}
+
+Clearly, the problematic run, that was just firing the $\channel{in}$ transition to infinity is not a weakly fair run, as $\inact{\transition{msg}}$ is enabled in all markings of the run, but never taken. 
+
+As mentioned in earlier, we define three more consuming properties that increase the requirement of how an \AIOPN should be able to consume messages on a channel.
+
+\begin{definition}[Decreasing]
+    An \AIOPN is \emph{decreasing} on a channel $\channel{c}$ if for any reachable marking $m$ with some messages on \channel{c}, the \AIOPN can autonomously from $m$ reach a marking $m'$ such that the number of messages on \channel{c} is less than it was in $m$.
+\end{definition}
+
+\begin{definition}[Emptying]
+    An \AIOPN is \emph{emptying} on a channel $\channel{c}$ if for any reachable marking $m$ with some messages on \channel{c}, the \AIOPN can autonomously from $m$ reach a marking $m'$ such that the channel \channel{c} is empty.
+\end{definition}
+
+\begin{definition}[Wholly Emptying]
+    An \AIOPN is \emph{wholly emptying} if for any reachable marking $m$, the \AIOPN can autonomously from $m$ reach a marking $m'$ where all channels are empty at once.
+\end{definition}
+
+Each of the three properties decreasing, emptying, and wholly emptying are also defined in the strong and necessarily variant as it was done for the consuming property. This means that we have 12 different properties regarding the consumption of messages on a communication channel. Beside these 12 consumption properties, we define a \emph{communication stopping} property, which requires that if a component stops consuming properties on a channel, then the sending component should be aware and stop sending messages on that channel, after a finite number of steps. If it immediately stops we say that the system is \emph{strongly communication stopping}. For example, $\pnN_2 \async \pnN_3$ in Figure~\ref{fig:intro:aiopn-composed} is not communication stopping, as $\pnN_2$ can always send new messages on the channel. 
+% However, $\pnN_4$ in Figure~\ref{fig:intro:aiopn-prob-nec-consuming} is infact strongly stopping, as 
+
+\input{introduction/figures/prop-rel-table}
+
+We have now presented 14 different properties that we believe are interesting for compositional system design regardless of the system application. We have also considered the relationships between the different properties, an overview is shown in Table~\ref{tab:intro:prop-rel}. For more discussion and details about these relations see Section~\ref{pap:petrinets}.
+We prove that all of these properties are compositional. Meaning that if a composed component $\pnN$ has a property $P$, then a composition of $\pnN$ and any other component will also have the property $P$ on the channels from $\pnN$.
+% \begin{result}  
+%     Given two \AIOPNs $\pnN$ and $\M$ and $P$ one of the channel properties.
+%     If $\pnN_1$ has property $P$, then the asynchronous composition $\pnN \async \M$ has property $P$ with respect to the channels of $\pnN$.
+% \end{result}    
+This is a crucial result and it means that \AIOPNs support a modular verification approach, where we can verify each component by itself, and only consider new channels when we need to prove that a composition has a property. 
+This modular verification approach holds for all properties except the wholly emptying, as we cannot prove that the new channels can be emptied at the same time as the channels of each component. On the other hand, wholly emptying is more a system requirement than a component requirement. 
+\begin{result}[Incremental design]
+    Let $\pnN$ and $\M$ be two \AIOPNs and let $P$ be an arbitrary channel property, except wholly emptying.
+    If both $\pnN$ and $\M$ have property $P$ and if $\pnN \async \M$ has property $P$ with respect to the new channels of the composition, then $\pnN \async \M$ has property $P$.
+\end{result}
+
+This result means that system engineers and designers can verify the communication of their component-based system design in an incremental way. First, they start by proving that compositions of primitive components have the desired property. Then, they prove that composition of verified composed components has the desired property, but the result above means that they only need to prove it for the new channels. This process continues until the whole system is proved to have the desired property.
+
+Finally, we prove that all 14 properties are decidable for \AIOPNs. We obtain these results by reusing existing decidability results and approaches for regular Petri nets.
+
+\begin{result}[Decidability]
+    Given an \AIOPN $\pnN$  and an arbitrary channel property $P$, it is decidable if $\pnN$ has property $P$. 
+\end{result}
+
+\section{Modal Asynchronous I/O Petri Nets}
+
+Up till now we have been working with two different formal methods that can be used in system design processes. The modal transition systems formalise the refinement steps of a design process and our study of properties directly related to asynchronous composition ensures that the communication in a component-based design is done properly. We will now join these two fields by extending our asynchronous I/O Petri nets with modalities, define modal refinement of such models and adapt the channel properties to cope with the modalities. This gives us a convenient framework where we can refine a system component-wise while preserving channel properties.
+
+\begin{figure}[ht]
+    \centering
+    \input{introduction/figures/maiopn-example-interface}
+    \caption{Example of a primitive \MAIOPN component $\pnN_{\mathsf{interface}}$.}
+    \label{fig:intro:maiopn-example-interface}
+\end{figure}
+
+We extend \AIOPNs with modalities simply by having two types of transitions instead of one, so we can distinguish may-transitions and must-transitions. Everything else stays the same and we call it \emph{modal asynchronous I/O Petri nets} (\MAIOPNs). Formally an \MAIOPN is defined as follows.  
+\begin{definition}[Modal Asynchronous I/O-Petri Net]
+    A \emph{modal asynchronous I/O-Petri net} (\MAIOPN) $\pnN = (\chan,\allowbreak
+    P,\allowbreak
+    T,\allowbreak
+    \Tmust, \allowbreak
+    \Sigmat,\allowbreak
+    W^-,\allowbreak
+    W^+,\allowbreak
+    \lambda,\allowbreak
+    m^0)$ is a modal Petri net such that,
+    \begin{itemize}
+        \item $(\chan,\allowbreak
+    P,\allowbreak
+    T,\allowbreak
+    \Sigmat,\allowbreak
+    W^-,\allowbreak
+    W^+,\allowbreak
+    \lambda,\allowbreak
+    m^0)$ is a \AIOPN, 
+        \item $T$ is a finite set of may-transitions with $P \cap T = \emptyset$, and
+        \item $\Tmust$ is a finite set of must-transitions with $\Tmust \subseteq T$.
+    \end{itemize}
+
+\end{definition}
+
+
+A simple example of a primitive \MAIOPN component is shown in Figure~\ref{fig:intro:maiopn-example-interface}. The black transitions are must-transitions and the white transition is a may-transition. The \MAIOPN $\pnN_{\mathsf{interface}}$ models the interface of a simple web-service that \emph{must} be able to receive \transition{Request} messages and once for each request it must be able to send a \transition{Response}. Furthermore, it \emph{may} send a \transition{Denied} message instead of a response, but this is not a required behaviour. 
+
+\begin{figure}[ht]
+\centering
+    \input{introduction/figures/maiopn-example-ws-composed}
+    \caption{$\pnN_{\mathsf{WS}} \async \pnN_{\mathsf{validator}} $.\label{fig:intro:maiopn-example-ws-composed}}
+\end{figure}
+
+The next step is to refine this interface into a more detailed specification of our web-service. We do this by introducing two components: the main web-service component $\pnN_{\mathsf{WS}}$ and a validation service $\pnN_{\mathsf{validator}}$ that will approve or deny users interacting with the web-service. The composition of these two components is shown in Figure~\ref{fig:intro:maiopn-example-ws-composed}. This composed system has the same open inputs and outputs as the web-service interface $\pnN_{\mathsf{interface}}$, but a more complex internal behaviour. Note that we use a special $\transition{\tau}$ transition to model hidden internal behaviour of a component. 
+The internal behaviour of this composed component is not relevant when we want to verify that it is a realisation of the interface. Therefore, we define a hiding operation that can relabel communication on certain channels to hidden $\tau$ channel. In this web-service example we hide communication on the \channel{CheckUser} and \channel{Validated} channels shown in Figure~\ref{fig:intro:maiopn-example-ws-composed-hiding} and denote it by $(\pnN_{\mathsf{WS}} \async \pnN_{\mathsf{interface}}) \setminus \{\channel{CheckUser}, \channel{Validated}\}$. 
+
+
+\begin{figure}[ht]
+\centering
+    \input{introduction/figures/maiopn-example-ws-composed-hiding}
+    \caption{$(\pnN_{\mathsf{WS}} \async \pnN_{\mathsf{validator}})\setminus \{\channel{CheckUser}, \channel{Validated}\} $.\label{fig:intro:maiopn-example-ws-composed-hiding}}
+\end{figure}
+
+
+We cannot directly reuse the modal refinement introduced earlier for MTS, as it does deal with the hidden internal transitions. Instead, we define \emph{weak modal refinement} of \MAIOPNs that allows for observational abstractions. The main difference is that we now consider observable transitions, known as \emph{weak transitions}. 
+A weak transition is a finite trace, where at most one transition is visible, i.e. not a $\tau$-transition. For instance, in $(\pnN_{\mathsf{WS}} \async \pnN_{\mathsf{interface}}) \setminus \{\channel{CheckUser}, \channel{Validated}\}$, we can execute the following weak sequence
+\[
+    (0,0,0,0,0,0) \lmustw{\transition{Request?}} (1,0,0,0,0,0) \lmayw{\transition{Denied!}}  \;.
+\] The actual sequence of transitions fired by these weak transitions is 
+\[
+    (0,0,0,0,0,0) \lmust{\transition{Request?}} (1,0,0,0,0,0) \may{\transition{\tau}}(0,0,0,1,0,0)\must{\transition{\tau}}(0,0,0,0,0,1)\lmust{\transition{Denied!}} \;. 
+\]
+    Weak modal refinement, denoted $\mrw$ is similar to modal refinement. It requires that every mandatory behaviour of the abstract specification should also be mandatory in the concrete specification, but it allows must-transitions to be machted by  weak must-transitions. Likewise, any allowed behaviour in the concrete specification should be allowed by the abstract specification, but again weak may-transitions are allowed. For a precise definition and discussion see Section~\ref{pap:tgc}. With weak modal refinement we can now prove that 
+\[
+    (\pnN_{\mathsf{WS}} \async \pnN_{\mathsf{validator}})\setminus \{\channel{CheckUser}, \channel{Validated}\} \mrw \pnN_{\mathsf{interface}} \;.
+\]
+The goal is now to show that we can refine the $\pnN_{\mathsf{validator}}$ component in any way, and preserve this refinement by composition and hiding, so we do not need to prove refinement of the interface again. Furthermore, we want to have a consuming channel property that also preserves this refinement. This will give us a modular approach where we can 
+\begin{enumerate}
+    \item define a system interface,
+    \item design the system behaviour with a component-based architecture,
+    \item prove that this system refines the interface by hiding internal behaviour, and
+    \item prove that the components are communicating properly with the consuming property.
+\end{enumerate}
+Now, with all the above done, we can start refining the components individually without violating the interface while maintaining the channel properties.
+
+Before we can reach this goal we have to adapt the consuming property to deal with modalities and hidden internal behaviour. We want the consuming property to be preserved by refinement, thus we need to make sure that a system has the consuming property in any possible implementation. To do this, we require that in any marking $m$ where there is some message on a channel $\channel{c}$ then the system \emph{must} autonomously be able to take this message. Hence, there should be a sequence $\rho$ of non-input must-transitions from $m$ leading to a marking $m'$ such that $m'\goes{\transition{\inact{c}}}m''$. Note that we also allow must $\tau$ transitions in $\rho$. 
+
+\begin{figure}[ht]
+\centering
+    \input{introduction/figures/example-maiopn-fairnes}
+    \caption{\MAIOPN $\pnN_2 \async \pnN'_3$.\label{fig:intro:maiopn-example-fairness}}
+\end{figure}
+
+For the necessarily consuming property, the adjustment is not as simple. There is a problem with the weak fairness assumption, which is not sufficient any more. Consider the composed \AIOPN $\pnN_2 \async \pnN_3$ in Figure~\ref{fig:intro:aiopn-composed} on page~\pageref{fig:intro:aiopn-composed} as an \MAIOPN, where every transition is a must-transition. Using the definition of necessarily consuming for \AIOPN $\pnN_2 \async \pnN_3$ is necessarily consuming. However, if we refine the component $\pnN_3$ by adding some hidden internal behaviour, we can break the necessarily consuming property. For instance in Figure~\ref{fig:intro:maiopn-example-fairness}, we have exchanged $\pnN_3$ with a weak refinement $\pnN_3'$. In $\pnN_2 \async \pnN'_3$ we can reach a marking $m$ with a token in $p_0$, $p_4$ and $\channel{msg}$. From this marking we can repeatingly fire the two rightmost $\tau$-transitions followed by $\transition{\outact{msg}}$ and $\transition{in?}$ to infinity. This is in fact a weakly fair run, but there is never taken a message from \channel{msg}. Hence, $\pnN_2 \async \pnN'_3$ is not necessarily consuming as defined for \AIOPNs.
+%  where the following infinite run is a weakly fair run; 
+% \[
+%     m \goes{\transition{\tau}} m \goes{\transition{\outact{msg}}} m' \goes{\transition{in?}} 
+%     \;\;\; 
+%     m \goes{\transition{\tau}} m \goes{\transition{\outact{msg}}} m' \goes{\transition{in?}}
+%     \;\;\; 
+%     m \goes{\transition{\tau}} m \goes{\transition{\outact{msg}}} m' \goes{\transition{in?}} \cdots 
+% \]
+
+The problem is that $\pnN_3'$ is a valid weak refinement of $\pnN_3$, but the introduced $\tau$-loop means that $\pnN_3'$ can loop forever without consuming messages from \channel{msg}, even in a weak fair run. The core of this problem is that we allow weak transitions in the definition of weak modal refinement, and this must be reflected in the necessarily property. In order to do this we introduce a notion of \emph{observationally weak fair runs}, where we require that any weak transition that is always enabled in a run is also infinitely often taken. In this concrete example this means that the weak transition $\lmustw{\transition{\inact{msg}}}$ is always enabled but never taken. Thus, the infinite run above does not qualify as an observationally weak fair run. With this notion of fairness we can define the necessarily consuming for \MAIOPNs by requiring that from any marking $m$ with some messages on a channel $\channel{c}$, the system must on all observationally weak fair runs eventually consume a message from $\channel{c}$.
+
+We have now presented the four techniques for component-based system design with \MAIOPNs; composition,
+hiding,
+refinement, and
+consuming properties.
+With these we prove that following main results. The first result shows that hiding internal communication preserves refinement.
+
+\begin{result}
+    For two \MAIOPNs $\pnN$ and $\M$ such that $\pnN \mrw \M$ and $H$ a subset of their channels it holds that $(\pnN \setminus H) \mrw (\M \setminus H)$.
+\end{result}
+
+The next result shows that refinement is preserved by composition.
+
+\begin{result}
+    Given four \MAIOPNs, $\pnN,\pnN',\M$ and $\M'$ such that $\pnN' \mrw \pnN$ and $\M'\mrw \M$, then it holds that $\pnN' \async \M' \mrw \pnN \async \M$. 
+\end{result}
+
+Like for \AIOPNs, \MAIOPNs do also support incremental design.
+\begin{result}[Incremental design]
+    Let $\pnN$ and $\M$ be two \MAIOPNs such that they are both (necessarily) consuming. If $\pnN \async \M$ is (necessarily) consuming with respect to the new channels of the composition, then $\pnN \async \M$ is (necessarily) consuming.
+\end{result}
+
+Finally, we prove that (necessarily) consuming is preserved by refinement.
+
+\begin{result}
+    Let $\pnN$ and $\M$ be two \MAIOPNs such that $\pnN$ is (necessarily) consuming. If $\M \mrw \pnN$ then $\M$ is (necessarily) consuming.
+\end{result}
+
+With all these results we believe that modal asynchronous I/O Petri nets is a suitable framework for component-based system design of complex systems. We have not studied the remaining channel properties in this modal framework, but we expect that they can be adapted in a similar manner and that the results above will continue to hold.

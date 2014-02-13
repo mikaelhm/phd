@@ -1,0 +1,339 @@
+\subsection{Motivation} 
+Modal transition systems 
+%~\cite{DBLP:conf/lics/LarsenT88,AHLNW:EATCS:08} 
+and their extensions described in the literature
+%like disjunctive MTS (DMTS)
+%~\cite{DBLP:conf/lics/LarsenX90}, %,fossacs-techrep}, 
+%1-selecting MTS (1MTS)%~\cite{FS:JLAP:08} 
+%and transition systems with obligations (OTS)
+%~\cite{benes_et_al:OASIcs:2011:3070}
+are lacking the capability to express several 
+specification requirements like exclusive, conditional and persistent choices.
+%\footnote{For more details, see Appendix~\ref{ap:mts}.}
+% (except for 1-selecting MTS being capable of expressing exclusive-or).  
+We shall now discuss these limitations on an example
+as a motivation for the introduction of parametric MTS formalism with
+general Boolean conditions in specification requirements.
+
+Consider a simple specification of a traffic light controller that can 
+be at any moment in one of the four predefined states:
+\red, \green, \yellow or \yellowRed.
+%, as is some national variants there is a \yellowRed light signal 
+%preceding the \green light. 
+The requirements of the specification are: when \green is on the traffic 
+light may either change to \red or \yellow and if it turned \yellow it must 
+go to \red afterward; when \red is on it may either turn to 
+\green or \yellowRed, and if it turns \yellowRed (as it is the case in some
+countries) it must go to \green afterwords. 
+%Intuitively, this means that the two yellow states are optional.
+
+
+\begin{figure}[ht]
+  \centering
+  \subfloat[MTS specification $S_1$.]{\label{fig:TL-mts}
+   % \scalebox{0.8}{
+  \begin{tikzpicture}[->,>=stealth',initial text=,xscale=0.8,yscale=0.8,transform shape]
+    \tikzstyle{every node}=[font=\large,label distance=-1.2mm] \tikzstyle{every
+      state}=[fill=black,shape=rectangle,inner sep=.5mm,minimum height=12mm, minimum width=6mm]
+    % background, as picture bound
+    \draw [fill=white,draw=white] (-1,-2) rectangle (3,2);
+    
+    % nodes with traffic lights
+    \node[initial,state,draw=white,fill=white,label=120:{\green}] (green) at (0,0) {};
+    \trafficlight{white}{white}{green}{0}{0}
+    
+    \node[state,draw=white,fill=white,label=right:{\red}] (red) at (4,0) {};
+    \trafficlight{red}{white}{white}{4}{0}
+    
+    \node[state,draw=white,fill=white,label=below:{\yellow}] (yellow) at (2,-2) {};
+    \trafficlight{white}{yellow}{white}{2}{-2}
+    
+    \node[state,draw=white,fill=white,label=90:{\yellowRed}] (yellowred) at (2,2) {};
+    \trafficlight{red}{yellow}{white}{2}{2}
+    
+    \path (red) edge [bend right=10,dashed] node [above] {\go} (green);
+    \path (green) edge [bend right=10,dashed] node [below] {\stop} (red);
+    \path (red.north) edge [bend right,dashed] node [above,sloped] {\getReady} (yellowred.east);
+    \path (yellowred.west) edge [bend right] node [above,sloped] {\go} (green.north);
+    \path (green.south) edge [bend right,dashed] node [below,sloped] {\prepareToStop} (yellow.west);
+    \path (yellow.east) edge [bend right] node [below,sloped] {\stop} (red.south);
+\end{tikzpicture}} 
+% }
+\qquad
+\subfloat[DMTS specification $S_2$.]{\label{fig:TL-DMTS}
+% \scalebox{0.8}{
+  \begin{tikzpicture}[->,>=stealth',initial text=,xscale=0.8,yscale=0.8,transform shape]
+    \tikzstyle{every node}=[font=\large] \tikzstyle{every
+      state}=[fill=black,shape=rectangle,inner sep=.5mm,minimum height=12mm, minimum width=6mm]
+
+    % nodes with traffic lights
+    \node[initial,state,draw=white,fill=white] (green) at (0,0) {};
+    \trafficlight{white}{white}{green}{0}{0}
+    
+    \node[state,draw=white,fill=white] (red) at (4,0) {};
+    \trafficlight{red}{white}{white}{4}{0}
+    
+    \node[state,draw=white,fill=white] (yellow) at (2,-2) {};
+    \trafficlight{white}{yellow}{white}{2}{-2}
+    
+    \node[state,draw=white,fill=white] (yellowred) at (2,2) {};
+    \trafficlight{red}{yellow}{white}{2}{2}
+    
+    \path (red) edge [bend right=10,dashed] node [above] {\go} (green);
+    \path (green) edge [bend right=10,dashed] node [below] {\stop} (red);
+    \path (red.north) edge [bend right,dashed] node [above,sloped] {\getReady} (yellowred.east);
+    \path (yellowred.west) edge [bend right] node [above,sloped] {\go} (green.north);
+    \path (green.south) edge [bend right,dashed] node [below,sloped] {\prepareToStop} (yellow.west);
+    \path (yellow.east) edge [bend right] node [below,sloped] {\stop} (red.south);
+    \draw (green.south) -- (1.4,-1.2) -- (yellow.west);
+    \path (1.4,-1.2) edge (red.west);
+    \draw (red.north) -- (2.6,1.2) -- (yellowred.east);
+    \path (2.6,1.2) edge (green.east);
+    \node at (4.5,-3) {};
+\end{tikzpicture} }
+% } 
+
+\caption{Specifications of a traffic light controller.}
+\end{figure}
+
+%\paragraph{MTS}
+Figure~\ref{fig:TL-mts} shows an obvious MTS specification (defined
+formally later on) of the proposed specification. 
+The transitions in the standard MTS formalism are either of type
+may (optional transitions depicted as dashed lines) or must 
+(required transitions depicted as solid lines). 
+In Figure~\ref{fig:TL-none}, Figure~\ref{fig:TL-both} and 
+Figure~\ref{fig:TL-alternation} we present three different implementations 
+of the MTS specification where there are no more optional transitions.
+The implementation $I_1$ does not implement any may transition as it  
+is a valid possibility to satisfy the specification $S_1$.
+Of course, in our concrete example, this means that the light is constantly
+\green and it is clearly an undesirable behaviour that cannot be, however,
+easily avoided. 
+The second implementation $I_2$ on the %\ref{fig:TL-both} 
+other hand implements all may transitions, again a legal implementation
+in the MTS methodology but not a desirable implementation of a traffic
+light as the next action is not always deterministically given. Finally, the implementation $I_3$ of $S_1$ 
+%Figure~\ref{fig:TL-alternation} 
+illustrates the third problem with the MTS specifications, namely
+that the choices made in each turn are not persistent and the
+implementation alternates between entering \yellow or not.
+None of these problems can be avoided when using the MTS formalism.
+
+\begin{figure}[t!]
+  \centering
+
+    \subfloat[Implementation $I_1$.]{\label{fig:TL-none}  
+        \begin{tikzpicture}[->,>=stealth',initial text=,xscale=0.8,yscale=0.8,transform shape]
+            \tikzstyle{every node}=[font=\large] \tikzstyle{every
+              state}=[fill=black,shape=rectangle,inner sep=.5mm,minimum height=12mm, minimum width=6mm]
+            % background, as picture bound
+            \draw [fill=white,draw=white] (-1.5,-2.5) rectangle (1.5,2);
+
+
+            % nodes with traffic lights
+            \node[initial,state,draw=white,fill=white] (green) at (0.5,0) {};
+            \trafficlight{white}{white}{green}{0.5}{0}
+            \node[draw=white,fill=white] (empty) at (4,0) {};
+        \end{tikzpicture}  
+    }
+    \quad
+    \subfloat[Implementation $I_2$.]{\label{fig:TL-both} 
+        \begin{tikzpicture}[->,>=stealth',initial text=,xscale=0.8,yscale=0.8,transform shape]
+            \tikzstyle{every node}=[font=\large] \tikzstyle{every
+              state}=[fill=black,shape=rectangle,inner sep=.5mm,minimum height=12mm, minimum width=6mm]
+            % background, as picture bound
+            % \draw [fill=white,draw=white] (-1,-2) rectangle (3,2);
+
+            % nodes with traffic lights
+            \node[initial,state,draw=white,fill=white] (green) at (0,0) {};
+            \trafficlight{white}{white}{green}{0}{0}
+
+            \node[state,draw=white,fill=white] (red) at (4,0) {};
+            \trafficlight{red}{white}{white}{4}{0}
+
+            \node[state,draw=white,fill=white] (yellow) at (2,-2) {};
+            \trafficlight{white}{yellow}{white}{2}{-2}
+
+            \node[state,draw=white,fill=white] (yellowred) at (2,2) {};
+            \trafficlight{red}{yellow}{white}{2}{2}
+
+            \path (red) edge [bend right=10] node [above] {\go} (green);
+            \path (green) edge [bend right=10] node [below] {\stop} (red);
+            \path (red.north) edge [bend right] node [above,sloped] {\getReady} (yellowred.east);
+            \path (yellowred.west) edge [bend right] node [above,sloped] {\go} (green.north);
+            \path (green.south) edge [bend right] node [below,sloped] {\prepareToStop} (yellow.west);
+            \path (yellow.east) edge [bend right] node [below,sloped] {\stop} (red.south);
+        \end{tikzpicture}  
+    }
+    \quad
+    \subfloat[Implementation $I_3$.]{\label{fig:TL-alternation}  
+        \begin{tikzpicture}[->,>=stealth',initial text=,xscale=0.8,yscale=0.8,transform shape]
+            \tikzstyle{every node}=[font=\large] \tikzstyle{every
+            state}=[fill=black,shape=rectangle,inner sep=.5mm,minimum height=12mm, minimum width=6mm]
+            % background, as picture bound
+            \draw [fill=white,draw=white] (-1,-2) rectangle (3,2);
+
+            % nodes with traffic lights
+
+            \node[initial,state,draw=white,fill=white] (green1) at (-1.902,.618) {};
+            \trafficlight{white}{white}{green}{-1.902}{.608}
+
+            \node[state,draw=white,fill=white] (red1) at (-1.176,-1.618) {};
+            \trafficlight{red}{white}{white}{-1.176}{-1.618}
+
+            \node[state,draw=white,fill=white] (green2) at (1.176,-1.618){};
+            \trafficlight{white}{white}{green}{1.176}{-1.618}
+
+            \node[state,draw=white,fill=white] (yellow) at (1.902,.618) {};
+            \trafficlight{white}{yellow}{white}{1.902}{.618}
+
+            \node[state,draw=white,fill=white] (red2) at (0,2) {};
+            \trafficlight{red}{white}{white}{0}{2}
+
+            \path (green1) edge [bend right=10] node [below,sloped] {\stop} (red1);
+            \path (red1) edge [bend right=10] node [below, sloped] {\go} (green2);
+            \path (green2) edge [bend right=10] node [above,sloped] {\getReady} (yellow);
+            \path (yellow) edge [bend right=10] node [above, sloped] {\stop} (red2);
+            \path (red2) edge [bend right=10] node [above, sloped] {\go} (green1);
+        \end{tikzpicture}  
+    }
+\caption{MTS implementations of a traffic light controller.}
+\end{figure}
+
+
+
+%\paragraph{DMTS}
+A more expressive formalism of disjunctive modal transition systems
+(DMTS) can overcome some of the above mentioned problems. 
+A possible DMTS specification $S_2$ is depicted in Figure~\ref{fig:TL-DMTS}. 
+Here the \getReady and \stop  transitions, as well as
+\prepareToStop and \go ones, are disjunctive, meaning that
+it is still optional which one is implemented but at least one of them 
+must be present. Now the system $I_1$ in Figure~\ref{fig:TL-none} is
+not a valid implementation of $S_2$ any more. Nevertheless, 
+the undesirable implementations $I_2$ and $I_3$ 
+%in Figure~\ref{fig:TL-both} and Figure~\ref{fig:TL-alternation} 
+are still possible and the modelling power of DMTS 
+is insufficient to eliminate them.
+
+%%% OTS Figure
+\begin{figure}[ht]
+    \centering
+    \begin{tikzpicture}[->,>=stealth',initial text=,xscale=0.8,yscale=0.8,transform shape]
+        \tikzstyle{every node}=[font=\large] \tikzstyle{every
+          state}=[fill=black,shape=rectangle,inner sep=.5mm,minimum height=12mm, minimum width=6mm]
+        % background, as picture bound
+        %\node[state,draw=white,fill=white] (empty) at (7.2,0) {};
+
+        %\draw [fill=white,draw=white] (-1,-2) rectangle (3,2);
+        
+        % nodes with traffic lights
+        \node[initial,state,draw=white,fill=white] (green) at (0,0) {};
+        \trafficlight{white}{white}{green}{0}{0}
+        
+        \node[state,draw=white,fill=white] (red) at (4,0) {};
+        \trafficlight{red}{white}{white}{4}{0}
+        
+        \node[state,draw=white,fill=white] (yellow) at (2,-2) {};
+        \trafficlight{white}{yellow}{white}{2}{-2}
+        
+        \node[state,draw=white,fill=white] (yellowred) at (2,2) {};
+        \trafficlight{red}{yellow}{white}{2}{2}
+        
+        \path (red) edge [bend right=10] node [above] {\go} (green);
+        \path (green) edge [bend right=10] node [below] {\stop} (red);
+        \path (red.north) edge [bend right] node [above,sloped] {\getReady} (yellowred.east);
+        \path (yellowred.west) edge [bend right] node [above,sloped] {\go} (green.north);
+        \path (green.south) edge [bend right] node [below,sloped] {\prepareToStop} (yellow.west);
+        \path (yellow.east) edge [bend right] node [below,sloped] {\stop} (red.south);
+
+        \node[right] at (5,.5) {\bfseries Obligation function:};
+        \node[right] at (5,0) {$\UPhi(\green) = (\stop,\red) \oplus (\prepareToStop,\yellow)$};
+        \node[right] at (5,-.5) {$\UPhi(\red) = (\go,\green) \oplus (\getReady,\yellowRed)$};
+        % \node[right] at (5,-.5) {$\UPhi(\yellow) = (\stop,\red)$};
+        % \node[right] at (5,-1) {$\UPhi(\yellowRed) = (\go,\green)$};
+        %eqaual size
+        % \node at (-1,-5.70) {};
+    %   \node at (5,-5.70) {};
+    \end{tikzpicture}
+    \caption{OTS Specification $S_3$. \label{fig:TL-BMTS}}
+\end{figure}
+
+%\paragraph{MTS with boolean conditions}
+Inspired by the recent notion of transition systems with 
+obligations (OTS)~\cite{benes_et_al:OASIcs:2011:3070}, 
+we can model the traffic light using specification
+as a transition system with arbitrary\footnote{In the transition
+systems with obligations only positive Boolean formulae are allowed.} 
+obligation formulae. These formulae are Boolean
+propositions over the outgoing transitions from each state,
+whose satisfying assignments yield the allowed combinations
+of outgoing transitions.
+A possible specification called $S_3$ is given 
+in Figure~\ref{fig:TL-BMTS} and it uses the operation of exclusive-or. 
+We will follow an agreement that whenever the obligation function for some node 
+is not listed in the system description then it is implicitly understood as 
+requiring all the available outgoing transitions to be present.
+Due to the use of exclusive-or in the obligation function, 
+the transition systems $I_1$ and $I_2$ are not valid implementation any more. 
+Nevertheless, the implementation $I_3$ 
+in Figure~\ref{fig:TL-alternation} cannot be avoided in this
+formalism either. 
+
+%%% PMTS Figure
+\begin{figure}[ht]
+  \centering 
+      \begin{tikzpicture}[->,>=stealth',initial text=,xscale=0.8,yscale=0.8,transform shape]
+        \tikzstyle{every node}=[font=\large] \tikzstyle{every
+          state}=[fill=black,shape=rectangle,inner sep=.5mm,minimum height=12mm, minimum width=6mm]
+        % background, as picture bound
+       % \draw [fill=white,draw=white] (-1,-2) rectangle (3,2);
+        
+        % nodes with traffic lights
+        \node[initial,state,draw=white,fill=white] (green) at (0,0) {};
+        \trafficlight{white}{white}{green}{0}{0}
+        
+        \node[state,draw=white,fill=white] (red) at (4,0) {};
+        \trafficlight{red}{white}{white}{4}{0}
+        
+        \node[state,draw=white,fill=white] (yellow) at (2,-2) {};
+        \trafficlight{white}{yellow}{white}{2}{-2}
+        
+        \node[state,draw=white,fill=white] (yellowred) at (2,2) {};
+        \trafficlight{red}{yellow}{white}{2}{2}
+        
+        \path (red) edge [bend right=10] node [above] {\go} (green);
+        \path (green) edge [bend right=10] node [below] {\stop} (red);
+        \path (red.north) edge [bend right] node [above,sloped] {\getReady} (yellowred.east);
+        \path (yellowred.west) edge [bend right] node [above,sloped] {\go} (green.north);
+        \path (green.south) edge [bend right] node [below,sloped] {\prepareToStop} (yellow.west);
+        \path (yellow.east) edge [bend right] node [below,sloped] {\stop} (red.south);
+        
+        \node [right] at (5,2.5) {{\bfseries Parameters:}};
+        \node [right] at (5,1.9) {$\{\mustGoYellowRed,\mustGoYellow\}$};
+        \node [right] at (5,1.2) {\bfseries Obligation function:};
+        \node [right] at (5,.6) {$\UPhi(\green) = ((\stop,\red) \oplus (\prepareToStop,\yellow))$};
+        \node [right] at (10,0.05) {$\wedge ( \mustGoYellow \Leftrightarrow (\prepareToStop,\yellow)) $};
+        \node [right] at (5,-.6) {$ \UPhi(\red) = ((\go,\green) \oplus (\getReady,\yellowRed))$};
+        \node [right] at (10,-1.15) {$ \wedge ( \mustGoYellowRed \Leftrightarrow (\getReady,\yellowRed))$};
+        % \node [right] at (5,-1.8) {$\UPhi(\yellow) = (\stop,\red)$};
+        % \node [right] at (5,-2.4) {$\UPhi(\yellowRed) = (\go,\green)$};
+    \end{tikzpicture}
+ 
+    \caption{PMTS specification $S_4$.\label{fig:TL-PMTS} }
+\end{figure}
+%\paragraph{PMTS}
+Finally, the problem with the alternating implementation $I_3$ is 
+that we cannot enforce in any of the above mentioned formalisms 
+a uniform (persistent) 
+implementation of the same transitions in all its states.
+In order to overcome this problem, we propose the so-called parametric 
+MTS where we can, moreover, choose persistently whether the transition 
+to \yellow is present or not via the use of parameters. 
+The PMTS specification with two parameters
+\mustGoYellowRed and \mustGoYellow is shown in Figure~\ref{fig:TL-PMTS}. 
+Fixing a priori the (Boolean) values of the parameters
+ %\mustGoYellow and \mustGoYellowRed 
+makes the choices permanent in the whole implementation, hence
+we eliminate also the last problematic implementation $I_3$.

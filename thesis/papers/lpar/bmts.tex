@@ -1,0 +1,171 @@
+%!TEX root = ../../thesis.tex
+
+
+In order to define MTS with durations, we first introduce the notion of
+\emph{controllable} and \emph{uncontrollable} duration intervals.
+A~controllable interval is a~pair $\ci{m,n}$ where $m,n \in \mathbb N_0$
+and $m \le n$. Similarly, an~uncontrollable interval is a~pair $\ui{m,n}$
+where $m,n \in \mathbb N_0$ and $m \le n$.
+We denote the set of all controllable intervals by $\Intl_\cn$, the set of all
+uncontrollable intervals by $\Intl_\un$, and the set of all intervals by 
+$\Intl = \Intl_\cn \cup \Intl_\un$.
+We also write only $m$ to denote the singleton interval $\ui{m,m}$. 
+Singleton controllable intervals need not be handled separately as there is no semantic difference to the uncontrollable counterpart.
+
+
+We can now formally define modal transition systems with durations. 
+In what follows, $\mathcal B(X)$ denotes the set of propositional logic 
+formulae over the set $X$ of atomic propositions, where we assume the standard connectives $\wedge,\vee,\neg$.
+
+\begin{definition}[MTSD] 
+%\todo{Jan: don't we want the initial state to be in the tuple? we have to handle it separately everywhere:-(}
+A~\emph{Modal Transition System with Durations} \allowbreak (MTSD) is a~tuple
+$\Spec = (S,T,D,\Phi,s_0)$ such that
+\begin{itemize}
+ 	\item $S$ is a~set of \emph{states} with the
+\emph{initial state} $s_0$,
+ 	\item $T \subseteq S \times \Sigma \times S$ is a set of
+\emph{transitions},
+ 	\item $D : T \to \Intl$ is a~\emph{duration interval
+function}, and
+ 	\item $\Phi : S \to \mathcal B(\Sigma\times S)$ is
+an~\emph{obligation function}.
+ \end{itemize}     
+ We assume that whenever the atomic proposition
+$(a,t)$ occurs in the \allowbreak Boolean formula $\Phi(s)$ then also $(s,a,t) \in T$. 
+
+Moreover, we require that there is no cycle of transitions that allows 
+for zero accumulated duration, i.e.~there is no path
+$s_1a_1s_2a_2\cdots s_n$ where \linebreak $(s_i,a_i,s_{i+1}) \in T$ and $s_n=s_1$
+such that for all $i$, the interval $D((s_i,a_i,s_{i+1}))$ 
+is of the form either $\ci{0,m}$ or $\ui{0,m}$ for some $m$.
+\end{definition}
+
+Note that instead of the basic may and must modalities known
+from the classical modal transition  %\todo{could be replaced by \cite{DBLP:conf/lics/LarsenT88}}
+systems~(see e.g.~\cite{AHLNW:EATCS:08}), we use
+arbitrary boolean formulae over the outgoing transitions of each
+state in the system as introduced in~\cite{BKLMS:ATVA:11}. This provides
+a higher generality as the formalism is capable to describe, 
+apart from standard modal transition systems, also more expressive formalisms
+like disjunctive modal transition 
+systems~\cite{DBLP:conf/lics/LarsenX90} and transition systems with 
+obligations~\cite{benes_et_al:OASIcs:2011:3070}. 
+See~\cite{BKLMS:ATVA:11} for a more thorough discussion of this formalism.
+
+In the rest of the paper, 
+%we shall often refer to an MTSD 
+%$(S,T,D,\Phi)$ simply as $S$.  Moreover, we
+%will sometimes assume an implicitly given initial state $s_0 \in S$
+%of the MTSD $S$. We 
+we adapt the following convention when drawing MTSDs.
+Whenever a state $s$ is connected with a solid arrow labelled by $a$
+to a state $s'$, this means that in any satisfying assignment of the Boolean
+formula $\Phi(s)$, the atomic proposition $(a,s')$ is always set
+to true (the transition \emph{must} be present in any refinement of the system).
+Should this not be the case, we use a dashed arrow instead (meaning
+that the corresponding transition \emph{may} be present in a refinement
+of the system but it can be also left out). 
+For example the solid edges in Figure~\ref{fig:spec1} correspond
+to an implicitly assumed $\Phi(s) = (a,s')$ where $(s,a,s')$ is the
+(only) outgoing edge from $s$; in this case we do not explicitly 
+write the obligation
+function. The three dashed transitions in the figure
+are optional, though at least one of them has to
+be preserved during any refinement (a feature that can be
+modelled for example in disjunctive MTS~\cite{DBLP:conf/lics/LarsenX90}).
+
+\begin{remark} \label{rem:mts}
+%The convention introduced above gives us 
+The standard notion of modal transition systems 
+(see e.g.~\cite{AHLNW:EATCS:08}) is obtained
+under the restriction that the formulae $\Phi(s)$ in any state $s \in S$
+have the form $(a_1,s_1) \wedge \ldots \wedge (a_n,s_n)$
+where $(s,a_1,s_1), \ldots, (s,a_n,s_n) \in T$. The edges mentioned in
+such formulae are exactly all must transitions; may transitions are not 
+listed in the formula and hence can be arbitrarily set to true or false.  
+\end{remark}
+Let by $T(s) = \{(a,t)\mid (s,a,t) \in T\}$ denote the set of all 
+outgoing transitions from the state $s \in S$.
+A~modal transition system with durations is called an~\emph{implementation}
+if $\Phi(s) = \bigwedge T(s)$ for all $s \in S$ (every allowed transition
+is also required), and 
+$D(s,a,s') \in \mathcal I_\mathsf u$ for all $(s,a,s') \in T$, i.e.~all
+intervals are uncontrollable, often singletons.  Figure~\ref{fig:impl1} shows
+an example of an implementation, while
+Figure~\ref{fig:spec2} is not yet an implementation as it still contains
+the controllable intervals $\ci{3,5}$ and $\ci{4,6}$.
+
+We now define a~notion of modal refinement. In order to do that, we
+first need to define refinement of intervals as a binary relation
+$\mathord{\leq} \subseteq \Intl \times \Intl$ such that
+\begin{itemize}
+\item $\ci{m',n'}\leq \ci{m,n}$ whenever $m' \ge m$ and $n' \le n$, and
+\item $\ui{m',n'} \leq \ci{m,n}$ whenever $m' \ge m$ and $n' \le n$.
+\end{itemize}
+%. An interval $\iota \in \mathcal I$
+%refines interval $\iota' \in \mathcal I$, written $\iota \leq \iota'$ if
+%\begin{itemize}
+%\item $\iota = \iota' = \ui{m,n}$, or
+%\item $\iota = \ci{m,n}$, $\iota' = \ci{m',n'}$, $m' \le m$, $n \le n'$, or
+%\item $\iota = \ui{m,n}$, $\iota' = \ci{m',n'}$, $m' \le m$, $n \le n'$.
+%\end{itemize}
+Thus controllable intervals can be refined by narrowing them, 
+at most until they become singleton intervals, or  until they are 
+changed to uncontrollable intervals. 
+Let us denote the collection of all possible sets of outgoing transitions from a state $s$ by
+$\val(s) := \{ E \subseteq T(s) \mid E \models \Phi(s) \}$ where
+$\models$ is the classical satisfaction relation on propositional
+formulae assuming that $E$ lists all true propositions.
+%\todo{we haven't defined $\models$ -- Nikola}
+
+\begin{definition}[Modal Refinement]
+Let $\Spec_1 = (S_1,T_1,D_1,\Phi_1,s_1)$ and $\Spec_2 = (S_2,T_2,D_2,\Phi_2,s_2)$ be two MTSDs.
+A binary relation
+$R \subseteq S_1 \times S_2$ is a~\emph{modal refinement} if
+for every $(s,t) \in R$ the following holds:
+\begin{align*} 
+ \forall M \in & \ \val(s) : \exists N \in \val(t) : \\
+& \ \forall (a,s') \in M : \exists (a,t') \in N : 
+%%\left(
+%%	(s',t') \in R
+%	((s,a,s'),(t,a,t')) \in \mathrm{Match}_R
+%%	\right)
+D_1(s,a,s') \leq D_2(t,a,t')
+\ \wedge\ 
+(s',t') \in R  \text{ and }
+%	\ \ \wedge 
+\\
+& \ \forall (a,t') \in N : \exists (a,s') \in M : 
+%%	(s',t') \in R\ 
+	%((s,a,s'),(t,a,t')) \in \mathrm{Match}_R
+D_1(s,a,s') \leq D_2(t,a,t')
+\ \wedge\ 
+(s',t') \in R \ .
+\end{align*}
+%where $\mathrm{Match}_R = \{ ((s,a,s'),(t,a,t')) \mid (s',t') \in R
+%\wedge 
+%D_1(s,a,s') \text{ refines } D_2(t,a,t')\}$. 
+We say that $s \in S_1$ modally refines $s' \in S_2$, 
+denoted by $s \mr s'$, if there
+exists a~modal refinement $R$ such that $(s,s') \in R$.
+We also write $\Spec_1 \mr \Spec_2$ if $s_1 \mr s_2$.
+%$s_1$ and $s_2$ are the implicitly given initial states of $S_1$ and $S_2$.
+\end{definition}
+
+Intuitively, the pair $(s,t)$ can be in the relation $R$ if for any
+satisfiable instantiation of outgoing edges from $s$ there is
+a satisfiable instantiation of outgoing edges from $t$ so that they
+can be mutually matched, possibly with $s$ having more refined
+intervals, and the resulting states are again in the relation $R$.
+
+Observe that in our running example 
+the following systems are in modal 
+refinement: $\Impl_1\mr \Spec_1 \mr \Spec$ and thus also
+$\Impl_1 \mr \Spec$, and similarly $\Impl_2\mr \Spec_2 \mr \Spec$ and thus also  $\Impl_2 \mr \Spec$.
+
+The reader can verify that on the standard modal transition systems (see 
+Remark~\ref{rem:mts}) the modal refinement relation corresponds
+to the classical modal refinement as 
+introduced in~\cite{DBLP:conf/lics/LarsenT88}.  
+

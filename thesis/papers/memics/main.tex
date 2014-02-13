@@ -1,0 +1,18 @@
+\input{papers/memics/introduction}
+
+\input{papers/memics/definition}
+
+\input{papers/memics/logic}
+
+\input{papers/memics/parameters}
+
+\section{Conclusion and Future Work} 
+We have introduced a new logic for Boolean modal transition systems (BMTS), based on Hennessy-Milner Logic with recursion. The logic characterizes the modal refinement relation on BMTS, which we proved by giving the characteristic formula for a BMTS and showing that the satisfaction relation coincided with modal refinement. 
+
+Secondly we applied the logic on parametric MTS (PMTS) as a tool to select the right truth assignment for the parameters of a PMTS, in order to fulfill a requirement. We gave a new semantic to the logic on PMTS, and showed that we can solve this problem via a maximal fix-point of a mutually recursive equation system.
+
+By providing these results, we think that the OTS, BMTS and PMTS are all justified formalisms of the MTS specification family.
+
+In the future we would like to investigate whether there exists an efficient algorithm for selecting the parameters of a PMTS given a requirement. One could try using BDDs or similar data structures to represent the constrains on the parameters.
+
+\paragraph{Acknowledgments} We would like to thank Ji\v{r}\'{\i} Srba for our initial discussions and his helpful comments. We would also like to thank Line Juhl for proofreading the paper.

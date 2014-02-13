@@ -1,0 +1,231 @@
+%!TEX root = ../../thesis.tex
+
+\begin{figure}[ht]
+\centering
+	\begin{tikzpicture}[node distance=100pt]
+		\node[state,minimum size=20pt,initial] (s0) {$s$};
+		\node[state,minimum size=20pt,right=of s0] (s1) {};
+		\node[state,minimum size=20pt,right=of s1] (s2) {};
+		\node[state,minimum size=20pt,below=of s2] (s3) {};
+		\node[state,minimum size=20pt,below=of s1] (s4) {};
+		\node[state,minimum size=20pt,below=of s0] (s5) {$t$};
+		\node[below=0.4 of s4] {
+			$ \Phi(t)= (\BigClean,s)\ \vee (\SkipClean,s)\ \vee (\SmallClean,s)$};
+		
+		\draw[arc] 
+			(s0) edge node[above] {\Wait} node[below] {$\ci{1,5}$} (s1) 
+			(s1) edge node[above] {\DriveBus} node[below] {$\ui{6,10}$} (s2) 
+			(s2) edge node[sloped,above] {\SmallClean} node[sloped,below] {$\ci{4,6}$} (s3) 
+			(s3) edge node[above] {\Wait} node[below] {$\ci{1,5}$} (s4) 
+			(s4) edge node[above] {\DriveBus} node[below] {$\ui{6,10}$} (s5) 
+			(s5) edge[dashed,bend left=80] node[sloped,above,yshift=-3] {\SmallClean} node[sloped,below,yshift=2] {$\ci{4,6}$} (s0) 
+			(s5) edge[dashed,bend right=70] node[sloped,above,yshift=-1] {\BigClean} node[sloped,below,yshift=2] {$\ci{20,30}$} (s0) 
+			(s5) edge[dashed] node[sloped,above,yshift=-3] {\SkipClean} node[sloped,below,yshift=2] {0} (s0) 
+		{};
+	\end{tikzpicture}
+	\caption{Example of Dual-Priced Modal Transition Systems with Time Durations, specification $\Spec$.\label{fig:spec1}}
+\end{figure}
+
+
+Consider the specification $\Spec$ in Figure~\ref{fig:spec1} 
+describing the work of a shuttle bus driver.
+He drives a bus between a hotel and the
+airport. First, the driver 
+has to \Wait for the passengers at the hotel. This can take one
+to five minutes. Since this behaviour is required to be present in all the
+implementations of this specification, it is drawn as a solid arrow and 
+called a \emph{must} transition. Then the driver has to \DriveBus the bus to
+the airport (this takes six to ten minutes)
+where he has to do a \SmallClean, then
+\Wait before he can \DriveBus the bus back to the hotel. When he returns he can
+do either a \SmallClean, \BigClean or \SkipClean of the bus before he
+continues. Here we do not require a particular option to be realised in the
+implementations, hence we only draw the transitions as dashed arrows. As these
+transitions may or may not be present in the implementations, they are called
+\emph{may} transitions. However, here the intention is to require at least one
+option be realised. Hence, we specify this using a propositional formula $\Phi$
+assigned to the state $t$ over its outgoing transitions as described
+in~\cite{benes_et_al:OASIcs:2011:3070,BKLMS:ATVA:11}. After performing one of the
+actions, the driver starts over again. Note that next time 
+the choice in $t$ may differ.
+
+Observe that there are three types of durations on the transitions. First,
+there are \emph{controllable} intervals, written in angle brackets. The meaning
+of e.g.~$\langle1,5\rangle$ is that in the implementation we can instruct the
+driver to wait for a fixed number of minutes in the range. Second, there are
+\emph{uncontrollable} intervals, written in square brackets. 
+The interval~$[6,10]$ on
+the \DriveBus transition means that in the implementation we cannot fix any
+particular time and the time can vary, say, depending on the traffic 
+and it is chosen
+nondeterministically by the environment. Third, the degenerated case of a
+single number, e.g.~$0$, denotes that the time taken is always constant and
+given by this number. In particular, a~zero duration means that the transition
+happens instantaneously.
+\begin{figure}[ht]
+	\centering
+	\subfloat[Specification $\Spec_1$.\label{fig:spec2}]{
+	\begin{tikzpicture}[node distance=80pt]
+			\node[state,minimum size=20pt,initial] (s0) {$s$};
+			\node[state,minimum size=20pt,right=of s0] (s1) {};
+			\node[state,minimum size=20pt,below=of s1,xshift=-50pt] (s2) {};
+			
+			\draw[arc] 
+				(s0) edge node[above] {\Wait} node[below] {$\ci{3,5}$} (s1) 
+				(s1) edge node[sloped,below] {\DriveBus} node[sloped,above] {$\ui{6,10}$} (s2) 
+				(s2) edge node[sloped,below] {\SmallClean} node[sloped,above] {$\ci{4,6}$}(s0)		{};
+		\end{tikzpicture}
+	}
+	\qquad
+	\subfloat[Implementation $\Impl_1$.\label{fig:impl1}]{
+		\begin{tikzpicture}[node distance=80pt]
+			\node[state,minimum size=20pt,initial] (s0) {$s$};
+			\node[state,minimum size=20pt,right=of s0] (s1) {};
+			\node[state,minimum size=20pt,below=of s1,xshift=-50pt] (s2) {};
+			
+			\draw[arc] 
+				(s0) edge node[above] {\Wait} node[below] {$5$} (s1) 
+				(s1) edge node[sloped,below] {\DriveBus} node[sloped,above] {$\ui{6,10}$} (s2) 
+				(s2) edge node[sloped,below] {\SmallClean} node[sloped,above] {$6$}(s0)		{};
+		\end{tikzpicture}
+	}
+	\caption{Examples of Dual-Priced Modal Transition Systems with Time Durations.}
+\end{figure}
+
+The system $\Spec_1$ is another specification, 
+a \emph{refinement} of $\Spec$, where 
+we additionally specify that the driver 
+must do a \SmallClean after each \DriveBus.
+Note that the \Wait interval has been narrowed. 
+The system $\Impl_1$ is an implementation of
+$\Spec_1$ (and actually also of $\Spec$) 
+where all controllable time intervals have
+already been fully resolved to their final single values: 
+the driver must \Wait for 5
+minutes and do the \SmallClean for 6 minutes. Note that uncontrollable
+intervals remain unresolved in the implementations and the time is
+chosen by the environment each time the action is
+performed. This reflects  the inherent uncontrollable uncertainty of the
+timing, e.g.~of a traffic.
+\begin{figure}[ht]
+\centering
+	\begin{tikzpicture}[node distance=100pt]
+		\node[state,minimum size=20pt,initial] (s0) {$s$};
+		\node[state,minimum size=20pt,right=of s0] (s1) {};
+		\node[state,minimum size=20pt,right=of s1] (s2) {};
+		\node[state,minimum size=20pt,below=of s2] (s3) {};
+		\node[state,minimum size=20pt,below=of s1] (s4) {};
+		\node[state,minimum size=20pt,below=of s0] (s5) {$t$};
+		% \node[below=0.4 of s4] {$ \Phi(t)= (\BigClean,s)\ \vee (\SkipClean,s)\ \vee (\SmallClean,s)$};
+		
+		\draw[arc] 
+			(s0) edge node[above] {\Wait} node[below] {$\ci{1,5}$} (s1) 
+			(s1) edge node[above] {\DriveBus} node[below] {$\ui{6,10}$} (s2) 
+			(s2) edge node[sloped,above] {\SmallClean} node[sloped,below] {$6$} (s3) 
+			(s3) edge node[above] {\Wait} node[below] {$\ci{1,5}$} (s4) 
+			(s4) edge node[above] {\DriveBus} node[below] {$\ui{6,10}$} (s5) 
+			(s5) edge[dashed,bend left=80] node[sloped,above,yshift=-3] {\SmallClean} node[sloped,below,yshift=2] {$\ui{4,5}$} (s0) 
+			(s5) edge[bend right=70] node[sloped,above,yshift=-1] {\BigClean} node[sloped,below,yshift=2] {$\ci{20,30}$} (s0) 
+			% (s5) edge[dashed] node[sloped,above,yshift=-3] {\SkipClean} node[sloped,below,yshift=2] {0} (s0) 
+			{};
+	\end{tikzpicture}
+	\caption{Specification $\Spec_2$.\label{fig:spec3}}
+\end{figure}
+\begin{figure}[ht]
+\centering
+	\begin{tikzpicture}[node distance=100pt]
+		\node[state,minimum size=20pt,initial] (s0) {$s$};
+		\node[state,minimum size=20pt,right=of s0] (s1) {};
+		\node[state,minimum size=20pt,right=of s1] (s2) {};
+		\node[state,minimum size=20pt,below=of s2] (s3) {};
+		\node[state,minimum size=20pt,below=of s1] (s4) {};
+		\node[state,minimum size=20pt,below=of s0] (s5) {$t$};
+		% \node[below=0.4 of s4] {$ \Phi(t)= (\BigClean,s)\ \vee (\SkipClean,s)\ \vee (\SmallClean,s)$};
+		
+		\draw[arc] 
+			(s0) edge node[above] {\Wait} node[below] {$1$} (s1) 
+			(s1) edge node[above] {\DriveBus} node[below] {$\ui{6,10}$} (s2) 
+			(s2) edge node[sloped,above] {\SmallClean} node[sloped,below] {$6$} (s3) 
+			(s3) edge node[above] {\Wait} node[below] {$1$} (s4) 
+			(s4) edge node[above] {\DriveBus} node[below] {$\ui{6,10}$} (s5) 
+			% (s5) edge[dashed,bend left=80] node[sloped,above,yshift=-3] {\SmallClean} node[sloped,below,yshift=2] {$\ui{4,5}$} (s0) 
+			(s5) edge node[sloped,above,yshift=-1] {\BigClean} node[sloped,below,yshift=2] {$30$} (s0) 
+			% (s5) edge[dashed] node[sloped,above,yshift=-3] {\SkipClean} node[sloped,below,yshift=2] {0} (s0) 
+			{};
+	\end{tikzpicture}
+	\caption{Implementation $\Impl_2$.\label{fig:impl2}}
+\end{figure}
+
+The system $\Spec_2$ is yet another specification and again a 
+refinement of $\Spec$, where the
+driver can always do a \BigClean in $t$ and 
+possibly there is also an~alternative
+allowed here of a \SmallClean. Notice that both \SmallClean intervals have been
+restricted and changed to uncontrollable. This means that we give up the
+control over the duration of this action and if this transition is implemented,
+its duration will be every time chosen nondeterministically in that range.
+Finally, $\Impl_2$ is then an implementation of $\Spec_2$ and $\Spec$.
+
+
+
+
+
+\begin{figure}[!t]
+	\centering
+	\begin{tikzpicture}[node distance=.2]
+		\node[anchor=north west,fill=lightlightblue] at (0,0) (run-cost){ 
+			\begin{tabular}{l|r}
+				$a\in\Sigma$  	&\; $r(a)$	\\ \hline
+				\Wait 			& 8\\
+				\DriveBus 		& 10\\
+				\SmallClean 	& 6\\
+				\BigClean 		& 7\\
+				\SkipClean 		& 0
+			\end{tabular} 
+		};
+		\node[right=of run-cost.north east,anchor=north west, fill=lightlightblue] (invest-cost){
+			\begin{tabular}{l|r}
+				$h\in H$  		&\; $\hc(h)$\\ \hline
+				\VacuumCleaner  & 100\\
+				\Sponge 		& 5
+			\end{tabular}
+		};
+
+		\node[above=of run-cost.north west,anchor=south west, fill=lightlightblue] (H-set) {$H=\{\VacuumCleaner,\Sponge\}$};
+		\node[below=of run-cost.south west,anchor=north west, fill=lightlightblue] (H-req) {
+				$ 
+					\Psi(a) = \begin{cases}
+									\VacuumCleaner & \text{if } a = \BigClean \\
+									\Sponge \vee \VacuumCleaner & \text{if } a= \SmallClean \\
+									true & \text{otherwise}
+								\end{cases}
+				$
+		};
+	\end{tikzpicture}
+\caption{Price Scheme.\label{fig:cost}}
+\end{figure}	
+
+Furthermore, we develop a way to model cost of resources. Each action is
+assigned a \emph{running price} it costs per time unit, e.g.~\DriveBus costs 10
+each time unit it is being performed as it can be  seen in the left table of
+Figure~\ref{fig:cost}. In addition, in order to perform an action, some
+hardware may be needed, e.g.~a~\VacuumCleaner for the \BigClean and its price
+is 100 as can be seen on the right. This \emph{investment price} is paid once
+only.
+
+Let us now consider the problem of finding an optimal implementation, so that we
+spend the least possible amount of money (e.g.~the pay to the driver) per time
+unit while conforming to the specification $\Spec$. 
+We call this problem \emph{the
+cheapest implementation problem}.
+The optimal implementation is to buy a vacuum cleaner if one can afford an
+investment of 100 and do the \BigClean every time as long as possible and \Wait
+as shortly as possible. (Note that \BigClean is more costly per time unit than
+\SmallClean but lasts longer.) This is precisely implemented in $\Impl_2$ and
+the (worst-case) average cost per time unit is $\approx7.97$. 
+If one cannot afford the
+vacuum cleaner but only a sponge, the optimal worst case long run average is
+then a bit worse and is implemented by doing the \SmallClean as long as
+possible and \Wait now as \emph{long} as possible. This is depicted in $\Impl_1$
+and the respective average cost per time unit is $\approx8.10$. 
+%For further details, see Example~\ref{ex:prices}.

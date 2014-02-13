@@ -1,0 +1,973 @@
+\section{Complexity of Modal Refinement Checking} \label{ss:complexity}
+
+We shall now investigate the complexity of refinement checking
+on PMTS and its relevant subclasses. Without explicitly mentioning it,
+we assume that all considered PMTS 
+are now finite and the decision problems are hence well defined.
+The complexity bounds include classes from the polynomial hierarchy
+(see e.g.~\cite{papadimitriou1994cc}) where for example 
+$\SigmaP_0 = \PiP_0 = $ P, $\PiP_1 = \coNP$ and $\SigmaP_1 = \NP$. 
+
+\begin{table}[bh]
+\footnotesize
+\centering
+
+    \begin{tabular}{|>{\columncolor{lightlightblue}}c|>{\columncolor{lightlightblue}}c|>{\columncolor{lightlightblue}}c|>{\columncolor{lightlightblue}}c|>{\columncolor{lightlightblue}}c|>{\columncolor{lightlightblue}}c|}\hline
+	{\cellcolor{lightblue}}&{\cellcolor{lightblue}}  Boolean  	& {\cellcolor{lightblue}}Positive 	& {\cellcolor{lightblue}}pCNF 	& {\cellcolor{lightblue}}pDNF &{\cellcolor{lightblue}} MTS\\\hline
+    {\cellcolor{lightblue}}&&& $\in$ coNP && $\in$ coNP \\
+    \multirow{-2}{*}{{\cellcolor{lightblue}}~Boolean~} & 
+        \multirow{-2}{*}{$\PiP_2$-complete} & 
+        \multirow{-2}{*}{\ coNP-complete\ } & P-hard & 
+        \multirow{-2}{*}{\ coNP-complete\ } & P-hard \\
+    
+    \hline
+    {\cellcolor{lightblue}}Positive& $\PiP_2$-complete	& coNP-complete	& ~P-complete~	& coNP-complete & ~P-complete~
+    \\\hline
+    {\cellcolor{lightblue}}pCNF	& $\PiP_2$-complete	& coNP-complete	& P-complete & coNP-complete & P-complete
+    \\\hline
+    {\cellcolor{lightblue}}pDNF	& $\PiP_2$-complete	& P-complete		& P-complete	& P-complete & P-complete
+    \\\hline
+    {\cellcolor{lightblue}}MTS	& $\PiP_2$-complete	& P-complete		& P-complete	& P-complete & P-complete
+    \\\hline
+    {\cellcolor{lightblue}}Impl	& NP-complete	& P-complete		& P-complete	& P-complete & P-complete
+    \\\hline
+    \end{tabular}
+
+\caption{Complexity of modal refinement checking of parameter-free systems.}
+\label{tbl:mr-compl}
+\end{table}
+
+\subsection{Parameter-Free Systems}
+
+
+Since even the parameter-free systems have interesting expressive
+power and the complexity of refinement on OTS has not been studied
+before, 
+we first focus on parameter-free systems.
+
+Moreover, the results of this subsection are then applied
+to parametric systems in the next subsection.
+
+The results are summarized in Table~\ref{tbl:mr-compl}.
+The rows in the table correspond 
+to the restrictions on the left-hand side PMTS while the columns correspond 
+to the restrictions on the right-hand side PMTS. Boolean denotes the general 
+system with arbitrary negation. Positive denotes the positive systems, 
+in this case exactly OTS. We use pCNF and pDNF to denote positive systems 
+with formulae in conjunctive and disjunctive normal forms, respectively. 
+In this case, pCNF coincides with DMTS. The special case of satisfaction 
+relation, where the refining system is an implementation is denoted by Impl.
+We do not include Impl to the columns as it makes sense that 
+an implementation is refined only to an implementation and here modal
+refinement corresponds to 
+bisimilarity that is 
+P-complete~\cite{balcazar1992dbp} (see also \cite{SawaJ05}). 
+The P-hardness is hence the obvious lower bound for all the 
+problems mentioned in the table. 
+
+
+
+
+
+We start with the simplest NP-completeness result. 
+
+\begin{proposition} 
+Modal refinement between an implementation and a\linebreak parameter-free PMTS is NP-complete.
+\end{proposition}
+\begin{proof}
+The containment part is straightforward. 
+First we guess the relation $R$.
+As $s$ is an implementation then 
+the set $\val_{\emptyset}(s)$ is a singleton.
+We thus only need to further guess $N \in \val_{\Valid}(t)$ and then in polynomial 
+time verify the two conjuncts in Definition~\ref{def:pers-mr}.
+
+The hardness part is by a simple reduction from SAT. 
+Let $\varphi(x_1, \ldots, x_n)$ be an given Boolean formula (instance of SAT).
+We construct two PMTSs $(S,T,P,\UPhi)$ and \linebreak  $(S',T',P',\UPhi')$ such that 
+\begin{enumerate}
+    \item $S = \{s,s'\}, T={(s,a,s')}, P= \emptyset$, $\UPhi(s) = (a,s')$ and $\UPhi(s') = \true$ and 
+    \item $S'= \{t, t_1, \ldots\ , t_n\}$, $T = \{(t,a,t_i) \mid 1 \le i \le n.\}$, 
+$P' = \emptyset$, $\UPhi(t) = \varphi[(a,t_i)/x_i]$ and $\UPhi(t_i) = \true$ 
+for all $i$, $1\le i \le n$.
+\end{enumerate}
+Clearly, $\varphi$ is satisfiable if and only if $s \mr t$.
+\end{proof}
+
+
+Next we show that modal refinement is $\PiP_2$-complete. 
+The following proposition introduces a gadget used also later on in other 
+hardness results. We will refer to it as the \emph{$*$-construction}. 
+
+\begin{proposition} 
+\label{prop:BB} 
+Modal refinement between two parameter-free PMTS is 
+$\PiP_2$-hard even if the left-hand side is
+an~MTS.
+
+\end{proposition}
+\begin{proof}
+The proof is by polynomial time reduction from the 
+validity of the quantified Boolean 
+formula $\psi \equiv \forall x_1 \ldots \forall x_n 
+\exists y_1 \ldots \exists y_m : 
+\varphi(x_1, \ldots, x_n, y_1, \ldots, y_m)$ 
+to the refinement checking problem $s\mr t$
+where $s$ and $t$ are given as follows. 
+
+\medskip
+
+
+\begin{center}
+\begin{tikzpicture}[->,>=stealth',initial text=,xscale=0.96]
+    \node[initial,state] (s) at(-3.5,0) {$s$};
+    \node[state] (s2) at(-3.5,-2) {$s'$};
+    \node at (-3.5, -1) {$\cdots$};  
+    
+    \path (s) edge [bend right=80] node [left] {$x_1$} (s2);
+    \path (s) edge [bend right=25] node [left] {$x_2$} (s2);
+    \path (s) edge [bend left=25] node [right] {$x_n$} (s2);
+    \path (s) edge [bend left=80] node [right] {$*$} (s2);
+
+    \node at(-3.5,.65) {$\UPhi(s)=(*,s')$};
+
+
+
+    \tikzstyle{every node}=[font=\small] 
+    
+    \node[initial,state] (t) at(0,0) {$t$};
+    \node[state] (tp) at(0,-2) {$t'$};
+    \node[state] (t1) at (2.2,-2) {$t_1$};
+    \node[state] (t2) at (3.9,-2) {$t_2$};
+    \node[state] (tm) at (6.3,-2) {$t_m$};
+    \node at (0, -1) {$\cdots$};    
+    \node at (5.1, -2) {$\cdots$};    
+   
+    
+    \path (t) edge [bend right=80] node [left] {$x_1$} (tp);
+    \path (t) edge [bend right=25] node [left] {$x_2$} (tp);
+    \path (t) edge [bend left=25] node [right] {$x_n$} (tp);
+    \path (t) edge [bend left=80] node [right] {$*$} (tp);   
+    \path (t.east) edge [bend left=40] node [right,pos=.745] {$*$} (t1.north);  
+    \path (t.east) edge [bend left=30] node [right,pos=.815] {$*$} (t2.north);   
+    \path (t.east) edge [bend left=17] node [right,pos=.825] {$*$} (tm.north);   
+
+    \node [right] at(-.75,.65) {$\UPhi(t)=\varphi[(x_i,t')/x_i,(*,t_i)/y_i]$};
+
+
+
+
+\end{tikzpicture}
+\end{center}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\smallskip
+
+Assume that $\psi$ is true. Let 
+$M \in \val_{\emptyset}(s)$ (clearly $(*,s') \in M$) and we want to argue
+that there is $N \in \val_{\emptyset}(t)$ with $(*,t') \in N$ such that
+for all $(x_i,s') \in M$  there is $(x_i,t') \in N$ (clearly the 
+states $s'$, $t'$ and $t_i$ are in modal refinement)
+and for all $(x_i,t') \in N$ there is $(x_i,s') \in M$.
+Such an $N$ can be found by simply including 
+$(x_i,t')$ whenever $(x_i,s') \in M$ and by adding
+also $(*,t')$ into $N$. As $\psi$ is true, we include into $N$
+also all $(*,t_i)$ whenever $y_i$ is set to true in $\psi$.
+Hence we get $s \mr t$.
+
+On the other hand if $\psi$ is false then we pick
+$M \in \val_{\emptyset}(s)$ such that $M$ corresponds to the
+values of $x_i$'s such that there are no values of 
+$y_1, \ldots, y_m$ that make $\psi$ true. This means that from 
+$t$ there will be no transitions as $\val_{\emptyset}(t)= \emptyset$
+assuming that $(x_i,t')$ have to be set to true whenever
+$(x_i,s') \in M$, otherwise the refinement between $s$ and $t$ will fail.
+However, now $(*,s') \in M$ cannot be matched from 
+$t$ and hence $s \not\mr t$.
+
+
+
+
+
+\end{proof}
+
+\begin{proposition} \label{prop:coinduction}
+Modal refinement between two parameter-free PMTS is in $\PiP_2$.
+\end{proposition}
+\begin{proof}
+The containment follows directly from Definition~\ref{def:pers-mr} 
+(note that the parameters are empty) and 
+the fact that the last conjunction 
+in Definition~\ref{def:pers-mr} is polynomially verifiable 
+once the sets $M$ and $N$ were fixed.
+The relation $R$ could in principle be guessed before
+it is verified, however, this would increase the complexity bound
+to $\SigmaP_3$.  Instead, we will initially include all 
+pairs (polynomially many) into $R$ and for each pair 
+ask whether for every $M$ there is $N$ such that the two
+conjuncts are satisfied. If it fails, we remove the pair and 
+continue until we reach (after
+polynomially many steps) the greatest fixed point. The complexity in
+this way remains in $\PiP_2$. We shall use this standard method 
+also in further proofs
+and refer to it as a co-inductive computation of $R$.
+
+
+\end{proof}
+
+
+\subsubsection{Positive Right-Hand Side.}
+We have now solved all the cases where the right-hand side is arbitrary.
+We now look at the cases where the right-hand side is positive.
+In the proofs that follow we shall use the alternative characterization
+of refinement from Lemma~\ref{lem:ref-positive}.
+The following proposition determines the subclasses on which modal refinement 
+can be decided in polynomial time.
+
+\begin{proposition}
+Modal refinement on parameter-free PMTS is in P, provided that 
+both sides are positive and 
+either the left-hand side is in pDNF or the right-hand side is in pCNF.
+\end{proposition}
+\begin{proof}
+Due to Lemma~\ref{lem:ref-positive}, the refinement is equivalent to the
+conjunction of \eqref{eqn:five} and \eqref{eqn:four}. Clearly, \eqref{eqn:five} can be checked in P. 
+We show that Condition \eqref{eqn:four} can be verified in P too.
+Recall 
+that \eqref{eqn:four}  says that
+\begin{align*}
+ \forall M \in \val_\mu(s) : \match_t(M) \in \val_\nu(t) 
+\end{align*}
+where $\match_t(M) = \{ (a,t') \in T(t) \mid \exists (a,s') \in M :
+(s',t') \in R\}$.
+
+First assume that the left-hand side is in pDNF.
+If for some $M$ the Condition~\eqref{eqn:four}  
+is satisfied then it is also
+satisfied for all $M' \supseteq M$, as $\val_{\mu}(s)$ is upwards closed.
+It it thus sufficient to verify the condition 
+for all minimal elements (wrt. inclusion)
+of $\val_{\mu}(s)$. In this case it correspond to the clauses of $\UPhi(s)$.
+Thus we get a polynomial time algorithm as shown 
+in Algorithm~\ref{alg:poly1}.
+
+\begin{algorithm}[ht]
+\SetKwInOut{Input}{Input}
+\SetKwInOut{Output}{Output}
+\Input{states $s$ and $t$ such that $\UPhi(s)$ is in positive DNF and
+$\UPhi(t)$ is positive, relation $R$}
+\Output{\emph{true} if $s$, $t$ satisfy the refinement condition, \emph{false} otherwise}
+
+\ForEach{clause $(a_1,s_1) \wedge \cdots \wedge (a_k,s_k)$ in $\UPhi(s)$}{
+
+	$N \gets \{(a,t') \in T(t) \mid \exists i : a_i = a \wedge (s_i,t') \in R\}$\;
+
+	\lIf{$N \not\in \val_\nu(t)$}{\Return {\em false}\;}
+}
+\Return {\em true}\;
+\caption{Test for Condition \eqref{eqn:four} of modal 
+refinement (pDNF) \label{alg:poly1}} 
+\end{algorithm}
+
+Second, assume that the right-hand side is in pCNF. 
+Note that Condition~\eqref{eqn:four} can be equivalently stated as
+\begin{align}
+\forall M : \match_t(M) \not\in\val_\nu(t) \Rightarrow M \not\in \val_\mu(s) \label{eqn:fourEq}
+\end{align}
+As $\UPhi(t)$ is in conjunctive normal form then 
+
+$N \in \val_\nu(t)$ is equivalent to saying that
+
+$N$ has nonempty
+intersection with each clause of $\UPhi(t)$. 
+We may thus enumerate all maximal $N \not\in \val_\nu(t)$.
+Having a~maximal $N \not\in \val_\nu(t)$, we 
+can easily construct $M$ such that $N = \match_t(M)$.
+This leads to the polynomial time Algorithm~\ref{alg:poly2}.
+
+\begin{algorithm}[h]
+\SetKwInOut{Input}{Input}
+\SetKwInOut{Output}{Output}
+\Input{states $s$ and $t$ such that $\UPhi(s)$ is positive and
+$\UPhi(t)$ is in positive CNF, relation $R$}
+\Output{\emph{true} if $s$, $t$ satisfy the refinement condition, \emph{false} otherwise}
+
+\ForEach{clause $(a_1,t_1) \vee \cdots \vee (a_k,t_k)$ 
+	in $\UPhi(t)$}{
+
+	$M \gets T(s) \setminus \{(a,s') \in T(s) \mid \exists i : a_i = a \wedge (s',t_i) \in R\}$\;
+
+	\lIf{$M \in \val_\mu(s)$}{\Return {\em false}\;}
+}
+\Return {\em true}\;
+\caption{Test for Condition~\eqref{eqn:four} of modal
+refinement (pCNF)\label{alg:poly2}} 
+\end{algorithm}
+The statement of the proposition thus follows.
+
+\end{proof}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\begin{proposition}
+Modal refinement on parameter-free PMTS is in coNP, if the 
+right-hand side is positive.
+\end{proposition}
+\begin{proof}
+Due to Lemma~\ref{lem:ref-positive} we can solve the two refinement conditions separately.
+Furthermore, both Condition \eqref{eqn:three} an \eqref{eqn:four} of Lemma~\ref{lem:ref-positive} can be checked in coNP. The guessing of $R$ is 
+done co-inductively as described in the proof of 
+Proposition~\ref{prop:coinduction}.
+
+\end{proof}
+
+\begin{proposition}
+Modal refinement on parameter-free systems is coNP-hard, 
+even if the left-hand side is in positive CNF
+and the right-hand side is in positive DNF.
+\end{proposition}
+\begin{proof}
+We reduce SAT into non-refinement.
+Let $\varphi(x_1, \ldots, x_n)$ be a~formula in CNF.
+We modify $\varphi$ into an equivalent formula $\varphi'$ as follows:
+add new variables $\tilde x_1$, \ldots, $\tilde x_n$
+and for all $i$ change all occurrences of $\neg x_i$ into $\tilde x_i$
+and add new clauses
+$(x_i \vee \tilde x_i)$ and $(\neg x_i \vee \neg \tilde x_i)$.
+
+Observe now that all clauses contain either all positive literals 
+or all negative literals. 
+Let $\psi^+$ denote a CNF formula that contains all positive clauses
+of $\varphi'$ and $\psi^-$ denote a CNF formula that contains all 
+negative clauses of $\varphi'$.
+As $\varphi' = \psi^+ \wedge \psi^-$ it is clear that 
+$\varphi'$ is satisfiable if and only if
+$(\psi^+ \Rightarrow \neg \psi^-)$ is not valid.
+
+Now we construct two 
+PMTSs $(S,T,P,\UPhi)$ and $(S',T',P',\UPhi')$ 
+over \linebreak $\USigma = \{ x_1, \ldots, x_n, \tilde x_1, \ldots, \tilde x_n \}$
+ as follows: 
+\begin{enumerate}
+    \item  $S=\{s,s'\}$, 
+    $T= \{(s,x_i,s'), (s,\tilde x_i, s') \mid 1 \leq i \leq n\}$, \\
+    $P = \emptyset$,
+    $\UPhi(s) = \psi^+[(x_i,s')/x_i,(\tilde x_i,s')/\tilde x_i]$ 
+    and $\UPhi(s') = \true$, and
+    \item $S' = \{t,t'\}$, 
+    $T' = \{ (t,x_i,t'),(t,\tilde x_i,t) \mid 1 \leq i \leq n\}$, \\
+    $P' = \emptyset$, 
+    $\UPhi(t) = \neg \psi^-[(x_i,t')/x_i,(\tilde x_i,t')/\tilde x_i]$ and 
+$\UPhi(t') = \true$.
+\end{enumerate}
+ Note that by pushing the negation of $\psi^-$ inside, 
+ this formula can be written as pDNF.
+It is easy to see that now $s \mr t$ if and only if 
+$(\psi^+ \Rightarrow \neg \psi^-)$ is valid.
+Therefore, $s \not\mr t$ if and only 
+if $\varphi$ is satisfiable.
+
+\end{proof}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Note that the exact complexity of modal refinement with the right-hand 
+side being in positive CNF or MTS and the left-hand side Boolean remains open. 
+
+\subsection{Systems with Parameters}
+
+In the sequel we investigate the complexity of refinement checking in the 
+general case of PMTS with parameters. The complexities are summarized 
+in Table~\ref{tbl:pmr-compl}.
+\begin{table}[b!]
+\centering
+\begin{tabular}{|>{\columncolor{lightlightblue}}c|>{\columncolor{lightlightblue}}c|>{\columncolor{lightlightblue}}c|>{\columncolor{lightlightblue}}c|>{\columncolor{lightlightblue}}c|}\hline
+	{\cellcolor{lightblue}}&{\cellcolor{lightblue}} Boolean 	&{\cellcolor{lightblue}} positive 	&{\cellcolor{lightblue}} pCNF 	&{\cellcolor{lightblue}} pDNF \\\hline
+    {\cellcolor{lightblue}}&&& $\in \PiP_3$ & \\
+    \multirow{-2}{*}{{\cellcolor{lightblue}}~Boolean~} & 
+	\multirow{-2}{*}{$\PiP_4$-complete} & 
+	\multirow{-2}{*}{$\PiP_3$-complete} & $\PiP_2$-hard &
+	\multirow{-2}{*}{$\PiP_3$-complete} \\
+\hline
+{\cellcolor{lightblue}}positive& $\PiP_4$-complete& $\PiP_3$-complete& $\PiP_2$-complete &$\PiP_3$-complete
+\\\hline
+{\cellcolor{lightblue}}pCNF	& $\PiP_4$-complete& $\PiP_3$-complete & $\PiP_2$-complete &$\PiP_3$-complete
+\\\hline
+{\cellcolor{lightblue}}pDNF	& $\PiP_4$-complete& $\PiP_2$-complete & $\PiP_2$-complete & $\PiP_2$-complete
+\\\hline
+{\cellcolor{lightblue}}MTS	& $\SigmaP_3$-complete &  NP-complete & NP-complete & NP-complete
+\\\hline
+{\cellcolor{lightblue}}Impl	& NP-complete & NP-complete & NP-complete & NP-complete
+\\\hline
+\end{tabular}
+\caption{Complexity of modal refinement checking with parameters.}
+\label{tbl:pmr-compl}
+\end{table}
+We start with an observation of how the results on parameter-free systems 
+can be applied to the parametric case.
+
+
+\begin{proposition}
+The complexity upper bounds from Table~\ref{tbl:mr-compl} carry over to Table~\ref{tbl:pmr-compl},
+as follows.
+If the modal refinement in the parameter-free case is in \emph{NP}, 
+\emph{coNP} or $\PiP_2$,
+then the modal refinement with parameters is in $\PiP_2$, $\PiP_3$ and 
+$\PiP_4$, respectively.
+Moreover, if the left-hand side is an MTS, the complexity upper bounds shift
+from \emph{NP} and $\PiP_2$ to \emph{NP} and $\SigmaP_3$, respectively.
+
+
+
+
+\end{proposition}
+\begin{proof}
+
+In the first case, we first universally choose $\mu$, we then 
+existentially choose $\nu$ and modify the formulae $\UPhi(s)$ and $\UPhi(t)$ 
+by evaluating the parameters. This does not change the normal 
+form/positiveness of the formulae.
+We then perform the algorithm for the parameter-free refinement.
+
+For the second case note that implementations and MTS have no parameters and
+we may simply choose (existentially) $\nu$ and run the algorithm for the
+parameter-free refinement. 
+
+\end{proof}
+
+
+We now focus on the respective lower bounds.
+
+
+
+
+
+
+\begin{proposition}
+Modal refinement between an implementation and a \linebreak right-hand side
+in positive CNF or in DNF is NP-hard.
+\end{proposition}
+\begin{proof}
+The proof is by reduction from SAT. 
+Let $\varphi(x_1,\ldots,x_n)$ be a~formula in CNF
+and let $\varphi_1$, $\varphi_2$, \ldots, $\varphi_k$ be the clauses of 
+$\varphi$.
+We construct two PMTSs $(S,T,P,\UPhi)$ and $(S',T',P',\UPhi')$ over the
+action alphabet $\USigma = \{a_1, \ldots, a_k\}$
+as follows: 
+\begin{enumerate}
+    \item $S = \{s,s'\}$, 
+    $T = \{(s, a_i, s') \mid 1 \le i \le k\}$,\\
+    $P = \emptyset$, 
+    $\UPhi(s) = \bigwedge_{1 \le i \le k} (a_i,s')$ and
+    $\UPhi(s') = \true$ and
+    \item $S' = \{t\} \cup \{t_i \mid 1 \le i \le k\}$,
+    $T' = \{(t,a_i,t_i) \mid 1 \le i \le k\}$, \\
+    $P' = \{ x_1, \ldots, x_n \}$,
+    $\UPhi'(t) = \bigwedge_{1 \le i \le k} (a_i,t_i)$
+    and $\UPhi'(t_i) = \varphi_i$ for all $1 \le i \le k$.
+\end{enumerate}
+Notice that each $\varphi_i$ in $\UPhi'(t_i)$ is in positive
+form as we negate only the parameters $x_i$ and every clause
+$\varphi_i$ is trivially in DNF. 
+Now we easily get that 
+$s \mr t$ if and only if $\varphi$ is satisfiable.
+
+\end{proof}
+
+
+
+\begin{proposition}\label{p:lm}
+Modal refinement is $\SigmaP_3$-hard even if the left-hand side is MTS.
+\end{proposition}
+\begin{proof}
+The proof is done using the~construction of the proof
+of Proposition~\ref{prop:BB} with parameters added on the right-hand side.
+
+We will make a reduction from the validity of the quantified Boolean
+formula $\psi \equiv \exists z_1, \ldots, z_k : \forall x_1 \ldots \forall x_n 
+\exists y_1 \ldots \exists y_m :$
+$\varphi(z_1, \ldots, z_k, x_1, \ldots, x_n, y_1, \ldots, y_m)$
+to the refinement checking problem $s \mr t$
+where $s$ and $t$ are given as follows.
+Moreover, the right-hand side system has $\{z_1, \ldots, z_k\}$
+as its set of parameters.
+
+\medskip
+
+\begin{tikzpicture}[->,>=stealth',initial text=]
+\node[initial,state] (s) at(-3.5,0) {$s$};
+    \node[state] (s2) at(-3.5,-2) {$s'$};
+    \node at (-3.5, -1) {$\cdots$};  
+    
+    \path (s) edge [bend right=80] node [left] {$x_1$} (s2);
+    \path (s) edge [bend right=25] node [left] {$x_2$} (s2);
+    \path (s) edge [bend left=25] node [right] {$x_n$} (s2);
+    \path (s) edge [bend left=80] node [right] {$*$} (s2);
+
+    \node at(-3.5,.65) {$\UPhi(s)=(*,s')$};
+
+
+    \tikzstyle{every node}=[font=\small] 
+    
+    \node[initial,state] (t) at(0,0) {$t$};
+    \node[state] (tp) at(0,-2) {$t'$};
+    \node[state] (t1) at (2.2,-2) {$t_1$};
+    \node[state] (t2) at (3.9,-2) {$t_2$};
+    \node[state] (tm) at (6.1,-2) {$t_m$};
+    \node at (0, -1) {$\cdots$};    
+    \node at (5.1, -2) {$\cdots$};    
+    
+    \path (t) edge [bend right=80] node [left] {$x_1$} (tp);
+    \path (t) edge [bend right=25] node [left] {$x_2$} (tp);
+    \path (t) edge [bend left=25] node [right] {$x_n$} (tp);
+    \path (t) edge [bend left=80] node [right] {$*$} (tp);   
+    \path (t.east) edge [bend left=40] node [right,pos=.745] {$*$} (t1.north);  
+    \path (t.east) edge [bend left=30] node [right,pos=.815] {$*$} (t2.north);   
+    \path (t.east) edge [bend left=17] node [right,pos=.825] {$*$} (tm.north);   
+
+    \node [right] at(-.75,.65) {$\UPhi(t)=\varphi[(x_i,t')/x_i,(*,t_i)/y_i]$};
+\end{tikzpicture}
+
+\smallskip
+
+Assume that $\psi$ is true. Then there exists a~valuation $\nu$ on 
+$\{z_1, \ldots, z_k\}$ such that $\forall x : \exists y : \varphi(x,y)$
+is true. Using now
+the same argument as that in the proof of Proposition~\ref{prop:BB},
+we get that $s \mr t$.
+
+On the other hand let $\psi$ be false and let $\nu$ be an
+arbitrary valuation on $\{z_1, \ldots, z_k\}$. We then may
+again use the reasoning in the proof of Proposition~\ref{prop:BB}
+to get that $s \not\mr t$.
+\end{proof}
+
+
+The following proof introduces a gadget used also later on in other hardness results. We refer to it as \emph{CNF-binding}. Further, we use
+the $*$-construction here.
+
+\begin{proposition}\label{p:lc}
+Modal refinement is $\PiP_4$-hard even if the left-hand side is in positive CNF.
+\end{proposition}
+\begin{proof}[Sketch]
+Consider a $\PiP_4$-hard QSAT instance, 
+a formula $\psi=\forall x \exists y \forall z \exists w : \varphi(x,y,z,w)$ with $\varphi$ is in CNF and $x,y,z,w$ vectors of length $n$.
+We construct two system $s$ and $t$ and use the variables 
+$\{ x_1, \ldots, x_n \}$ as parameters for the 
+left-hand side system $s$, and $\{ y_1, \ldots, y_n \}$ as parameters for the 
+right-hand side system $t$. 
+\begin{center}
+\begin{tikzpicture}[->,>=stealth',initial text=,yscale=0.8]
+\node[initial,state] (s) at(-3.5,0) {$s$};
+    \node[state] (s2) at(-3.5,-2) {$s'$};
+    
+
+    \path (s) edge [bend right=80] node [left] {$t_i$} (s2);
+    \path (s) edge [bend right=25] node [left] {$f_i$} (s2);
+    \path (s) edge [bend left=25] node [right] {$z_i$} (s2);
+    \path (s) edge [bend left=80] node [right] {$*$} (s2);
+
+    \node at(-3.5,.8) {$\UPhi(s)=(*,s')\ \wedge\ $CNF-binding};
+
+
+
+    \tikzstyle{every node}=[font=\small]
+
+    \node[initial,state] (t) at(0,0) {$t$};
+    \node[state] (tp) at(0,-2) {$t'$};
+    \node[state] (t1) at (2.2,-2) {$u_i$};
+    
+    
+    
+    
+   
+
+    \path (t) edge [bend right=80] node [left] {$t_i$} (tp);
+    \path (t) edge [bend right=25] node [left] {$f_i$} (tp);
+    \path (t) edge [bend left=25] node [right] {$z_i$} (tp);
+    \path (t) edge [bend left=80] node [right] {$*$} (tp);
+    \path (t.east) edge [bend left=40] node [right,pos=.745] {$*$} (t1.north);
+
+    \node [right] at(-.75,.8) {$\UPhi(t)=(*,s')\wedge \varphi[(t_i,t')/x_i,(f_i,t')/\neg x_i,$};
+    \node [right] at(1.70,0.1) {$(z_i,t')/z_i,(*,u_i)/w_i]$};
+
+\node at(4.6,-1.2) {for all $1\leq i\leq n$};
+\end{tikzpicture}
+\end{center}
+
+On the left we require $\UPhi(s) = (*,s')\wedge \bigwedge_{1 \le i \le n} 
+\Big((x_i \Rightarrow (t_i,s')) \wedge (\neg x_i \Rightarrow (f_i,s')\Big)$ and
+call the latter conjunct \emph{CNF-binding}. 
+Thus the value of each parameter $x_i$ is ``saved'' into transitions of the system. Note that although both $t_i$ and $f_i$ may be present, a ``minimal'' implementation contains exactly one of them. On the right-hand side 
+the transitions look similar but we require
+$\UPhi(t) = (*,t)\wedge\varphi'$ 
+where $\varphi'$ is created from $\varphi$ by changing
+every positive literal $x_i$ into $(t_i,t')$,
+every negative literal $\neg x_i$ into $(f_i,t')$,
+every $z_i$ into $(z_i,t')$, and
+every $w_i$ into $(*,u_i)$.
+
+We show that $\psi$ is true iff $s\mr t$. Assume first that $\psi$ is true. 
+Therefore, for every choice of parameters $x_i$ there is a choice of parameters $y_i$ so that $\forall z \exists w : \varphi(x,y,z,w)$ is true and, moreover, $t_i$ or $f_i$ is present on the left whenever $x_i$ or $\neg x_i$ is true, respectively (and possibly even if it is false). We set exactly all these transitions $t_i$ and $f_i$ on the right, too. Further, for every choice of transitions $z_i$ on the left there are $w_i$'s so that $\varphi(x,y,z,w)$ holds. On the right, we implement a transition $(z_i,t')$ for each $z_i$ set to true and $(*,u_i)$ for each $w_i$ set to true. Now $\varphi'$ is satisfied 
+as it has only positive occurrences of $(t_i,t')$
+and $(f_i,t')$ and hence the extra $t_i$'s and $f_i$'s do not matter. 
+Now for every implementation of $s$ we obtained an implementation of $t$. Moreover, their transitions match. Indeed, $t_i$'s and $f_i$'s were set the same as on the left, similarly for $z_i$'s. As for the $*$-transition, we use the same argumentation as in the original $*$-construction. On the left, there is always one. On the right, there can be more of them due to $w_i$'s but at least one is also guaranteed by $\UPhi(t)$.
+
+Let now $s\mr t$. Then for every choice of $x_i$'s---and thus also for every choice of \emph{exactly} one transition of $t_i,f_i$ for each $i$---there are $y_i$'s so that every choice of transitions $z_i$ can be matched on the right so that $\varphi'$ is true with some transitions $(*,u_i)$. Since choices of $t_i/f_i$ correspond exactly to choices of $x_i$ it only remains to set $w_i$ true for each transition $(*,u_i)$ on the right, thus making $\varphi$ true.
+
+\end{proof}
+
+
+We now prove Proposition~\ref{p:lcrc}, followed by Proposition~\ref{p:lcrd}. The reason
+for this ordering is that the setting of Proposition~\ref{p:lcrc} is simpler and the
+proof involves just one method, namely that of the CNF-binding, 
+no $*$-construction is used and no additional actions are needed.
+
+
+\begin{proposition}\label{p:lcrc}
+Modal refinement is $\PiP_2$-hard even if both sides are in positive CNF.
+\end{proposition}
+\begin{proof}
+Recall that positive means that there may be negations, but only limited
+to parameter literals.
+The proof is done by reduction from the validity of \linebreak  
+$\forall x_1, \ldots, x_n \exists y_1, \ldots, y_m : 
+\varphi(x_1, \ldots, x_n, y_1, \ldots, y_m)$, where $\varphi$ is in CNF.
+The idea is that the left-hand side has only $x_i$ as parameters
+while the right-hand side has $y_i$ as parameters.
+To ensure that the valuation of $x_i$ is the same
+on both sides, we bind them through transitions.
+
+Let 
+$\USigma = \{t_1, \ldots, t_n, f_1, \ldots, f_n\}$
+be the set of actions.
+The systems $(S,T,P,\UPhi)$ and $(S',T',P',\UPhi')$ are built as follows: 
+\begin{enumerate}
+    \item $S = \{s, s'\}$,\\ 
+    $T = \{(s,t_i,s'), (s,f_i,s') \mid
+1 \le i \le n \}$,\\ 
+    $P = \{x_1, \ldots, x_n\}$,\\
+    $\UPhi(s) = \bigwedge_{1 \le i \le n} ((x_i \Rightarrow (t_i,s')) \wedge (\neg x_i \Rightarrow (f_i,s'))$ (note that this may be written in positive CNF),\\
+    $\UPhi(s') = \true$;
+    \item $S' = \{ t, t' \}$,\\
+    $T' = \{ (t,t_i,t'), (t,f_i,t') \mid 1 \le i \le n \}$,\\
+    $P' = \{y_1, \ldots, y_m\}$,\\
+
+    $\UPhi'(t) = \varphi[(t_i,t')/x_i,(f_i,t')/\neg x_i]$,\\
+
+    $\UPhi'(t') = \true$.
+\end{enumerate}
+
+
+
+We now claim that $\forall x \exists y : \varphi$ holds
+if and only if $s \mr t$.
+We show the two implications separately. 
+
+Let first $\forall x \exists y : \varphi$ hold.
+Let $\mu \subseteq P_1$ be arbitrary. As this is a truth valuation
+on the $x_i$ variables, we know that there exists a valuation
+on the $y_i$ variables such that $\varphi$ holds. Let $\nu \subseteq P_2$
+be such a valuation.
+Let further $M \in \val_\mu(s)$ be arbitrary.
+Clearly, if $x_i \in \mu$ then $(t_i,s') \in M$ and 
+if $x_i \not\in \mu$ then $(f_i,s') \in M$.
+
+We set \[N = \{ (x,t') \mid (x,s') \in M\}\]. Clearly, such $N$ satisfies
+both conjuncts of the refinement definition. We need to show that 
+$N \in \val_\nu(t)$. We thus need to show that $N$ satisfies
+all the clauses in $\UPhi'(t)=\varphi[(t_i,t')/x_i,(f_i,t')/\neg x_i]$.
+
+We use the fact that $\varphi$ holds, given the current valuation
+$\mu$ on $x_i$ and $\nu$ on $y_i$.
+Let $(\ell_1 \vee \ell_2 \vee \cdots \vee \ell_k)$ be an arbitrary clause
+of $\varphi$. Clearly, at least one literal was satisfied.
+If that literal was $y_i$ or $\neg y_i$ then the same literal appears
+in the modified clause of $\UPhi'(t)$ and we are done.
+If that literal was $x_i$ then it has been changed into
+$(t_i,t')$, but as $x_i \in \mu$, we have that $(t_i,t') \in N$.
+Similarly, if that literal was $\neg x_i$ then it has been 
+changed into $(f_i,t')$, but as $x_i \not\in\mu$, we have
+that $(f_i,t') \in N$. Thus $s \mr t$.
+
+For the other implication let 
+$\exists x \forall y : \neg \varphi$ hold.  We show that $s \not\mr t$.
+Let $\mu$ be the valuation of $x_i$ such that 
+$\exists x \forall y : \neg \varphi$ holds.
+Let $\nu$ be arbitrary. This corresponds to a valuation on $y_i$.
+
+We now set 
+\[
+M = \{ (t_i, s') \mid x_i \in \mu \} \cup \{ (f_i, s') \mid x_i \not\in \mu \}.
+\] 
+Clearly, $M\in\val_\mu(s)$. Let further $N \in \val_\nu(t)$. (If $\val_\nu(t) = \emptyset$, we are done.)
+
+We know that given the current $x$ and $y$ valuation, $\varphi$ does not hold.
+This means that there exists at least one clause of $\varphi$ that is false.
+Let $(\ell_1 \vee \ell_2 \vee \cdots \vee \ell_k)$ be such clause. 
+All $\ell_j$ are false, given current valuation $\mu$ and $\nu$.
+However, the modified clause of $\UPhi'(t)$ corresponding to this one
+is satisfied by $N$ (valuation of $(t_i,t')$ and $(f_i,f')$) as $N\in\val_\nu(t)$.
+
+Therefore, for some $i$,
+     either $(t_i,t') \in N$ while $x_i \not \in \mu$
+    or $(f_i,t') \in N$ while $x_i \in \mu$.
+In both cases $N$ does not satisfy 
+the second conjunct part of the modal refinement
+definition. Therefore $s \not\mr t$.
+\end{proof}
+
+The next proposition again reuses the idea of CNF-binding in the very same fashion as above. Moreover, it handles more actions, more precisely those that appear as $z_i$'s in Proposition~\ref{p:lc}. Thus, the proof is the same, omitting the $*$-construction. Therefore, we only provide the reduction without repeating the formal arguments that it indeed works.
+
+\begin{proposition}\label{p:lcrd}
+Modal refinement is $\PiP_3$-hard for the left-hand side 
+in positive CNF and the right-hand side in positive DNF.
+\end{proposition}
+\begin{proof}
+The proof is done by reduction from the validity of 
+the quantified Boolean formula
+$\forall x_1, \ldots, x_k
+\exists y_1,\ldots, y_l \forall z_1,\ldots, z_m
+: \varphi$ with $\varphi$ in DNF. 
+
+Let the action alphabet be $\USigma = \{t_1, \ldots, t_k, f_1, \ldots, f_k, 
+  z_1, \ldots, z_m \}$.
+
+The two systems $(S,T,P,\UPhi)$ and $(S',T',P',\UPhi')$ are built as
+follows: 
+\begin{enumerate}
+    \item $S = \{s, s'\}$, 
+    $T = \{ (s,t_i,s'), (s,f_i,s') \mid 1 \le i \le k\} \cup \{ (s, z_j, s') \mid 1 \le j \le m \}$, \\
+    $P = \{x_1, \ldots, x_k\}$,
+    $\UPhi(s) = \bigwedge_{1 \le i \le n} ((x_i \Rightarrow (t_i,s')) \wedge (\neg x_i \Rightarrow (f_i,s'))$, and
+    $\UPhi(s') = \true$;
+    \item $S' = \{t, t'\}$, 
+    $T' = \{(t,t_i,t'), (t,f_i,t') \mid 1 \le i \le k\} \cup \{(t, z_j, t')\mid 1 \le j \le m\}$, \\
+    $P' = \{y_1, \ldots, y_k\}$,
+    $\UPhi'(t) = \varphi[(t_i,t')/x_i,(f_i,t')/\neg x_i,(z_i,t')/z_i]$,
+    $\UPhi'(t') = \true$.
+\end{enumerate}
+
+Now $\forall x \exists y \forall z : \varphi(x,y,z)$ holds if and only if
+$s \mr t$.
+\end{proof}
+
+We now modify the idea of CNF-binding to \textbf{DNF-binding} where instead of $(x_i \Rightarrow (t_i,s')) \wedge (\neg x_i \Rightarrow (f_i,s'))$ we use $(x_i \wedge (t_i,s')) \vee (\neg x_i \wedge (f_i,s'))$ to bind parameters of 
+left-hand side with transitions of right-hand side. 
+
+The binding works slightly differently, as with DNF we are unable to make
+a~conjuction of such formulae for all $i$. We thus employ 
+a~new special action $\bullet$. The left-hand side then first requires
+a~$\bullet$-transition into $n$ different states $s_i$, each requiring
+the above formula for its respective $i$.
+
+
+\begin{proposition}\label{p:ldrc}
+Modal refinement is $\PiP_2$-hard even if left-hand side is in positive DNF and
+right-hand side is in positive CNF.
+\end{proposition}
+\begin{proof}
+The proof is done by reduction from the validity of the
+quantified Boolean formula
+ $\forall x_1, \ldots, x_n \exists y_1, \ldots, y_m : 
+ \varphi(x_1, \ldots, x_n, y_1, \ldots, y_m)$, where $\varphi$ is in CNF.
+
+ Let the action alphabet be $\USigma = \{ t_1, \ldots, t_n, f_1, \ldots, f_n, \bullet \}$.
+The two systems $(S,T,P,\UPhi)$ and $(S',T',P',\UPhi')$ are built as
+follows: 
+\begin{enumerate}
+    \item $S = \{s,s' \} \cup \{s_i \mid 1 \le i \le n\}$,
+$T=\{(s,\bullet,s_i), (s_i, t_i, s'), (s_i, f_i, s') \mid 1 \le i \le n\}$, \\
+$P =  \{ x_1, \ldots, x_n\}$,
+ $\UPhi(s) = \bigwedge_i (\bullet,s_i)$,
+ $\UPhi(s_i) = (x_i \wedge (t_i,s')) \vee (\neg x_i \wedge (f_i,s'))$,
+ $\UPhi(s') = \true$;
+
+\item 
+$S' = \{t,t' \} \cup \{u_i,v_i \mid 1 \le i \le n \}$,\\
+$T' = \{(t,\bullet,u_i), (t,\bullet,v_i), (u_i,t_i,t'), (u_i,f_i,t'),\allowbreak (v_i,f_i,t'), (v_i,t_i,t') \mid 1 \le i \le n\}$,\\
+$P' = \{y_1, \ldots, y_n \}$,
+$\UPhi'(t) = \varphi[(\bullet,u_i)/x_i,(\bullet,v_i)/\neg x_i]$,\\
+ $\UPhi'(u_i) = (t_i,t')$, $\UPhi'(v_i) = (f_i,t')$, $\UPhi'(t') = \true$.
+\end{enumerate}
+
+ Now $\forall x \exists y : \varphi(x,y)$ holds if
+ and only if $s \mr t$.
+ The reasoning behind this fact is similar to the proof of
+ Proposition~\ref{p:lcrc}.
+
+\end{proof}
+
+The proof of the next proposition is only a slight alteration of previous proof where the $\bullet$-construction is performed in two steps.
+
+\begin{proposition}\label{p:ldpd}
+Modal refinement is $\PiP_2$-hard even if left-hand side is in positive DNF and
+right-hand side is in positive DNF.
+\end{proposition}
+\begin{proof}
+
+The proof is done by reduction from the validity of the quantified
+Boolean formula
+$\forall x_1, \ldots, x_n \exists y_1, \ldots, y_m : 
+\varphi(x_1, \ldots, x_n, y_1, \ldots, y_m)$, where $\varphi$ is in CNF.
+Let $\varphi_1$, \ldots, $\varphi_k$ denote the clauses of $\varphi$.
+
+
+Let the action alphabet be $\USigma = \{ t_1, \ldots, t_n, f_1, \ldots, f_n, \bullet \}$.
+The two systems $(S,T,P,\UPhi)$ and $(S',T',P',\UPhi')$ are built as
+follows: 
+\begin{enumerate}
+    \item 
+$S = \{s,s',s'' \} \cup \{s_i \mid 1 \le i \le n\}$,\\
+$T = \{(s,\bullet,s')\} \cup \{ (s',\bullet,s_i), (s_i, t_i, s''), 
+(s_i, f_i, s'') \mid 1 \le i \le n\}$,\\
+$P = \{ x_1, \ldots, x_n\}$,
+ 
+$\UPhi(s) = (\bullet,s')$,
+  $\UPhi(s') = \bigwedge_i (\bullet,s_i)$,\\
+  $\UPhi(s_i) = (x_i \wedge (t_i,s'')) \vee (\neg x_i \wedge (f_i,s''))$,
+  $\UPhi(s'') = \true$;
+
+\item 
+$S' = \{t,t'\} \cup \{ u_i, v_i \mid 1 \le i \le n \}
+\cup \{ w_j \mid 1 \le j \le k \}$,\\
+$T' = \{ (t,\bullet,w_j) \mid  1 \le j \le k \}
+\cup \{ (w_j,\bullet,u_i), (w_j,\bullet,v_i) \mid
+1 \le i \le n,  1 \le j \le k \}
+\\ ~~\qquad \cup \{ (u_i,t_i,t'), (u_i,f_i,t'), (v_i,f_i,t'), (v_i,t_i,t')
+\mid 1 \le i \le n \}$, \\
+$P' = \{y_1, \ldots, y_n \}$,
+
+$\UPhi'(t) = \bigwedge_j w_j$,
+$\UPhi'(w_j) = \varphi_j'$ where $\varphi_j'$ is created from
+$\varphi_j$ by changing all positive literals $x_i$ into $(\bullet,u_i)$
+and all negative literals $\neg x_i$ into $(\bullet,v_i)$.
+$\UPhi'(u_i) = (t_i,t')$, $\UPhi'(v_i) = (f_i,t')$, $\UPhi'(t') = \true$.
+
+\end{enumerate}
+
+Now $\forall x \exists y : \varphi(x,y)$ holds if
+and only if $s \mr t$.
+\end{proof}
+
+The proof of the last proposition is a~combination of DNF-binding (including
+the $\bullet$-construction) with the previously used $*$-construction.
+
+\begin{proposition}\label{p:ld}
+Modal refinement is $\PiP_4$-hard even if the left-hand side is in positive DNF.
+\end{proposition}
+
+\begin{proof}
+The proof is done by reduction from the validity of the quantified
+Boolean formula
+ $\forall x \exists y \forall z \exists w : \varphi(x,y,z,w)$ where
+ $x,y,z,w$ are all $n$-dimensional binary vectors and $\varphi$ is in CNF.
+
+We let
+$\USigma = \{t_1, \ldots, t_n, f_1, \ldots, f_n, 
+        z_1, \ldots, z_n, *, \bullet \}$
+and we create the two systems 
+$(S,T,P,\UPhi)$, $(S',T',P',\UPhi')$ over the
+action alphabet $\Sigma$
+as follows:
+\begin{enumerate}
+    \item $S = \{s,s'\} \cup \{s_i \mid 1 \le i \le n\}$,\\
+$T = \{(s,\bullet,s_i), (s_i,t_i,s'), (s_i,f_i,s'),
+(s,z_i,s') \mid 1 \le i \le n\} \cup \{(s,*,s')\}$,\\
+$P = \{ x_1, \ldots, x_n \}$, 
+
+$\UPhi(s) = (*,s') \wedge \bigwedge_i (\bullet,s_i)$,\\
+$\UPhi(s_i) = (x_i \wedge (t_i,s')) \vee (\neg x_i \wedge (f_i,s'))$
+for all $1 \le i \le n$,
+$\UPhi(s') = \true$;
+\item 
+$S' = \{t, t'\} \cup \{u_i, v_i, w_i \mid 1 \le i \le n\}$,\\
+$T' = \{(t,z_i,t'), (t,\bullet,u_i), (t,\bullet,v_i),\allowbreak
+(t,*,w_i), \allowbreak(u_i,t_i,t'), (u_i,f_i,t'), (v_i,t_i,t'),
+\allowbreak
+(v_i,f_i,t') \mid 1 \le i \le n\} \cup \{(t,*,t')\}$,\\
+
+$P' = \{ y_1, \ldots, y_n \}$,
+
+$\UPhi'(t) = (*,t') \wedge \allowbreak \varphi[(\bullet,u_i)/x_i,
+        (\bullet,v_i)/\neg x_i,
+        (z_i,t')/z_i,
+        (*,w_i)/w_i]$,
+
+\\for all $1 \le i \le n$: $\UPhi'(u_i) = (t_i,t')$,
+$\UPhi'(v_i) = (f_i,t')$,
+$\UPhi'(w_i) = \UPhi'(t') = \true$.
+
+
+\end{enumerate}
+
+ It can be verified, using similar arguments as before, that 
+$s \mr t$ if and only if \linebreak
+$\forall x \exists y \forall z \exists w : \varphi(x,y,z,w)$.
+\end{proof}
+
+
+Although the complexity may seem discouraging in many cases, there is an 
+important remark to make. The refinement checking may be exponential,
+but only in the outdegree of each state and the number of
+parameters, while it is polynomial in the number of states. 
+As one may expect the outdegree and the number of parameters to be much smaller
+than the number of states, this means that the refinement checking
+may still be done in a~rather efficient way. This claim is furthermore
+supported by the existence of efficient SAT solvers that may be employed 
+to check the inner conditions in the modal refinement.
+
+
+

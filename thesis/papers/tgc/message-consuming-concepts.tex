@@ -1,0 +1,134 @@
+%!TEX root = main.tex
+\section{Message Consuming Systems}\label{sec:mcs}
+
+In this section we consider generic properties concerning the asynchronous communication via channels
+inspired by the various channel properties studied in~\cite{haddad-et-al-2013}.
+%for asynchronous I/O-Petri nets.
+We focus on the \emph{message consuming} and the \emph{necessarily message consuming} properties
+and generalise them to take into account modalities and observational abstraction w.r.t.\ silent transitions.
+Our goal is that the properties scale up to larger contexts (to support incremental design)
+and that they are preserved by modal refinement. Moreover we consider their decidability.
+For the definitions %of the communication properties
+we rely on the semantics of \MAIOPNs, i.e.\ on \MAIOTSs.
+
+\subsection{Concepts and Definitions}\label{subsec:mcs}
+
+%The basic idea behind the \emph{message consuming} property is that whenever a message has been put on a communication channel
+%it must be possible to consume it, possibly after some delay. This requirement can be strengthened
+%such that any message pending on a communication channel must eventually be consumed which is the idea behind
+%\emph{necessarily message consuming}.
+Let us first discuss the message consuming property~\ref{def:cp-tgc-tgc:bas-consuming}
+of Def.~\ref{def:cp-tgc-tgc} for a \MAIOTS $\S$ and a subset $B$ of its channels.
+It requires,
+for each channel $a \in B$, that if in an arbitrary reachable state $q$ of $\S$ there is a message on $a$, then $\S$ must be able
+to consume it, possibly after some delay caused by the execution of autonomous must-transitions.
+All transitions that do not depend on the environement, i.e.\ are not related to input labels,
+are considered to be autonomous. Our approach follows a ``pessimistic'' assumption taking into account arbitrary environments
+that can let the system go where it wants and can also stop to provide inputs at any moment.
+ It is important that we require must-transitions
+since the consuming property should be preserved by modal refinement.
+It is inspired by the notion of ``output compatibility'' studied for synchronously composed transition systems in~\cite{hennicker_knapp_2011}.
+
+%Let us comment on the role of the environment for the formulation of this property.
+%First, we consider arbitrary reachable states of $\S$.
+%This means that we take into account the worst environment which can let $\S$ go everywhere by providing (non-deterministically)
+%all inputs that $\S$ can accept.
+%Then, at some point at which a message is available on channel $a$, the environment can stop
+%to provide further inputs and waits whether $\S$ can \emph{autonomously} reach a state
+%$q'$ by a sequence of must-transitions in which it  must be able to consume $a$, i.e.\ execute $\inact{a}$.
+%To allow autonomous must-transitions before consumption
+
+A central role when components run in parallel is played by fairness assumptions; see,e.g.,~\cite{berard-et-al-2001}.
+First we must define what we mean by a run and then we will explain our fairness notion.
+A run is a finite or infinite sequence of state transitions which satisfies a maximality condition.
+In principle a run can only stop when a deadlock is reached. However we must be careful
+since (1) we are dealing with open systems whose executions depend on the input from the environment,
+(2) we must take into account that transitions with a may-modality can be skipped in a refinement,
+and (3) we must be aware that also silent must-transitions without successive mandatory visible actions
+can be omitted in a refinement; cf. Def.~\ref{def:wmr}, rule~\ref{def:wmr:must:tau}.
+In particular divergence in an abstract state could be implemented by a deadlock.
+If one of the above conditions holds in a certain state it is called a \emph{potential deadlock state}.
+%States which just take into account (1) are called ``pure input states'' in~\cite{haddad-et-al-2013}
+%and correspond to markings that ``stop except for inputs'' in~\cite{Stahl12}. This is however not sufficient in the context of
+%modal refinement and observational abstraction considered here.
+
+%%%old text:
+%For the formalisation of the necessarily consuming property~\ref{def:cp-tgc-tgc:nec-consuming}
+%we have to consider system runs
+%since the required consumption should take place in all possible executions,
+%starting from a state in which the channel is not empty, and this should hold in any environment
+%and should be valid in any refinement. Let us first define potential deadlock states,
+%i.e.\ states in which an execution might stop.
+%Let $\S = \maiotstup{}$ be a \MAIOTS with $\ioalpha{}$.\linebreak A state $q \in Q$ is a \emph{potential deadlock state}
+%if for all $a \in (\Sigma \setminus \inset)$, % $q \centernot{\mustw{a}} \stateTGC$, i.e.\
+%there is no state $q' \in Q$ such that $q \mustw{a} q'$. 
+% This means that there is no visible autonomous weak must-transition enabled in $q$. 
+%This is a potential deadlock for three reasons: (1) the environment of $\S$ might not serve any inputs for \S, (2) the enabled proper may-transitions might be omitted in a refinement and (3) sequences of must $\tau$-transitions without successive mandatory visible actions can also be omitted in a refinement.
+%In particular divergence in an abstract state can be refined to a deadlock.
+%States which just take into account (1) are called ``pure input states'' in~\cite{haddad-et-al-2013}
+%and correspond to markings that ``stop except for inputs'' in~\cite{Stahl12}. This is however not sufficient in the context of
+%modal refinement and observational abstraction considered here.
+
+Formally, let $\S = \maiotstup{}$ be a \MAIOTS with $\ioalpha{}$. A state $q \in Q$ is a potential deadlock state
+if for all $a \in (\Sigma \setminus \inset)$, % $q \centernot{\mustw{a}} \stateTGC$, i.e.\
+there is no state $q' \in Q$ such that $q \mustw{a} q'$. 
+A \emph{run} of $\S$ starting in a state $q_1 \in Q$ is a finite or infinite sequence $\rho =q_1  \may{a_1} q_2 \may{a_2} q_3 \may{a_3} \cdots$ with $a_i \in \Sigmat$ and $q_i \in Q$ %for all $i$
+such that, if the sequence is finite, its last state is a potential deadlock state.
+%We denote the set of all runs of $\S$ starting from $q_1$ as $\run{\S}(q_1)$. 
+We assume that system runs are executed in a runtime infrastructure which follows a fair scheduling policy. In our context this means that any visible autonomous action $a$, that is always enabled by a weak must-transition from a certain state on, will infinitely often be executed. 
+Formally, a run $\rho = q_1 \may{a_1} q_2 \may{a_2} \cdots$ %\in \run{\S}(q_1)$
+is called \emph{observationally weakly fair} if it is finite or if it is infinite and then for all $a \in (\Sigma \setminus \inset)$ the following holds:
+\[
+    (\exists k \geq 1\;.\; \forall i \geq k \;.\; \exists q'  \;.\; q_i \mustw{a} q') \implies (\forall k \geq 1 \;.\; \exists i \geq k \;.\; a_i = a).
+\]
+\noindent We denote the set of all observationally weakly fair runs of $\S$ starting from $q_1$ by $\frun{\S}(q_1)$.
+For instance, for the MAIOPN $\M$ in Fig.~\ref{fig:obsFairness-con} on page~\pageref{fig:obsFairness-con} an infinite run which always executes
+$\outact{a}, \inact{a}, \ldots$ is observationally weakly fair.
+A (diverging) run of $\M$ which always executes $\tau$ from a certain state on
+is not observationally weakly fair since $\inact{a}$ is then always enabled by a weak must-transition but never taken.
+
+Note that for our results it is sufficient to use a weak fairness property instead of strong fairness.
+We are now ready to define also the necessarily consuming property~\ref{def:cp-tgc-tgc:nec-consuming} which requires
+that whenever a message is pending on a communication channel then the message must eventually be consumed on
+all observationally weakly fair runs.%Both consuming properties are defined relative to a subset of the channels.
+
+\begin{definition}[Message consuming]\label{def:cp-tgc-tgc}
+    Let $\S = \maiotstup{}$ be a \MAIOTS with I/O-alphabet $\ioalpha{}$ and let $B \subseteq \chan$ be a subset of its channels.
+            \begin{enumerate}[label=\alph*), ref=(\alph*), leftmargin=*, itemsep=1pt]
+                \item\label{def:cp-tgc-tgc:bas-consuming}$\S$ is \emph{message consuming} w.r.t.\ $B$ if for all $a \in B$  and all $q \in \reach(\S)$,
+                \\\hspace*{20pt}$
+                    \val(q,a)>0 \implies \exists q',q''\in Q \;.\; \exists \sigma \in (\Sigma \setminus \inset)^* \: .\:q \mustw{\sigma} q' \must{\inact{a}} q''.
+                 $
+\vspace{1mm}
+                \item\label{def:cp-tgc-tgc:nec-consuming}$\S$ is \emph{necessarily message consuming} w.r.t.\ $B$ if for all $a \in B, q \in \reach(\S)$,
+\vspace{1mm}
+                \\\hspace*{20pt}$
+                  \val(q,a)>0 \implies \forall \rho \in \frun{\S}(q) \; .\;\;\inact{a} \in \rho \;$.\footnote{ i.e.\ there is a transition in $\rho$ labelled by $\inact{a}$.}
+            \end{enumerate}
+$\S$ is \emph{(necessarily) message consuming} if  $\S$ is (necessarily) message consuming w.r.t.\ $\chan$.
+
+\end{definition}
+
+In the special case, in which all may-transitions are must-transitions and no silent transitions occur
+observationally weakly fair runs coincide with weakly fair runs and the two consuming properties coincide
+with the corresponding properties in~\cite{haddad-et-al-2013}.
+
+\begin{proposition}\label{prop:properties}
+    Let $\S$ be a \MAIOTS. If $\S$ is necessarily message consuming w.r.t $B$ then $\S$ is message consuming w.r.t $B$.
+\end{proposition}
+\begin{proof}
+    This is an adoptation of the proof in~\cite{TechReportVersion}.
+    The proof relies on the fact that for each $q \in \reach(\S)$ there exists an observationally weakly fair run $\rho \in \wfrun{\S}(q)$, such that $\rho$ is a must-trace, $a \not\in \rho$ for all $a \in \inset$, and there is no infinite $\tau$ sequence in $\rho$. This run can be constructed by choosing, in an observationally weakly fair manner in each reached state, some enabled weak non-input must-action. If no such action is enabled in the last visited state, the last state is a deadlock state and we are done. Otherwise the resulting infinite run has the required property.
+
+    With this fact, we can prove the proposition as follows: Let $q \in \reach(\S)$, $a \in B$ such that $\val(q,a) > 0$. By necessarily message consuming, for all $\rho \in \wfrun{\S}(q)$ we have $\inact{a} \in \rho$. Since we know there exists a weakly fair run $\rho$ without input actions, constructed as described above, we get that there exists $\sigma \in (\Sigma \setminus \inset)^*$ and $q'\in Q$ such that $q \mustw{\sigma} q' \must{\inact{a}}$. Thus $\S$ is message consuming w.r.t. $B$.
+\end{proof}
+
+
+
+%\vspace{3mm}
+%\textbf{From Rolf:} Should we explain a counterexample for the converse direction?\\[3mm]
+
+The definitions and the proposition are propagated to modal asynchronous I/O-Petri nets in the obvious way.
+For instance, a \MAIOPN $\pnN$ is \emph{(necessarily) message consuming} if $\maiots(\pnN)$ is (necessarily) message consuming.
+All \MAIOPNs considered in Sect.~\ref{sec:example} are necessarily message consuming.
+

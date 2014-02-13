@@ -1,0 +1,37 @@
+\begin{tikzpicture}[scale=0.8, every node/.style={transform shape}]
+\node[place,tokens=1] at (0,0) (p0) {};
+\node[mayt,rotate=90,label={[label distance=2mm,yshift=3]180:$\outact{a}$}] at (0,-1.5) (ta_out) {};
+\node[place] at (0, -3) (p1) {};
+\node[mayt,rotate=90,label={[label distance=2mm,yshift=3]180:$\inact{b}$}] at (0, -4.5) (tb_in) {};
+
+
+\node[place,tokens=1] at (6,0) (p2) {};
+\node[mustt,rotate=90,label={[label distance=2mm,yshift=-3]0:$\outact{b}$}] at (6,-1.5) (tb_out) {};
+\node[place] at (6, -3) (p3) {};
+\node[mustt,rotate=90,label={[label distance=2mm,yshift=-3]0:$\inact{a}$}] at (6, -4.5) (ta_in) {};
+
+\node[place,label=above:$p_a$] at (3,-1.5) (pa) {};
+\node[place,label=above:$p_b$] at (3,-4.5) (pb) {};
+
+\draw[arc] (p0) -- (ta_out) {};
+\draw[arc] (ta_out) -- (p1) {};
+\draw[arc] (p1) -- (tb_in) {};
+
+\draw[arc] (ta_out) -- (pa) {};
+\draw[arc] (pa) -- (ta_in) {};
+
+\draw[arc] (p2) -- (tb_out) {};
+\draw[arc] (tb_out) -- (p3) {};
+\draw[arc] (p3) -- (ta_in) {};
+
+\draw[arc] (tb_out) -- (pb) {};
+\draw[arc] (pb) -- (tb_in) {};
+
+% \node[above of=p0] {$\mathcal M_1$};
+% \node[above of=p2] {$\mathcal M_6$};
+
+\begin{pgfonlayer}{background}
+\node [fill=white,inner sep=8mm,fit=(p0) (ta_out) (p1) (tb_in)] {};
+\node [fill=white,inner sep=8mm,fit=(p2) (tb_out) (p3) (ta_in)] {};
+\end{pgfonlayer}
+\end{tikzpicture}

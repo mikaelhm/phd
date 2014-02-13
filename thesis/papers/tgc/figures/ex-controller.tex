@@ -1,0 +1,43 @@
+%!TEX root = ../main.tex
+\begin{tikzpicture}
+
+
+\node[mustt,rotate=0,label={left:$\trans{file?}$}] at (-2,-1) (filein) {};
+\node[place,tokens=0] at (-1,-1) (p0) {};
+
+\node[mustt,rotate=0,label={above:$\trans{gif!}$}] at (0,0) (gifout) {};
+\node[mustt,rotate=0,label={below:$\trans{txt!}$}] at (0,-2) (txtout) {};
+
+\node[place,tokens=0] at (1,0) (p1) {};
+\node[place,tokens=0] at (1,-2) (p2) {};
+
+\node[mustt,rotate=0,label={above:$\trans{jpg?}$}] at (3,0) (jpgin) {};
+\node[mustt,rotate=0,label={right:$\trans{fail?}$}] at (1.8,-1) (fail) {};
+\node[mustt,rotate=0,label={below:$\trans{zip?}$}] at (3,-2) (zipin) {};
+
+\node[place,tokens=0] at (4,0) (p3) {};
+\node[mustt,rotate=0,label={right:$\trans{comprJpg!}$}] at (5,0) (comprjpg) {};
+
+\node[place,tokens=0] at (4,-2) (p4) {};
+\node[mustt,rotate=0,label={right:$\trans{comprZip!}$}] at (5,-2) (comprzip) {};
+
+
+\draw[arc] (filein) to[] (p0) {};
+
+\draw[arc] (p0) to[bend left] (gifout) {};
+\draw[arc] (p0) to[bend right] (txtout) {};
+
+\draw[arc] (gifout) to[] (p1) {};
+\draw[arc] (txtout) to[] (p2) {};
+
+\draw[arc] (p1) to[] (jpgin) {};
+\draw[arc] (p1) to[] (fail) {};
+\draw[arc] (p2) to[] (zipin) {};
+
+\draw[arc] (jpgin) to[] (p3) {};
+\draw[arc] (fail) to[] (p0) {};
+\draw[arc] (zipin) to[] (p4) {};
+
+\draw[arc] (p3) to[] (comprjpg) {};
+\draw[arc] (p4) to[] (comprzip) {};
+\end{tikzpicture}

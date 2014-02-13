@@ -1,0 +1,108 @@
+%!TEX root = main.tex
+
+%\textbf{From Rolf:} Should we change the title?
+%Suggestions:\\
+%Specification of Distributed Component Systems with Modal I/O--Petri nets\\
+%Modelling Distributed Component Systems with Modal I/O--Petri nets\\
+%Designing Distributed Component Systems with Modal I/O--Petri nets\\
+%Specification of Distributed Systems with Modal Asynchronous I/O--Petri nets\\
+%Specification of Distributed Component Systems with Modal Asynchronous I/O--Petri nets
+
+
+\section{Introduction}
+
+%Ideas:
+%
+%\vspace*{3mm}
+%Why Modal Petri nets and not modal LTS?\\
+%1) Assembly behaviour not well representable with LTS (problem: interleaving)\\
+%2) infinite state systems\\
+%==> 3) must, may on LTS level not sufficient
+
+
+Component-based design is an important field in software engineering.
+Crucial tasks in the design process concern the stepwise refinement of specifications
+towards implementations and the
+%composition of components to form larger systems.
+formation of component assemblies by composition.
+Many approaches and formalisms have been proposed for rigorous
+component-based design  supporting different communication styles
+and different notions of refinement.
+Among them particular attention has been attracted by modal transition systems
+introduced by Larsen and Thomsen in 1988~\cite{DBLP:conf/lics/LarsenT88}
+which use distinguished may- and must-transitions to specify allowed and
+obligatory behaviour and thus provide a flexible basis for refinement.
+While refinement concerns the vertical dimension of system development,
+composition concerns the horizontal dimension in which larger systems are built from smaller
+ones such that communication requirements must be respected.
+Communication properties are important when reasoning about distributed
+mechanisms, algorithms and applications (e.g. management of sockets in UNIX,
+maintaining unicity of a token in a ring based algorithm, guarantee of email reading, etc.).
+% In the context of concurrently running interacting components their
+%communication compatibility is an important requirement.
+%It depends on the underlying communication style and the way of composition.
+%which might follow the synchronous or the asynchronous paradigm
+%using event queues or unorderd transmisson media for communication.
+
+Petri nets are a natural model for the design of concurrent and distributed systems.
+They have received a great attention w.r.t. the composition and refinement
+issues including communication properties. Composition of nets has been addressed via several paradigms.
+The process algebra approach
+has been investigated by several works leading to the Petri net
+algebra~\cite{BDK01}. Such an approach is closely related to synchronous composition.
+In~\cite{Souissi90} and~\cite{SM89} asynchronous composition of nets is performed
+via a set of places or, more generally, via a subnet modelling some medium. Then
+structural restrictions on the subnets are proposed in order to preserve
+global properties like liveness or deadlock-freeness.
+In~\cite{reisig09} a general composition operator is proposed and
+its associativity is established. A closely related concept to composition
+is the one of open Petri nets which has been used in different contexts
+like the analysis of web services~\cite{DK2009}.
+In parallel, very early works
+have been done for defining and analyzing refinement of nets;
+see~\cite{brauer89} for a survey. Looking at more recent works,~\cite{schafer07} (which is the closest to our contribution)
+studies the refinement in the context of circuit design.
+In~\cite{schafer07} the authors introduce the notion of a correct implementation
+and show that it is compositional. Several works
+also use an abstraction/refinement paradigm to propose efficient verification
+methods; see e.g.~\cite{ganty07}.
+
+In our contribution we want to combine the advantages of modal transition systems
+with the ability of Petri nets to specify infinite state systems,
+with their decidability potential and with their way how asynchronous composition
+can be achieved.  A natural candidate are \emph{modal Petri nets} introduced in~\cite{EHH12} (and later in \cite{BK12} as a special case of Modal Process Rewrite Systems)
+which studies modal refinement and decidability results.
+Surprisingly, to the best of our knowledge, no other approaches to modal Petri nets exist yet.
+On the other hand, for asynchronous communication, we have recently
+introduced in~\cite{haddad-et-al-2013} \emph{asynchronous I/O-Petri nets},
+for which we have analysed several communication properties from the compositionality
+and decidability point of view.
+Hence it is an obvious goal to combine, adjust and extend the results achieved in~\cite{EHH12}
+and~\cite{haddad-et-al-2013} to a rigorous design methodology that
+supports the vertical and the horizonatal dimension of software development
+in a uniform and compatible way.
+
+We summarise our proposal by means of an illustrating example in Sect.~\ref{sec:example}.
+Sect.~\ref{sec:maiots} presents the underlying formal defintions of modal asynchronous I/O--Petri nets \linebreak (\MAIOPNs) 
+and their semantics in terms of modal asynchronous I/O-transition systems (\MAIOTSs).
+In Sect.~\ref{sec:wmr} we consider modal refinement and, in Sect.~\ref{sec:mcs}, we study
+generic communication properties for components which interact via unordered and unbounded
+communication channels. We focus on the \emph{message consuming} and the
+\emph{necessarily message consuming} properties which are important requirements
+to ensure that previously sent messages can be consumed by the communication
+partner or must necessarily be consumed on all observationally weakly fair runs.
+The latter is a significant new concept
+which is the basis for the preservation of the necessarily consuming property
+when components are (1) put in larger contexts or (2) are refined by modal refinement.
+We show that the principle of incremental design in~\cite{haddad-et-al-2013}
+extends to the generalised channel properties and that the decidability results
+carry over to the new integrated framework.
+We also study compositionality of modal refinement w.r.t.\ asynchronous composition
+and show that our framework supports the principle of independent implementability in the sense of~\cite{alfaroHenzinger2005}.
+Our design methodology is complemented by an operator for channel hiding
+which supports  encapsulatation of component assemblies and the construction of black-box behaviours.
+
+
+
+
+

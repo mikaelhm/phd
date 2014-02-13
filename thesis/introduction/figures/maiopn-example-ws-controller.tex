@@ -1,0 +1,26 @@
+%!TEX root = ../../thesis.tex
+
+\begin{tikzpicture}[node distance=0.5cm and 1cm]
+    \node[mustt,label=above:$\transition{Request?}$] (req) {};
+    \node[place, right=of req] (p) {};
+    \node[mayt,label=left:$\transition{CheckUser!}$,below=of p] (check) {};
+
+    \node[mustt,label=above:$\transition{\tau}$,right=of p] (noval) {};
+    \node[place, below=of noval] (p1) {};
+
+    \node[place, right=of noval] (p2) {};
+    \node[mayt,label=right:$\transition{Validated?}$,below=of p2] (validated) {};
+
+    \node[mustt,label=above:$\transition{Response!}$,right=of p2] (res) {};
+    % \node[mayt,label=below:$\transition{Denied!}$,below right=of p] (denied) {};
+    
+    \draw[arc] (req) -- (p) {};
+    \draw[arc] (p) -- (check) {};
+    \draw[arc] (check) -- (p1) {};
+    \draw[arc] (p1) -- (validated) {};
+    \draw[arc] (validated) -- (p2) {};
+    \draw[arc] (p2) -- (res) {};
+    \draw[arc] (p) -- (noval) {};
+    \draw[arc] (noval) -- (p2) {};
+
+\end{tikzpicture}

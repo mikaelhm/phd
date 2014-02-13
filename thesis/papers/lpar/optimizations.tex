@@ -1,0 +1,138 @@
+We now simplify the construction. The first simplification is summarized by the
+observation that the strategies of both players only need to choose the
+extremal points of the interval in vertices of the form $(s,a,t)$. 
+%This holds for the strategies of both players.
+
+\begin{lemma}\label{lem:extremal}
+%If we have optimal positional strategies $\sigma$, $\rho$ for \emph{min} and
+%\emph{max}, respectively, we can find 
+There are
+optimal positional strategies $\sigma'$,
+$\rho'$ for \emph{min} and \emph{max}, respectively, such that the choice in vertices of the form $(s,a,t)$ is always one of
+the two extremal points of the interval $D(s,a,t)$.
+\end{lemma}
+\begin{proof}
+Let $\sigma$ and $\rho$ be optimal positional strategies for \emph{min} and
+\emph{max}. We transform them into $\sigma'$ and $\pi'$. The proof is done by induction on the number of vertices of the
+form $(s,a,t)$ from which one of the strategies chooses a~non-extremal point of
+the interval $D(s,a,t)$.
+
+If there are no such vertices, we are obviously done. Suppose further that
+there is at least one such vertex, say $(s,a,t)$. Without loss of
+generalization, let this vertex be player \emph{min}'s vertex. (The other case
+is handled similarly.) We thus have $D(s,a,t) = \ci{m,n}$ and $\sigma((s,a,t))
+= (s,a,j,t)$ with $m < j < n$.
+
+We investigate three cases, depending on the relationship of the rate $r(a)$ and the value $v(s)$.
+\begin{itemize}
+\item $r(a) = v(s)$. Then the duration of the transition $(s,a,t)$ does not matter
+	and we may freely change $\sigma$ into $\sigma'$ by defining 
+	$\sigma'((s,a,t)) = (s,a,n,t)$ and $v(s)$ remains the same.
+\item $r(a) > v(s)$. Clearly, changing $\sigma$ into $\sigma'$ by defining
+	$\sigma'((s,a,t)) = (s,a,m,t)$ may only decrease $v(s)$ or not change it
+	at all. (As $\sigma$ is optimal strategy, $v(s)$ remains the same
+	using $\sigma'$.)
+\item $r(a) < v(s)$. Using similar argument as in the previous case, we change
+	$\sigma$ into $\sigma'$ by defining $\sigma'(s,a,t) = (s,a,n,t)$ and $\sigma'$ remains optimal.
+\end{itemize}
+Repeated use of this argument concludes the proof.
+\end{proof}
+
+
+We may thus simplify the construction according to the previous lemma so
+that there are at most two outgoing edges for each state of the form 
+$(s,a,t)$ are as follows:
+%\begin{itemize}
+%\item 
+%\begin{center}
+$((s,a,t),(s,a,j,t)) \in E$ iff $j$ is an extremal point of $D(s,a,t)$.
+%\end{center}
+%\end{itemize}
+
+%We thus reduce the number of outgoing edges for these vertices to at most
+%two.
+
+
+
+
+
+
+
+%Although we have this complexity proof, the actual algorithm so far has to
+We can also optimize the expansion of $\val(s)$. So far, we have
+built an exponentially larger weighted MPG graph as the size of $\val(s)$ is exponential in the out-degree of $s$. 
+However, we can do better if we
+restrict ourselves to the class of MTSD where all $\Phi(s)$ are
+positive boolean formulae, i.e.~the only connectives are $\wedge$ and $\vee$.  
+Instead of enumerating all valuations, we
+can use the syntactic tree of the formula to build a 
+weighted MPG of polynomial size.
+
+Let $\mathit{sf}(\varphi)$ denote the set of all sub-formulae of $\varphi$
+(including~$\varphi$).
+Let further $\modS = \{ (s, \varphi) \mid s \in S;\, \varphi \in \mathit{sf}(\Phi(s)) \}$.
+The weighted MPG is constructed with 
+\begin{itemize}
+%\item $V = \modS \cup \modT$
+\item $V_{min} = \{ (s,\varphi) \in\modS\mid \varphi = \varphi_1 \vee \varphi_2 \text{ or }
+	(\varphi = (a,t) \text{ and } D(s,a,t) \in \mathcal I_\cn) \} \cup \modT$
+\item $V_{max} = \{ (s,\varphi) \in\modS\mid \varphi = \varphi_1 \wedge \varphi_2 \text{ or }
+	(\varphi = (a,t) \text{ and } D(s,a,t) \in \mathcal I_\un) \}$
+\item $E$ is defined as follows:
+\begin{align*}
+((s,\varphi_1 \wedge \varphi_2),(s,\varphi_i)) &\in E &&i\in\{1,2\}\\
+%((s,\varphi \wedge \psi),(s,\psi)) &\in E &&\text{(always)}\\
+((s,\varphi_1 \vee \varphi_2),(s,\varphi_i)) &\in E &&i\in\{1,2\}\\
+%((s,\varphi \vee \psi),(s,\psi)) &\in E &&\text{(always)}\\
+((s,(a,t)),(s,a,j,t)) &\in E &&\iff j \text{ is an extremal point of }
+	D(s,a,t)\\
+((s,a,j,t),(t,\Phi(t))) &\in E &&\text{(always)}
+\end{align*}
+\item $r((s,a,j,t),(t,\Phi(t))) = r(a)$ and $r(-,-) = 0$ otherwise
+\item $d((s,a,j,t),(t,\Phi(t))) = j$ and $d(-,-) = 0$ otherwise.
+\end{itemize}
+
+
+\begin{example}
+In Figure~\ref{fig:example:poly} we show the result of translating the part of an MTSD from Figure~\ref{fig:trans1}. This weighted MPG is similar to the one in Figure~\ref{fig:trans2}, but instead of having a vertex for each satisfying set of outgoing transitions, we now have the syntactic tree of the obligation formula for each state. Further the vertex $(s,b,2,t_2)$ is left out, due to Lemma~\ref{lem:extremal}. Note that the vertices $(t_1,\Phi(t_1))$, $(t_2,\Phi(t_2))$ and $(t_3,\Phi(t_3))$ are drawn as circles, because the player of these states depends on the obligation formula and the outgoing transitions. 
+\end{example}
+\input{papers/lpar/translation_example2}
+
+\begin{remark}
+ Observe that one can perform this optimization even in the general case. Indeed, for those $s$ where $\Phi(s)$ is positive we locally perform this transformation; for $s$ with $\Phi(s)$ containing negations we stick to the original expansion. Thus, the exponential (in out-degree) blow-up occurs only locally.
+\end{remark}
+
+\begin{lemma}\label{lem:opt2correct}
+Both optimized translations are correct and on MTSDs where the obligation
+function is positive they run in polynomial time.
+\end{lemma}
+
+\begin{proof}
+A strategy for the player $min$ of a weighted MPG from a translation utilizing the optimizations of Section~\ref{opt} can be translated into an implementation of the original MTSD as follows. Let $\sigma$ be the strategy. We first define an~auxiliary function on the
+vertices of the MPG as follows:
+\begin{align*}
+f(s,(a,t)) &= \{(a,t)\} \\
+f(s,\varphi \vee \psi) &= f(\sigma(s,\varphi \vee \psi)) \\
+f(s,\varphi \wedge \psi) &= f(s,\varphi) \cup f(s,\psi)
+\end{align*}
+We then build the implementation as $(S',T',D',\Phi')$ where
+\begin{itemize}
+\item $S' = \{  s_\ii \mid s \in S \}$
+\item $(s_\ii,a,t_\ii) \in T'$ if $(a,t) \in f(s,\Phi(s))$
+\item $D'(s_\ii,a,t_\ii) = D(s,a,t)$ if $D(s,a,t) \in \Intl_\un$
+\item $D'(s_\ii,a,t_\ii) = j$ if $D(s,a,t) \in \Intl_\cn$ and
+	$\sigma((s,(a,t))) = (s,a,j,t)$
+\item $\Phi'(s) = \bigwedge_{(s_\ii,a,t_\ii)\in T'} (a,t_\ii)$\ .
+\end{itemize}
+The fact that 
+the constructed implementation is indeed an implementation of the given
+MTSD and that the running cost of the implementation starting from state
+$s_\ii$ is the same as $v((s,\Phi(s)))$ is straightforward and can be proved
+as in the previous case.
+
+Similarly, one can derive a strategy from an implementation so that its value does not get worse. We may safely assume that the implementation only implements durations as the extremal points of the controllable intervals. (Indeed, due to the original translation, Lemma~\ref{lem:extremal}, and the transformation back of Lemma~\ref{impl2strat}, one can obtain an implementation with only extremal points that have the same or smaller cost.) The new transformation (strategy $\sigma$ and mapping $\mu$) is the same as the previous one of Lemma~\ref{impl2strat}, the difference is that for history $\pi$ ending in $(s,\varphi_1\vee\varphi_2)$ we set $\sigma(\pi)=(s,\varphi_j)$ for an arbitrary $j\in\{1,2\}$ such that $T(i_n)\models\varphi_j$ where $\mu(\pi')=i_0\cdots i_n$ and $\pi'$ is the longest prefix of $\pi$ ending with the vertex $(s,\Phi(s))$. 
+
+The polynomial running time is clear from the construction.
+%\qed
+\end{proof}
+

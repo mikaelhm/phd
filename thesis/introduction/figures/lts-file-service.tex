@@ -1,0 +1,14 @@
+%!TEX root = ../../thesis.tex
+
+\begin{tikzpicture}
+
+    % \node[diamond,draw] {figure of simple file service};
+
+    \node[state,initial] (q0) {$q_0$};
+    \node[state,right=of q0] (q1) {$q_1$};
+
+    \path (q0) edge[->,bend right] node[below,midway] {\transition{request}} (q1) {};
+
+    \path (q1) edge[->,bend right] node[above,midway] {\transition{response}} (q0) {};
+
+\end{tikzpicture}

@@ -1,0 +1,36 @@
+%!TEX root = ../../thesis.tex
+
+\begin{tikzpicture}
+\node[place,tokens=1,label=above:$q_0$] at (0,0) (p0) {};
+\node[transition,rotate=90,label={[yshift=0,xshift=15,name=tmsg_outl]0:$\transition{\outact{msg}}$},enabled] at (1,-1.5) (tmsg_out) {};
+\node[place,tokens=0,label=below:$q_1$] at (0,-3) (p1) {};
+\node[transition,rotate=90,label={[yshift=0,xshift=0,name=ta_inl]90:$\transition{in?}$}] at (-1,-1.5) (ta_in) {};
+
+
+\node[place,tokens=0,label=above:$r_0$] at (8,0) (p2) {};
+\node[transition,rotate=90,label={[yshift=0,xshift=-15,name=tmsg_inl]0:$\transition{\inact{msg}}$}] at (7,-1.5) (tmsg_in) {};
+\node[place,tokens=1,label=below:$r_1$] at (8,-3) (p3) {};
+\node[transition,rotate=90,label={[yshift=0,xshift=0,name=tb_outl]-90:$\transition{out!}$},enabled] at (9,-1.5) (tb_out) {};
+
+\node[place,tokens=2,label=below:$\channel{msg}$] at (4,-1.5) (pa) {};
+
+\draw[arc] (p0) to[bend left] (tmsg_out) {};
+\draw[arc] (tmsg_out) to[bend left] (p1) {};
+\draw[arc] (p1) to[bend left] (ta_in) {};
+\draw[arc] (ta_in) to[bend left] (p0) {};
+
+\draw[arc] (tmsg_out) -- (pa) {};
+\draw[arc] (pa) -- (tmsg_in) {};
+
+\draw[arc] (p2) to[bend right] (tmsg_in) {};
+\draw[arc] (tmsg_in) to[bend right] (p3) {};
+\draw[arc] (p3) to[bend right] (tb_out) {};
+\draw[arc] (tb_out) to[bend right] (p2) {};
+% \node[above of=p0] {$\mathcal M_1$};
+% \node[above of=p2] {$\mathcal M_2$};
+
+\begin{pgfonlayer}{background}
+\node [compBackground,inner sep=6mm,fit=(p0) (tmsg_outl) (p1) (ta_inl)] {};
+\node [compBackground,inner sep=6mm,fit=(p2) (tb_outl) (p3) (tmsg_inl)] {};
+\end{pgfonlayer}
+\end{tikzpicture}

@@ -1,0 +1,13 @@
+%!TEX root = ../../thesis.tex
+
+\begin{tikzpicture}[node distance=.3cm and 1cm]
+    \node[mustt,label=left:$\transition{CheckUser?}$] (req) {};
+    
+    \node[place, right=of req] (p) {};
+    \node[mustt,label=right:$\transition{Validated!}$,right=of p] (res) {};
+	\node[mustt,label=right:$\transition{Denied!}$,below=of res] (denied) {};
+    
+    \draw[arc] (req) -- (p) {};
+    \draw[arc] (p) -- (res) {};
+    \draw[arc] (p) -- (denied) {};
+\end{tikzpicture}

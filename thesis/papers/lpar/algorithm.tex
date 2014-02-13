@@ -1,0 +1,55 @@
+The algorithm for our problem, given a specification $\Spec$, works as follows.
+\begin{enumerate}
+\item Nondeterministically choose hardware with the total price at most $max_\ic$.
+\item Create the weighted MPG out of $\Spec$.
+\item Solve the weighted MPG using the reduction to MPG and any standard
+algorithm for MPG that finds an optimal strategy for player \emph{min} and
+computes the value $v(s_0)$.
+\item Transform the strategy to an implementation $\Impl$.
+\item In the case of the cheapest-implementation problem return $\Impl$;\\ in
+the case of the implementation (decision) problem return $v(s_0)\leq max_\rc$. 
+\end{enumerate}
+We can now prove the following result, finishing the proof
+of Theorem~\ref{thm:NP}.
+%Note that the restricted case has a better complexity.
+
+\begin{proposition}
+The implementation problem is in NP.
+\end{proposition}
+\begin{proof}
+We first nondeterministically guess the hardware assignment.
+Due to \linebreak Section~\ref{translation}, we know that 
+the desired implementation has the same
+states as the original MTSD and its transitions are a~subset of the transitions
+of the original MTSD as the corresponding optimal strategies are positional.
+% can be chosen as positional ones.
+The first optimization (Section~\ref{opt}) guarantees that 
+durations can be chosen as the extremal points of the intervals. 
+Thus we can nondeterministically guess an optimal implementation 
+and its durations,
+and verify that it satisfies the price inequality.
+% \qed
+\end{proof}
+
+\begin{proposition}
+The implementation problem for MTSD with %$\Phi$ 
+positive obligation function and 
+a constant number of hardware components
+%hardware requirment function in %$\Psi$ in DNF 
+is in $\text{NP} \cap \text{coNP}$ 
+and solvable in pseudo-polynomial time.
+\end{proposition}
+\begin{proof}
+With the constant number of hardware components,
+we get a constant number of possible hardware configurations and 
+we can check each configuration separately one by one. 
+Further, by the first and the second optimization in Section~\ref{opt}, 
+the MPG graph is of size $\bigO(|T|+|\Phi|)$. Therefore, we polynomially reduce the implementation problem to the problem of solving constantly many 
+mean payoff games. The result follows by the existence of pseudo-polynomial 
+algorithms for MPGs~\cite{Zwick96thecomplexity}.
+% \qed 
+\end{proof}
+
+Further, our problem is at least as hard as solving MPGs that are clearly 
+a special case of our problem. Hence, Theorem~\ref{thm:MPG} follows.
+

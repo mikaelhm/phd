@@ -1,0 +1,53 @@
+Modal  Transition  Systems  (MTS) is a specification formalism
+\cite{DBLP:conf/lics/LarsenT88,AHLNW:EATCS:08} that aims at providing
+a flexible  and   easy-to-use  compositional
+development methodology  for reactive systems.  The formalism
+can be viewed as  a   fragment  of   a  temporal   
+%\todo{also a recent follow-up work http://dblp.uni-trier.de/rec/bibtex/journals/corr/abs-1108-4464}
+logic~\cite{Aceto:graphical,DBLP:journals/tcs/BoudolL92} that at the same time
+offers  a   behavioural compositional semantics with an intuitive
+notion of process refinement.
+%Recent attention to this logical view of MTS has been given in~\cite{Aceto:graphical}.
+The formalism of MTS is essentially a labelled  transition system
+that distinguishes two types of labelled transitions:  
+\emph{must}  transitions  which  are required in any  refinement
+of the system, and  \emph{may}  transitions  that are allowed
+to appear in a refined system but are not required.
+The refinement  of an  MTS  now  essentially consists  of
+iteratively resolving the presence or absence of may transitions in 
+the refined process.
+
+In a recent line of work \cite{JLS:weighted,MFCS11}, the MTS framework
+has  been  extended  to  allow  for the  specification  of  additional
+constraints on  quantitative aspects  (e.g.  time, power  or memory),
+which are  highly relevant in the  area of embedded  systems.  In this
+paper we  continue the  pursuit of quantitative  extensions of  MTS by
+presenting a novel extension of MTS with time durations being modelled
+as  controllable or  uncontrollable  intervals. We  further equip  the
+model with two kinds of  quantitative aspects: each action has its own
+running cost per  time unit, and actions may  require several hardware
+components of  different costs.   Thus, we ask  the question,  given a
+fixed budget  for the investment into the hardware components, what  is the implementation
+with the cheapest long-run average reward.
+
+\vspace{\smallskipamount}
+Before we  give a formal  definition of modal transition  systems with
+durations (MTSD) and the dual-price scheme, and provide algorithms for
+computing  optimal  implementations,  we  present  a  small  motivating
+example.
+
+\input{papers/lpar/motivating_example}
+
+\vspace{\smallskipamount}
+
+The most related work is~\cite{DBLP:conf/emsoft/ChakrabartiAHS03} where prices are introduced into a class of interface theories and long-run average objectives are discussed. Our work omits the issue of distinguishing input and output actions. Nevertheless, compared to~\cite{DBLP:conf/emsoft/ChakrabartiAHS03}, this paper deals with the time durations, the one-shot hardware investment and, most importantly, refinement of specifications. Further, timed automata have also been extended with prices~\cite{DBLP:conf/fmco/BehrmannLR04} and the long-run average reward has been computed in~\cite{DBLP:journals/fmsd/BouyerBL08}. However, priced timed automata lack the hardware and any notion of refinement, too.
+
+The paper is organized as follows. We introduce the MTS with the 
+time durations in Section~\ref{bmts} and 
+the dual-price scheme 
+%together with the problem of the cheapest implementation 
+in Section~\ref{prices}. Section~\ref{complexity} presents the main results on the complexity of the cheapest implementation problem. 
+First, we state the complexity of this problem in general and in an important special case and prove the hardness part. The algorithms proving the complexity upper bounds are presented only after introducing an extension of {mean payoff games with time durations}. These are needed to establish the results but are also interesting on their own as discussed in~Section~\ref{mpgd}.
+ We conclude and give some more account on related and future 
+ work in Section~\ref{concl}.
+
